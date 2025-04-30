@@ -1,4 +1,4 @@
-// bassit/internal/bass/display.go
+// Package bass bassit/internal/bass/display.go
 package bass
 
 import (
@@ -107,10 +107,10 @@ func RenderBassFretboard(bs *BassSimulator) {
 	// Draw the strings
 	for stringIdx, y := range stringYPosArray {
 		// Draw string names
-		drawText(bs.Screen, config.StringNameMarginLeft, y, bs.Strings[stringIdx].Name, tcell.StyleDefault.Foreground(tcell.ColorGreen))
+		drawText(bs.Screen, config.StringBaseNoteNameMarginLeft, y, bs.Strings[stringIdx].BaseNoteName, tcell.StyleDefault.Foreground(tcell.ColorGreen))
 
 		// Calculate the pressed fret position
-		pressedFret := bs.Strings[stringIdx].Pressed
+		pressedFret := bs.Strings[stringIdx].PressedFret
 		pressedFretXPos := -1
 		if pressedFret > 0 {
 			pressedFretXPos = int(math.Round(float64(fretXPosArray[pressedFret]+fretXPosArray[pressedFret-1]) / 2))
@@ -125,8 +125,15 @@ func RenderBassFretboard(bs *BassSimulator) {
 			}
 
 			char := config.StringChar
+			if bs.Strings[stringIdx].IsPlucked {
+				char = config.PluckedStringChar
+			}
 			if _, exists := fretXPosSet[x]; exists || x == fretboardStartX || x == fretboardEndX {
-				char = config.StringOverFretChar
+				if bs.Strings[stringIdx].IsPlucked {
+					char = config.PluckedStringOverFretChar
+				} else {
+					char = config.StringOverFretChar
+				}
 			}
 			bs.Screen.SetContent(x, y, char, nil, tcell.StyleDefault)
 		}

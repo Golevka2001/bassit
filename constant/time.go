@@ -1,4 +1,4 @@
-package config
+package constant
 
 var (
 	StringVibDurnMean = 300.0 // in ms

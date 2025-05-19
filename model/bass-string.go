@@ -29,11 +29,7 @@ func NewBassStringModel(baseNote note.Note) (*BassStringModel, error) {
 	fretToNote := make(map[int]note.Note)
 	fretToNote[0] = baseNote
 	for i := 1; i <= C.MaxFretCnt; i++ {
-		var err error
-		fretToNote[i], err = util.GetNoteStepFrom(fretToNote[i-1], 1)
-		if err != nil {
-			return nil, err
-		}
+		fretToNote[i] = util.GetNoteStepFrom(fretToNote[i-1], 1)
 	}
 
 	return &BassStringModel{
@@ -68,4 +64,11 @@ func (bsm *BassStringModel) ReleaseFret(fret int) {
 		// If no fret is pressed, set `CurValidFret` to 0 (open string)
 		bsm.CurValidFret = 0
 	}
+}
+
+func (bsm *BassStringModel) GetNoteToPlay() note.Note {
+	if bsm.CurValidFret == 0 {
+		return bsm.BaseNote
+	}
+	return bsm.FretToNote[bsm.CurValidFret]
 }

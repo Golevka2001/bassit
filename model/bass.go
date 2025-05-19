@@ -7,7 +7,7 @@ import (
 )
 
 type BassModel struct {
-	Strings []*BassStringModel
+	Strings []*BassStringModel // from highest to lowest
 }
 
 func NewBassModel(tuning []string) (*BassModel, error) {
@@ -24,6 +24,12 @@ func NewBassModel(tuning []string) (*BassModel, error) {
 	return &BassModel{
 		Strings: strings,
 	}, nil
+}
+
+func (bm *BassModel) GetLowestAndHighestNotes() (lowest, highest note.Note) {
+	lowest = bm.Strings[C.StringCnt-1].BaseNote
+	highest = bm.Strings[0].FretToNote[C.MaxFretCnt]
+	return
 }
 
 func (bm *BassModel) Press(pos C.PressedPos) {

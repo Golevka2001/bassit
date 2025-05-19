@@ -5,17 +5,17 @@ import (
 	"math/rand"
 	"time"
 
-	"bassit/config"
+	C "bassit/constant"
 )
 
 // GetVibDuration returns a random duration for string vibration
 func GetVibDuration() time.Duration {
-	duration := normalRand(config.StringVibDurnMean, config.StringVibDurStd)
+	duration := normalRand(C.StringVibDurnMean, C.StringVibDurStd)
 
-	if duration < config.StringVibDurnMin {
-		duration = config.StringVibDurnMin
-	} else if duration > config.StringVibDurMax {
-		duration = config.StringVibDurMax
+	if duration < C.StringVibDurnMin {
+		duration = C.StringVibDurnMin
+	} else if duration > C.StringVibDurMax {
+		duration = C.StringVibDurMax
 	}
 
 	return time.Duration(duration) * time.Millisecond

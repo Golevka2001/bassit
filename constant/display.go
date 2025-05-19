@@ -1,10 +1,16 @@
-package config
+package constant
 
-import "github.com/gdamore/tcell/v2"
+import (
+	"github.com/gdamore/tcell/v2"
+	"github.com/go-music-theory/music-theory/note"
+)
 
 var (
 	// DisplayedFretNum defines the number of frets to be displayed
 	DisplayedFretNum = 12
+
+	// AdjSymbolType defines how to display accidental notes
+	AdjSymbolType = note.Sharp // or note.Flat
 )
 
 /* Spacing properties */

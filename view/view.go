@@ -3,7 +3,7 @@ package view
 import (
 	"math"
 
-	"bassit/config"
+	"bassit/audio"
 	C "bassit/constant"
 	"bassit/model"
 	"bassit/util"
@@ -28,31 +28,36 @@ var (
 type View struct {
 	tcellScreen   tcell.Screen
 	bassModel     *model.BassModel
+	audioManager  *audio.AudioManager
 	width, height int
 }
 
-func NewView(screen tcell.Screen, bassModel *model.BassModel) View {
+func NewView(
+	screen tcell.Screen,
+	bassModel *model.BassModel,
+	audioManager *audio.AudioManager,
+) View {
 	screen.SetStyle(tcell.StyleDefault)
 	screen.Clear()
 
 	w, h := screen.Size()
 
-	borderStartX = config.FretboardMarginLeft
-	borderEndX = w - config.FretboardMarginRight
-	borderStartY = config.FretboardMarginTop
-	borderEndY = borderStartY + 2*config.StringMarginTop + (C.StringCnt-1)*config.StringSpacing
+	borderStartX = C.FretboardMarginLeft
+	borderEndX = w - C.FretboardMarginRight
+	borderStartY = C.FretboardMarginTop
+	borderEndY = borderStartY + 2*C.StringMarginTop + (C.StringCnt-1)*C.StringSpacing
 	fretboardLen = borderEndX - borderStartX
 
-	fretWireToX = make([]int, config.DisplayedFretNum+1)
+	fretWireToX = make([]int, C.DisplayedFretNum+1)
 	xToFretWire = make(map[int]int)
-	posMarkerToX = make([]int, config.DisplayedFretNum+1)
+	posMarkerToX = make([]int, C.DisplayedFretNum+1)
 	stringToY = make([]int, C.StringCnt)
 	yToString = make(map[int]int)
 
-	scaleFactor := float64(fretboardLen-config.NutWidth) / calcDn(config.DisplayedFretNum)
-	for fretWireIdx := 0; fretWireIdx <= config.DisplayedFretNum; fretWireIdx++ {
+	scaleFactor := float64(fretboardLen-C.NutWidth) / calcDn(C.DisplayedFretNum)
+	for fretWireIdx := 0; fretWireIdx <= C.DisplayedFretNum; fretWireIdx++ {
 		// Calculate the position of fret wires
-		x := calcFretWireXPos(fretWireIdx, scaleFactor, borderStartX+config.NutWidth)
+		x := calcFretWireXPos(fretWireIdx, scaleFactor, borderStartX+C.NutWidth)
 		fretWireToX[fretWireIdx] = x
 		xToFretWire[x] = fretWireIdx
 
@@ -65,19 +70,20 @@ func NewView(screen tcell.Screen, bassModel *model.BassModel) View {
 
 	// Calculate the position of strings
 	for stringIdx := 0; stringIdx < C.StringCnt; stringIdx++ {
-		y := borderStartY + config.StringMarginTop
+		y := borderStartY + C.StringMarginTop
 		if stringIdx > 0 {
-			y = stringToY[stringIdx-1] + config.StringSpacing
+			y = stringToY[stringIdx-1] + C.StringSpacing
 		}
 		stringToY[stringIdx] = y
 		yToString[y] = stringIdx
 	}
 
 	return View{
-		tcellScreen: screen,
-		bassModel:   bassModel,
-		width:       w,
-		height:      h,
+		tcellScreen:  screen,
+		bassModel:    bassModel,
+		audioManager: audioManager,
+		width:        w,
+		height:       h,
 	}
 }
 
@@ -96,45 +102,45 @@ func (v *View) drawBassFretboard() {
 	for x := borderStartX; x <= borderEndX; x++ {
 		for y := borderStartY; y <= borderEndY; y++ {
 			charToDraw := ' '
-			style := tcell.StyleDefault.Foreground(config.FretboardBorderColor).Background(config.FretboardBgColor)
+			style := tcell.StyleDefault.Foreground(C.FretboardBorderColor).Background(C.FretboardBgColor)
 
 			if x >= borderStartX && x < fretWireToX[0] {
 				// The nut
 				if y == borderStartY {
 					// The upper left corner
-					charToDraw = config.FretboardULCornerChar
+					charToDraw = C.FretboardULCornerChar
 				} else if y == borderEndY {
 					// The lower left corner
-					charToDraw = config.FretboardLLCornerChar
+					charToDraw = C.FretboardLLCornerChar
 				} else {
 					// The vertical border
-					charToDraw = config.FretboardVBorderChar
+					charToDraw = C.FretboardVBorderChar
 				}
 
-				style = tcell.StyleDefault.Foreground(config.NutBorderColor).Background(config.NutBgColor)
+				style = tcell.StyleDefault.Foreground(C.NutBorderColor).Background(C.NutBgColor)
 			} else if fretWireIdx, ok := xToFretWire[x]; ok {
 				// The fret wire
 				if y == borderStartY {
 					// Fret wire at the upper border
-					charToDraw = config.FretWireUpperChar
+					charToDraw = C.FretWireUpperChar
 				} else if y == borderEndY {
 					// Fret wire at the lower border
-					charToDraw = config.FretWireLowerChar
+					charToDraw = C.FretWireLowerChar
 				} else {
 					// The fret wire
-					charToDraw = config.FretWireChar
+					charToDraw = C.FretWireChar
 				}
 
 				if fretWireIdx == 0 {
 					// The right side of the nut
-					style = tcell.StyleDefault.Foreground(config.NutBorderColor).Background(config.NutBgColor)
+					style = tcell.StyleDefault.Foreground(C.NutBorderColor).Background(C.NutBgColor)
 				} else {
-					style = tcell.StyleDefault.Foreground(config.FretWireColor).Background(config.FretboardBgColor)
+					style = tcell.StyleDefault.Foreground(C.FretWireColor).Background(C.FretboardBgColor)
 				}
 			} else {
 				if y == borderStartY || y == borderEndY {
 					// The horizontal border
-					charToDraw = config.FretboardHBorderChar
+					charToDraw = C.FretboardHBorderChar
 				}
 			}
 
@@ -143,21 +149,21 @@ func (v *View) drawBassFretboard() {
 	}
 
 	// Draw the position markers
-	style := tcell.StyleDefault.Foreground(config.PosMarkerColor).Background(config.FretboardBgColor)
+	style := tcell.StyleDefault.Foreground(C.PosMarkerColor).Background(C.FretboardBgColor)
 	for posMarkerIdx, x := range posMarkerToX {
-		if posMarkerIdx > config.DisplayedFretNum {
+		if posMarkerIdx > C.DisplayedFretNum {
 			break
 		}
 
 		switch posMarkerIdx {
 		case 3, 5, 7, 9, 15, 17, 19, 21:
 			y := int(math.Round(float64(stringToY[1]+stringToY[2]) / 2)) // TODO: `StringNum` is regarded as 4
-			s.SetContent(x, y, config.PosMarkerChar, nil, style)
+			s.SetContent(x, y, C.PosMarkerChar, nil, style)
 		case 12, 24:
 			y1 := int(math.Round(float64(stringToY[0]+stringToY[1]) / 2))
 			y2 := int(math.Round(float64(stringToY[2]+stringToY[3]) / 2))
-			s.SetContent(x, y1, config.PosMarkerChar, nil, style)
-			s.SetContent(x, y2, config.PosMarkerChar, nil, style)
+			s.SetContent(x, y1, C.PosMarkerChar, nil, style)
+			s.SetContent(x, y2, C.PosMarkerChar, nil, style)
 		}
 	}
 }
@@ -170,9 +176,9 @@ func (v *View) drawBassStrings() {
 		curString := b.Strings[stringIdx]
 
 		// Draw base note names
-		noteNameStyle := tcell.StyleDefault.Foreground(config.BaseNoteNameFgColor).Background(config.BaseNoteNameBgColor)
+		noteNameStyle := tcell.StyleDefault.Foreground(C.BaseNoteNameFgColor).Background(C.BaseNoteNameBgColor)
 		noteName := util.GetNoteNameWithOctave(curString.BaseNote)
-		v.DrawLineText(config.StringBaseNoteNameMarginLeft, y, noteName, noteNameStyle)
+		v.DrawLineText(C.StringBaseNoteNameMarginLeft, y, noteName, noteNameStyle)
 
 		// Draw string lines
 		rightMostPressedPos := -1
@@ -186,44 +192,44 @@ func (v *View) drawBassStrings() {
 				isVibrating = true
 			}
 
-			charToDraw := config.StringChar
+			charToDraw := C.StringChar
 			if isVibrating {
-				charToDraw = config.VibratingStringChar
+				charToDraw = C.VibratingStringChar
 			}
 			if _, ok := xToFretWire[x]; ok || x == borderStartX {
-				charToDraw = config.StringOverFretChar
+				charToDraw = C.StringOverFretChar
 				if isVibrating {
-					charToDraw = config.VibratingStringOverFretChar
+					charToDraw = C.VibratingStringOverFretChar
 				}
 			}
 
 			_, _, originStyle, _ := s.GetContent(x, y)
-			stringStyle := originStyle.Foreground(config.StringColor)
+			stringStyle := originStyle.Foreground(C.StringColor)
 			s.SetContent(x, y, charToDraw, nil, stringStyle)
 		}
 
 		// Draw pressed fret signs
 		for fretIdx := curString.CurValidFret; fretIdx > 0; fretIdx-- {
-			if fretIdx > config.DisplayedFretNum {
+			if fretIdx > C.DisplayedFretNum {
 				continue
 			}
 
 			if curString.FretPressedStates[fretIdx] {
-				charToDraw := config.PressedFretSignChar
+				charToDraw := C.PressedFretSignChar
 				x := int(math.Round(float64(fretWireToX[fretIdx-1]+fretWireToX[fretIdx]) / 2))
 				y := stringToY[stringIdx]
-				style := tcell.StyleDefault.Foreground(config.PressedFretSignColor).Background(config.FretboardBgColor)
+				style := tcell.StyleDefault.Foreground(C.PressedFretSignColor).Background(C.FretboardBgColor)
 				s.SetContent(x, y, charToDraw, nil, style)
 			}
 		}
 
 		// Draw plucked string signs
-		x := v.width - config.PluckedStringSignMarginRight
-		style := tcell.StyleDefault.Foreground(config.StringColor).Background(config.FretboardBgColor)
+		x := v.width - C.PluckedStringSignMarginRight
+		style := tcell.StyleDefault.Foreground(C.StringColor).Background(C.FretboardBgColor)
 		if curString.PluckedState {
-			style = style.Foreground(config.PluckedStringSignColor)
+			style = style.Foreground(C.PluckedStringSignColor)
 		}
-		s.SetContent(x, y, config.PluckedStringSignChar, nil, style)
+		s.SetContent(x, y, C.PluckedStringSignChar, nil, style)
 	}
 }
 

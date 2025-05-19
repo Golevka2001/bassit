@@ -15,6 +15,10 @@ func (v *View) HandleKeyEvent(event hook.Event) {
 		if event.Kind == hook.KeyDown {
 			v.bassModel.Pluck(pluckedString)
 
+			// Play corresponding sound
+			curString := v.bassModel.Strings[pluckedString]
+			go v.audioManager.PlayBassNote(curString.GetNoteToPlay())
+
 			// Release the pluck and refresh the view after a short delay
 			go func() {
 				time.Sleep(util.GetVibDuration())

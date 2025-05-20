@@ -3,19 +3,18 @@ package audio
 import (
 	"bytes"
 	"fmt"
-	"io"
-	"math"
 	"os"
+	"os/exec"
 	"time"
 
+	// "bassit/audio/wav"
 	C "bassit/constant"
 	"bassit/util"
 
-	"github.com/200sc/klangsynthese/audio"
-	"github.com/200sc/klangsynthese/audio/filter"
 	"github.com/ebitengine/oto/v3"
 	"github.com/go-music-theory/music-theory/note"
-	"github.com/hajimehoshi/go-mp3"
+	"github.com/hajimehoshi/ebiten/v2/audio/wav"
+	// "github.com/hajimehoshi/go-mp3"
 )
 
 type AudioManager struct {
@@ -28,7 +27,7 @@ func NewAudioManager(lowestNote, highestNote note.Note) (*AudioManager, error) {
 	op := &oto.NewContextOptions{
 		SampleRate:   C.SampleRate,
 		ChannelCount: C.ChannelCount,
-		Format:       oto.FormatSignedInt16LE, // `go-mp3`'s format is signed 16bit integers
+		Format:       oto.FormatSignedInt16LE,
 	}
 
 	otoCtx, readyChan, err := oto.NewContext(op)
@@ -43,70 +42,22 @@ func NewAudioManager(lowestNote, highestNote note.Note) (*AudioManager, error) {
 		noteNameToPlayer: make(map[string]*oto.Player),
 	}
 
-	// am.genAllPossibleNotes(highestNote, lowestNote)
+	genAllPossibleNotes(lowestNote, highestNote)
+	am.loadNoteSamples(lowestNote, highestNote)
+
 	return am, nil
 }
 
 func (am *AudioManager) PlayBassNote(n note.Note) {
-	// noteName := util.GetNoteNameWithOctave(n)
+	noteName := util.GetNoteNameWithOctave(n)
 
-	// player, ok := am.noteNameToPlayer[noteName]
-	// if !ok {
-	// 	return
-	// }
-	// // Reset the player to the beginning
-	// player.Seek(0, 0)
-
-	// player.Play()
-
-	// for player.IsPlaying() {
-	// 	time.Sleep(time.Millisecond)
-	// }
-	file, err := os.Open(C.SrcBassSampleFilePath)
-	if err != nil {
-		// return err
+	player, ok := am.noteNameToPlayer[noteName]
+	if !ok {
+		return
 	}
-	defer file.Close()
-
-	// Decode MP3 to raw PCM
-	decMp3, err := mp3.NewDecoder(file)
-	if err != nil {
-		// return err
-	}
-
-	decPCM := make([]byte, decMp3.Length())
-	_, err = io.ReadFull(decMp3, decPCM)
-	if err != nil {
-		// return err
-	}
-
-	// Wrap decoded data for pitch shifting
-	baseEnc := audio.Encoding{
-		Data: decPCM,
-		Format: audio.Format{
-			SampleRate: uint32(C.SampleRate),
-			Channels:   uint16(C.ChannelCount),
-			Bits:       uint16(C.BitDepth),
-		},
-		CanLoop: audio.CanLoop{Loop: false},
-	}
-
-	// Set up pitch shifter
-	shifter, err := filter.NewFFTShifter(C.ShifterFFTFrameSize, C.ShifterOverSampleFactor)
-	if err != nil {
-		// return err
-	}
-
-	baseNote := *note.Named(C.SrcBassSampleNoteName)
-	step := util.GetStepBetween(baseNote, n)
-	encoder := shifter.PitchShift(math.Pow(2, float64(step)/12))
-	encoder(&baseEnc)
-
-	player := am.otoCtx.NewPlayer(bytes.NewReader(baseEnc.Data))
-	if player == nil {
-		// return fmt.Errorf("failed to create player for note %s", noteName)
-	}
-	defer player.Close()
+	// Reset the player to the beginning
+	player.Pause()
+	player.Seek(0, 0)
 
 	player.Play()
 
@@ -115,119 +66,171 @@ func (am *AudioManager) PlayBassNote(n note.Note) {
 	}
 }
 
-func (am *AudioManager) genAllPossibleNotes(lowestNote, highestNote note.Note) error {
-	file, err := os.Open(C.SrcBassSampleFilePath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	// Decode MP3 to raw PCM
-	decMp3, err := mp3.NewDecoder(file)
-	if err != nil {
-		return err
-	}
-
-	decPCM := make([]byte, decMp3.Length())
-	_, err = io.ReadFull(decMp3, decPCM)
-	if err != nil {
-		return err
-	}
-
-	// Wrap decoded data for pitch shifting
-	baseEnc := audio.Encoding{
-		Data: decPCM,
-		Format: audio.Format{
-			SampleRate: uint32(C.SampleRate),
-			Channels:   uint16(C.ChannelCount),
-			Bits:       uint16(C.BitDepth),
-		},
-		CanLoop: audio.CanLoop{Loop: false},
-	}
-
-	// Set up pitch shifter
-	shifter, err := filter.NewFFTShifter(C.ShifterFFTFrameSize, C.ShifterOverSampleFactor)
-	if err != nil {
-		return err
-	}
-
+func genAllPossibleNotes(lowestNote, highestNote note.Note) error {
 	// Shift up
+	lastNote := *note.Named(C.SrcBassSampleNoteName)
 	for {
-		baseNote := *note.Named(C.SrcBassSampleNoteName)
-		step := util.GetStepBetween(baseNote, highestNote)
-		for i := 0; i <= min(step, 12); i++ {
-			curNote := util.GetNoteStepFrom(baseNote, i)
-			curNoteName := util.GetNoteNameWithOctave(curNote)
+		curNote := util.GetNoteStepFrom(lastNote, 1)
+		curNoteName := util.GetNoteNameWithOctave(curNote)
 
-			encoder := shifter.PitchShift(C.ShiftUpFactors[i])
-			encoder(&baseEnc)
+		// srcFilePath := fmt.Sprintf("%s%s.mp3", C.NoteSampleDir, util.GetNoteNameWithOctave(lastNote))
+		// dstFilePath := fmt.Sprintf("%s%s.mp3", C.NoteSampleDir, curNoteName)
+		srcFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, util.GetNoteNameWithOctave(lastNote))
+		dstFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, curNoteName)
 
-			// Create a new player
-			player := am.otoCtx.NewPlayer(bytes.NewReader(baseEnc.Data))
-			if player == nil {
-				return fmt.Errorf("failed to create player for note %s", curNoteName)
+		_, err := os.Stat(dstFilePath)
+		if err == nil {
+			// File already exists
+			if curNoteName == util.GetNoteNameWithOctave(highestNote) {
+				break
 			}
 
-			// Store the player in the map
-			am.noteNameToPlayer[curNoteName] = player
-
-			if i == 12 {
-				baseNote = curNote
-			} else {
-				baseEnc.Data = decPCM // Reset to the original PCM data for the next iteration
-			}
+			lastNote = curNote
+			continue
 		}
-		if step < 12 {
+
+		var cmd *exec.Cmd
+		switch C.OS {
+		case "windows":
+			cmd = exec.Command("powershell", C.RubberBandPathForWindows, "-p", "1.0", "--fine", srcFilePath, dstFilePath)
+		case "darwin":
+			cmd = exec.Command("osascript", "-e", fmt.Sprintf("tell application \"Terminal\" to do script \"%s -p 1.0 --fine %s %s\"", C.RubberBandPathForDarwin, srcFilePath, dstFilePath))
+		}
+		if cmd == nil {
+			return fmt.Errorf("unsupported OS: %s", C.OS)
+		}
+
+		err = cmd.Run()
+		if err != nil {
+			return err
+		}
+
+		if curNoteName == util.GetNoteNameWithOctave(highestNote) {
 			break
 		}
+
+		lastNote = curNote
 	}
 
 	// Shift down
+	lastNote = *note.Named(C.SrcBassSampleNoteName)
 	for {
-		baseNote := *note.Named(C.SrcBassSampleNoteName)
-		step := util.GetStepBetween(baseNote, lowestNote)
-		for i := 0; i <= min(step, 12); i++ {
-			curNote := util.GetNoteStepFrom(baseNote, -i)
-			curNoteName := util.GetNoteNameWithOctave(curNote)
+		curNote := util.GetNoteStepFrom(lastNote, -1)
+		curNoteName := util.GetNoteNameWithOctave(curNote)
 
-			encoder := shifter.PitchShift(C.ShiftDownFactors[i])
-			encoder(&baseEnc)
+		// srcFilePath := fmt.Sprintf("%s%s.mp3", C.NoteSampleDir, util.GetNoteNameWithOctave(lastNote))
+		// dstFilePath := fmt.Sprintf("%s%s.mp3", C.NoteSampleDir, curNoteName)
+		srcFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, util.GetNoteNameWithOctave(lastNote))
+		dstFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, curNoteName)
 
-			// Create a new player
-			player := am.otoCtx.NewPlayer(bytes.NewReader(baseEnc.Data))
-			if player == nil {
-				return fmt.Errorf("failed to create player for note %s", curNoteName)
+		_, err := os.Stat(dstFilePath)
+		if err == nil {
+			// File already exists
+			if curNoteName == util.GetNoteNameWithOctave(lowestNote) {
+				break
 			}
 
-			// Store the player in the map
-			am.noteNameToPlayer[curNoteName] = player
-
-			if i == 12 {
-				baseNote = curNote
-			} else {
-				baseEnc.Data = decPCM // Reset to the original PCM data for the next iteration
-			}
+			lastNote = curNote
+			continue
 		}
-		if step < 12 {
+
+		var cmd *exec.Cmd
+		switch C.OS {
+		case "windows":
+			cmd = exec.Command("powershell", C.RubberBandPathForWindows, "-p", "-1.0", "--fine", srcFilePath, dstFilePath)
+		case "darwin":
+			cmd = exec.Command("osascript", "-e", fmt.Sprintf("tell application \"Terminal\" to do script \"%s -p -1.0 --fine %s %s\"", C.RubberBandPathForDarwin, srcFilePath, dstFilePath))
+		}
+		if cmd == nil {
+			return fmt.Errorf("unsupported OS: %s", C.OS)
+		}
+
+		err = cmd.Run()
+		if err != nil {
+			return err
+		}
+
+		if curNoteName == util.GetNoteNameWithOctave(lowestNote) {
 			break
 		}
+
+		lastNote = curNote
 	}
 
 	return nil
 }
 
-func loadMp3File(filePath string) (*mp3.Decoder, error) {
-	fileBytes, err := os.ReadFile(filePath)
-	if err != nil {
-		return nil, err
+func (am *AudioManager) loadNoteSamples(lowestNote, highestNote note.Note) {
+	// curNote := lowestNote
+	// curNoteName := util.GetNoteNameWithOctave(curNote)
+	// for {
+	// 	nextNoteName := util.GetNoteNameWithOctave(util.GetNoteStepFrom(curNote, 1))
+	// 	if nextNoteName == util.GetNoteNameWithOctave(highestNote) {
+	// 		break
+	// 	}
+
+	// 	filePath := fmt.Sprintf("%s%s.mp3", C.NoteSampleDir, curNoteName)
+
+	// 	// Read the file into memory
+	// 	fileBytes, err := os.ReadFile(filePath)
+	// 	if err != nil {
+	// 		curNote = util.GetNoteStepFrom(curNote, 1)
+	// 		curNoteName = util.GetNoteNameWithOctave(curNote)
+	// 		continue
+	// 	}
+	// 	// Convert the pure bytes into a reader object
+	// 	fileBytesReader := bytes.NewReader(fileBytes)
+	// 	// Decode file
+	// 	decodedMP3, err := mp3.NewDecoder(fileBytesReader)
+	// 	if err != nil {
+	// 		curNote = util.GetNoteStepFrom(curNote, 1)
+	// 		curNoteName = util.GetNoteNameWithOctave(curNote)
+	// 		continue
+	// 	}
+
+	// 	// Create a new 'player' that will handle our sound. Paused by default.
+	// 	player := am.otoCtx.NewPlayer(decodedMP3)
+	// 	am.noteNameToPlayer[curNoteName] = player
+
+	// 	// Store to the map
+	// 	curNote = util.GetNoteStepFrom(curNote, 1)
+	// 	curNoteName = util.GetNoteNameWithOctave(curNote)
+	// }
+
+	curNote := lowestNote
+	curNoteName := util.GetNoteNameWithOctave(curNote)
+	for {
+		nextNoteName := util.GetNoteNameWithOctave(util.GetNoteStepFrom(curNote, 1))
+		if nextNoteName == util.GetNoteNameWithOctave(highestNote) {
+			break
+		}
+
+		filePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, curNoteName)
+
+		// Read the file into memory
+		fileBytes, err := os.ReadFile(filePath)
+		if err != nil {
+			curNote = util.GetNoteStepFrom(curNote, 1)
+			curNoteName = util.GetNoteNameWithOctave(curNote)
+			continue
+		}
+		// Convert the pure bytes into a reader object
+		fileBytesReader := bytes.NewReader(fileBytes)
+		// Decode file
+		// decodedWav, err := wav.NewDecoder(fileBytesReader)
+		decodedWav, err := wav.DecodeWithoutResampling(fileBytesReader)
+		if err != nil {
+			curNote = util.GetNoteStepFrom(curNote, 1)
+			curNoteName = util.GetNoteNameWithOctave(curNote)
+			continue
+		}
+
+		// Create a new 'player' that will handle our sound. Paused by default.
+		player := am.otoCtx.NewPlayer(decodedWav)
+		am.noteNameToPlayer[curNoteName] = player
+
+		// Store to the map
+		curNote = util.GetNoteStepFrom(curNote, 1)
+		curNoteName = util.GetNoteNameWithOctave(curNote)
 	}
-
-	fileBytesReader := bytes.NewReader(fileBytes)
-
-	decodedMp3, err := mp3.NewDecoder(fileBytesReader)
-	if err != nil {
-		return nil, err
-	}
-
-	return decodedMp3, nil
 }

@@ -3,8 +3,9 @@ package app
 import (
 	"fmt"
 	"os"
+	"runtime"
 
-	"bassit/audio"
+	baudio "bassit/audio"
 	C "bassit/constant"
 	"bassit/model"
 	"bassit/util"
@@ -12,13 +13,11 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	hook "github.com/robotn/gohook"
-	"github.com/shirou/gopsutil/host"
 )
 
 func Run() {
-	// Get OS information
-	platform, _, _, _ := host.PlatformInformation()
-	C.OS = platform
+	// Detect OS
+	C.OS = runtime.GOOS
 
 	util.MapRawcodeToPressedPos()
 	util.MapRawcodeToPluckedString()
@@ -42,7 +41,7 @@ func Run() {
 		os.Exit(1)
 	}
 
-	am, err := audio.NewAudioManager(bm.GetLowestAndHighestNotes())
+	am, err := baudio.NewAudioManager(bm.GetLowestAndHighestNotes())
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, "Failed to create audio manager:", err)
 		os.Exit(1)

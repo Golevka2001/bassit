@@ -28,7 +28,7 @@ func NewBassModel(tuning []string) (*BassModel, error) {
 
 func (bm *BassModel) GetLowestAndHighestNotes() (lowest, highest note.Note) {
 	lowest = bm.Strings[C.StringCnt-1].BaseNote
-	highest = bm.Strings[0].FretToNote[C.MaxFretCnt]
+	highest = bm.Strings[0].FretToNote[C.DisplayedFretNum]
 	return
 }
 

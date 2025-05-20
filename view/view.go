@@ -3,7 +3,7 @@ package view
 import (
 	"math"
 
-	"bassit/audio"
+	baudio "bassit/audio"
 	C "bassit/constant"
 	"bassit/model"
 	"bassit/util"
@@ -28,14 +28,14 @@ var (
 type View struct {
 	tcellScreen   tcell.Screen
 	bassModel     *model.BassModel
-	audioManager  *audio.AudioManager
+	audioManager  *baudio.AudioManager
 	width, height int
 }
 
 func NewView(
 	screen tcell.Screen,
 	bassModel *model.BassModel,
-	audioManager *audio.AudioManager,
+	audioManager *baudio.AudioManager,
 ) View {
 	screen.SetStyle(tcell.StyleDefault)
 	screen.Clear()

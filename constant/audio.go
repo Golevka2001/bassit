@@ -1,46 +1,14 @@
 package constant
 
 var (
-	SampleRate   = 44100 // in Hz
+	SampleRate   = 48000 // in Hz
 	ChannelCount = 2     // stereo, or 1 for mono
-	BitDepth     = 16    // in bits
+	// BitDepth     = 24    // in bits
 )
 
 var (
-	SrcBassSampleFilePath = "assets/audio/bass-guitar_c2-raw-101274.mp3"
-	SrcBassSampleNoteName = "C2"
-
-	ShifterFFTFrameSize     = 1024
-	ShifterOverSampleFactor = 32
-
-	ShiftUpFactors = [13]float64{
-		1.0,
-		1.059463094, // 2^(1/12)
-		1.122462048, // 2^(2/12)
-		1.189207115, // 2^(3/12)
-		1.259921050, // 2^(4/12)
-		1.334839854, // 2^(5/12)
-		1.414213562, // 2^(6/12)
-		1.498307077, // 2^(7/12)
-		1.587401052, // 2^(8/12)
-		1.681792831, // 2^(9/12)
-		1.781797436, // 2^(10/12)
-		1.887748625, // 2^(11/12)
-		2.0,         // 2^(12/12)
-	}
-	ShiftDownFactors = [13]float64{
-		1.0,          // 2^(-0/12)
-		0.9438743127, // 2^(-1/12)
-		0.8908987181, // 2^(-2/12)
-		0.8408964153, // 2^(-3/12)
-		0.7937005260, // 2^(-4/12)
-		0.7491535384, // 2^(-5/12)
-		0.7071067812, // 2^(-6/12)
-		0.6674199271, // 2^(-7/12)
-		0.6299605249, // 2^(-8/12)
-		0.5946035575, // 2^(-9/12)
-		0.5612310242, // 2^(-10/12)
-		0.5297315472, // 2^(-11/12)
-		0.5,          // 2^(-12/12)
-	}
+	RubberBandPathForWindows = "assets/3rdparty/rubberband-4.0.0-gpl-executable-windows/rubberband-r3.exe"
+	RubberBandPathForDarwin  = "assets/3rdparty/rubberband-4.0.0-gpl-executable-macos/rubberband-r3"
+	NoteSampleDir            = "assets/audio/note/"
+	SrcBassSampleNoteName    = "C2"
 )

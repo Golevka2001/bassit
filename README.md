@@ -2,6 +2,19 @@
 
 `Bassit` is the bass in the terminal
 
+## Prerequisites
+
+### MacOS
+
+EN: Grant execute permission to `Rubber Band Library` binary file
+
+```sh
+cd /path/to/bassit
+chmod +x assets/3rdparty/rubberband-4.0.0-gpl-executable-macos/rubberband*
+# Check if the permission is `-rwxr-xr-x`
+ls -l assets/3rdparty/rubberband-4.0.0-gpl-executable-macos/rubberband*
+```
+
 ## 3rd Party Libraries & Assets
 
 - [Rubber Band Library](https://breakfastquay.com/rubberband/)

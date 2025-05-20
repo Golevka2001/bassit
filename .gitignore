@@ -10,6 +10,7 @@ assets/audio/note/*
 *.dll
 *.so
 *.dylib
+bassit
 
 # Test binary, built with `go test -c`
 *.test

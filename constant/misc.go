@@ -1,5 +1,5 @@
 package constant
 
 var (
-	OS = "unknown"
+    OS = "unknown"
 )

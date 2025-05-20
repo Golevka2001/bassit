@@ -1,20 +1,18 @@
 package audio
 
 import (
-    "bytes"
-    "fmt"
-    "os"
-    "os/exec"
-    "time"
+	"bytes"
+	"fmt"
+	"os"
+	"os/exec"
+	"time"
 
-    // "bassit/audio/wav"
-    C "bassit/constant"
-    "bassit/util"
+	C "bassit/constant"
+	"bassit/util"
 
-    "github.com/ebitengine/oto/v3"
-    "github.com/go-music-theory/music-theory/note"
-    "github.com/hajimehoshi/ebiten/v2/audio/wav"
-    // "github.com/hajimehoshi/go-mp3"
+	"github.com/ebitengine/oto/v3"
+	"github.com/go-music-theory/music-theory/note"
+	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 )
 
 type AudioManager struct {
@@ -73,8 +71,6 @@ func genAllPossibleNotes(lowestNote, highestNote note.Note) error {
         curNote := util.GetNoteStepFrom(lastNote, 1)
         curNoteName := util.GetNoteNameWithOctave(curNote)
 
-        // srcFilePath := fmt.Sprintf("%s%s.mp3", C.NoteSampleDir, util.GetNoteNameWithOctave(lastNote))
-        // dstFilePath := fmt.Sprintf("%s%s.mp3", C.NoteSampleDir, curNoteName)
         srcFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, util.GetNoteNameWithOctave(lastNote))
         dstFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, curNoteName)
 
@@ -94,7 +90,7 @@ func genAllPossibleNotes(lowestNote, highestNote note.Note) error {
         case "windows":
             cmd = exec.Command("powershell", C.RubberBandPathForWindows, "-p", "1.0", "--fine", srcFilePath, dstFilePath)
         case "darwin":
-            cmd = exec.Command("osascript", "-e", fmt.Sprintf("tell application \"Terminal\" to do script \"%s -p 1.0 --fine %s %s\"", C.RubberBandPathForDarwin, srcFilePath, dstFilePath))
+            cmd = exec.Command(C.RubberBandPathForDarwin, "-p", "1.0", "--fine", srcFilePath, dstFilePath)
         }
         if cmd == nil {
             return fmt.Errorf("unsupported OS: %s", C.OS)
@@ -118,8 +114,6 @@ func genAllPossibleNotes(lowestNote, highestNote note.Note) error {
         curNote := util.GetNoteStepFrom(lastNote, -1)
         curNoteName := util.GetNoteNameWithOctave(curNote)
 
-        // srcFilePath := fmt.Sprintf("%s%s.mp3", C.NoteSampleDir, util.GetNoteNameWithOctave(lastNote))
-        // dstFilePath := fmt.Sprintf("%s%s.mp3", C.NoteSampleDir, curNoteName)
         srcFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, util.GetNoteNameWithOctave(lastNote))
         dstFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, curNoteName)
 
@@ -139,7 +133,7 @@ func genAllPossibleNotes(lowestNote, highestNote note.Note) error {
         case "windows":
             cmd = exec.Command("powershell", C.RubberBandPathForWindows, "-p", "-1.0", "--fine", srcFilePath, dstFilePath)
         case "darwin":
-            cmd = exec.Command("osascript", "-e", fmt.Sprintf("tell application \"Terminal\" to do script \"%s -p -1.0 --fine %s %s\"", C.RubberBandPathForDarwin, srcFilePath, dstFilePath))
+            cmd = exec.Command(C.RubberBandPathForDarwin, "-p", "-1.0", "--fine", srcFilePath, dstFilePath)
         }
         if cmd == nil {
             return fmt.Errorf("unsupported OS: %s", C.OS)
@@ -161,42 +155,6 @@ func genAllPossibleNotes(lowestNote, highestNote note.Note) error {
 }
 
 func (am *AudioManager) loadNoteSamples(lowestNote, highestNote note.Note) {
-    // curNote := lowestNote
-    // curNoteName := util.GetNoteNameWithOctave(curNote)
-    // for {
-    // 	nextNoteName := util.GetNoteNameWithOctave(util.GetNoteStepFrom(curNote, 1))
-    // 	if nextNoteName == util.GetNoteNameWithOctave(highestNote) {
-    // 		break
-    // 	}
-
-    // 	filePath := fmt.Sprintf("%s%s.mp3", C.NoteSampleDir, curNoteName)
-
-    // 	// Read the file into memory
-    // 	fileBytes, err := os.ReadFile(filePath)
-    // 	if err != nil {
-    // 		curNote = util.GetNoteStepFrom(curNote, 1)
-    // 		curNoteName = util.GetNoteNameWithOctave(curNote)
-    // 		continue
-    // 	}
-    // 	// Convert the pure bytes into a reader object
-    // 	fileBytesReader := bytes.NewReader(fileBytes)
-    // 	// Decode file
-    // 	decodedMP3, err := mp3.NewDecoder(fileBytesReader)
-    // 	if err != nil {
-    // 		curNote = util.GetNoteStepFrom(curNote, 1)
-    // 		curNoteName = util.GetNoteNameWithOctave(curNote)
-    // 		continue
-    // 	}
-
-    // 	// Create a new 'player' that will handle our sound. Paused by default.
-    // 	player := am.otoCtx.NewPlayer(decodedMP3)
-    // 	am.noteNameToPlayer[curNoteName] = player
-
-    // 	// Store to the map
-    // 	curNote = util.GetNoteStepFrom(curNote, 1)
-    // 	curNoteName = util.GetNoteNameWithOctave(curNote)
-    // }
-
     curNote := lowestNote
     curNoteName := util.GetNoteNameWithOctave(curNote)
     for {

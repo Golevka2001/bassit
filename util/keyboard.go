@@ -1,32 +1,32 @@
 package util
 
 import (
-    C "bassit/constant"
+	C "bassit/constant"
 )
 
 func MapRawcodeToPressedPos() {
-    for stringIdx, keyMap := range C.KeyToPressedPos {
-        for key, fretIdx := range keyMap {
-            rawcode, ok := C.KeyToRawcode[key]
-            if !ok {
-                continue
-            }
+	for stringIdx, keyMap := range C.KeyToPressedPos {
+		for key, fretIdx := range keyMap {
+			rawcode, ok := C.KeyToRawcode[key]
+			if !ok {
+				continue
+			}
 
-            C.RawcodeToPressedPos[rawcode] = C.PressedPos{
-                String: stringIdx,
-                Fret:   fretIdx,
-            }
-        }
-    }
+			C.RawcodeToPressedPos[rawcode] = C.PressedPos{
+				String: stringIdx,
+				Fret:   fretIdx,
+			}
+		}
+	}
 }
 
 func MapRawcodeToPluckedString() {
-    for key, stringIdx := range C.KeyToPluckedString {
-        rawcode, ok := C.KeyToRawcode[key]
-        if !ok {
-            continue
-        }
+	for key, stringIdx := range C.KeyToPluckedString {
+		rawcode, ok := C.KeyToRawcode[key]
+		if !ok {
+			continue
+		}
 
-        C.RawcodeToPluckedString[rawcode] = stringIdx
-    }
+		C.RawcodeToPluckedString[rawcode] = stringIdx
+	}
 }

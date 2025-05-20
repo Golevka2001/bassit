@@ -1,11 +1,11 @@
 package util
 
 import (
-    "fmt"
+	"fmt"
 
-    C "bassit/constant"
+	C "bassit/constant"
 
-    "github.com/go-music-theory/music-theory/note"
+	"github.com/go-music-theory/music-theory/note"
 )
 
 // GetNoteStepFrom returns the note that is `inc` steps away from the given note
@@ -14,19 +14,19 @@ import (
 //   - from: the starting note
 //   - inc: the number of steps to move (can be negative)
 func GetNoteStepFrom(from note.Note, inc int) note.Note {
-    if inc == 0 {
-        return from
-    }
+	if inc == 0 {
+		return from
+	}
 
-    class, octave := from.Class.Step(inc)
+	class, octave := from.Class.Step(inc)
 
-    target := from
-    target.Class = class
-    target.Octave += octave // NOTE: `octave` is how may octaves to shift
+	target := from
+	target.Class = class
+	target.Octave += octave // NOTE: `octave` is how may octaves to shift
 
-    // TODO: Do other properties need to be updated?
+	// TODO: Do other properties need to be updated?
 
-    return target
+	return target
 }
 
 // GetStepBetween returns the number of steps between two notes
@@ -34,12 +34,12 @@ func GetNoteStepFrom(from note.Note, inc int) note.Note {
 //   - positive if `to` is higher than `from`
 //   - negative if `to` is lower than `from`
 func GetStepBetween(from, to note.Note) int {
-    OctaveDiff := int(to.Octave - from.Octave)
-    StepDiff := int(to.Class - from.Class)
-    return StepDiff + OctaveDiff*12
+	OctaveDiff := int(to.Octave - from.Octave)
+	StepDiff := int(to.Class - from.Class)
+	return StepDiff + OctaveDiff*12
 }
 
 // GetNoteNameWithOctave returns the note name with octave (e.g., "A2", "C#3")
 func GetNoteNameWithOctave(note note.Note) string {
-    return fmt.Sprintf("%s%d", note.Class.String(C.AdjSymbolType), note.Octave)
+	return fmt.Sprintf("%s%d", note.Class.String(C.AdjSymbolType), note.Octave)
 }

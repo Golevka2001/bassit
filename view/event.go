@@ -19,14 +19,15 @@ func (v *View) HandleKeyEvent(event hook.Event) {
 			v.drawPluckedString(pluckedStringIdx)
 
 			// Play corresponding sound
-			curString := v.bassModel.Strings[pluckedStringIdx]
-			go v.audioManager.PlayBassNote(curString.GetNoteToPlay())
+			curNote := v.bassModel.Strings[pluckedStringIdx].GetNoteToPlay()
+			go v.audioManager.PlayBassNote(curNote)
 
 			// Release the pluck and refresh the view after a short delay
 			go func() {
 				time.Sleep(util.GetVibDuration())
 				v.bassModel.ReleasePluck(pluckedStringIdx)
 				v.restorePluckedString(pluckedStringIdx)
+				v.audioManager.StopBassNote(curNote)
 			}()
 		}
 		return
@@ -38,6 +39,7 @@ func (v *View) HandleKeyEvent(event hook.Event) {
 		pressedString := v.bassModel.Strings[pressedPos.String]
 		if pressedString.PluckedState && pressedPos.Fret >= pressedString.CurValidFret {
 			v.restorePluckedString(pressedPos.String)
+			v.audioManager.StopBassNote(pressedString.GetNoteToPlay())
 		}
 
 		if event.Kind == hook.KeyDown {

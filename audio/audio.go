@@ -64,6 +64,19 @@ func (am *AudioManager) PlayBassNote(n note.Note) {
 	}
 }
 
+func (am *AudioManager) StopBassNote(n note.Note) {
+	// FIXME: When the same note is played at different positions (e.g. (0,2) and (1,7) are both A2), this function stops both of them.
+	// One possible solution is to assign a unique player to each position, but this would consume more memory and introduce noise.
+	noteName := util.GetNoteNameWithOctave(n)
+
+	player, ok := am.noteNameToPlayer[noteName]
+	if !ok {
+		return
+	}
+	player.Pause()
+	player.Seek(0, 0)
+}
+
 func genAllPossibleNotes(lowestNote, highestNote note.Note) error {
 	// Shift up
 	lastNote := *note.Named(C.SrcBassSampleNoteName)

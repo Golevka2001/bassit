@@ -87,7 +87,7 @@ func runEventLoop(s tcell.Screen, v view.View) {
 				return
 			}
 
-			v.HandleKeyEvent(ev)
+			go v.HandleKeyEvent(ev)
 		}
 	}
 }

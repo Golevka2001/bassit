@@ -104,6 +104,8 @@ func genAllPossibleNotes(lowestNote, highestNote note.Note) error {
 			cmd = exec.Command("powershell", C.RubberBandPathForWindows, "-p", "1.0", "--fine", srcFilePath, dstFilePath)
 		case "darwin":
 			cmd = exec.Command(C.RubberBandPathForDarwin, "-p", "1.0", "--fine", srcFilePath, dstFilePath)
+		default:
+			cmd = exec.Command("rubberband", "-p", "1.0", "--fine", srcFilePath, dstFilePath)
 		}
 		if cmd == nil {
 			return fmt.Errorf("unsupported OS: %s", C.OS)
@@ -147,6 +149,8 @@ func genAllPossibleNotes(lowestNote, highestNote note.Note) error {
 			cmd = exec.Command("powershell", C.RubberBandPathForWindows, "-p", "-1.0", "--fine", srcFilePath, dstFilePath)
 		case "darwin":
 			cmd = exec.Command(C.RubberBandPathForDarwin, "-p", "-1.0", "--fine", srcFilePath, dstFilePath)
+		default:
+			cmd = exec.Command("rubberband", "-p", "-1.0", "--fine", srcFilePath, dstFilePath)
 		}
 		if cmd == nil {
 			return fmt.Errorf("unsupported OS: %s", C.OS)

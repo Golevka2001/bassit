@@ -6,7 +6,7 @@
 
 ### MacOS
 
-EN: Grant execute permission to `Rubber Band Library` binary file
+Grant execute permission to `Rubber Band Library` binary file:
 
 ```sh
 cd /path/to/bassit
@@ -14,6 +14,25 @@ chmod +x assets/3rdparty/rubberband-4.0.0-gpl-executable-macos/rubberband*
 # Check if the permission is `-rwxr-xr-x`
 ls -l assets/3rdparty/rubberband-4.0.0-gpl-executable-macos/rubberband*
 ```
+
+### Linux
+
+Install `rubberband-cli` or `rubberband`:
+
+```sh
+# Debian, Ubuntu, openSUSE users should install `rubberband-cli`
+apt install rubberband-cli
+alias rubberband="rubberband-cli" # for convenience
+
+# Other Linux distributions should install `rubberband`
+apk add rubberband
+# OR dnf install rubberband
+# OR pacman -S rubberband
+# OR yum install rubberband
+# etc.
+```
+
+If [pkgs.org](https://pkgs.org/download/rubberband) doesn't list your Linux distribution, you will need to install from source, see [their repository](https://github.com/breakfastquay/rubberband).
 
 ## 3rd Party Libraries & Assets
 

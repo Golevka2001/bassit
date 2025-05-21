@@ -74,7 +74,7 @@ func runEventLoop(s tcell.Screen, v view.View) {
 	evChan := hook.Start()
 	defer hook.End()
 
-	v.Draw()
+	v.DrawInitBass()
 	for ev := range evChan {
 		if ev.Kind == hook.KeyDown || ev.Kind == hook.KeyUp {
 			curKey := C.RawcodeToKey[ev.Rawcode]
@@ -88,8 +88,6 @@ func runEventLoop(s tcell.Screen, v view.View) {
 			}
 
 			v.HandleKeyEvent(ev)
-
-			v.Draw()
 		}
 	}
 }

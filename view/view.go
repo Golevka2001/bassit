@@ -57,14 +57,14 @@ func NewView(
 	scaleFactor := float64(fretboardLen-C.NutWidth) / calcDn(C.DisplayedFretNum)
 	for fretWireIdx := 0; fretWireIdx <= C.DisplayedFretNum; fretWireIdx++ {
 		// Calculate the position of fret wires
-		x := calcFretWireXPos(fretWireIdx, scaleFactor, borderStartX+C.NutWidth)
+		x := calcNthFretWireXPos(fretWireIdx, scaleFactor, borderStartX+C.NutWidth)
 		fretWireToX[fretWireIdx] = x
 		xToFretWire[x] = fretWireIdx
 
 		// Calculate the position of position markers
 		switch fretWireIdx {
 		case 3, 5, 7, 9, 12, 15, 17, 19, 21, 24:
-			posMarkerToX[fretWireIdx] = int(math.Round(float64(x+fretWireToX[fretWireIdx-1]) / 2))
+			posMarkerToX[fretWireIdx] = calcFretCenterXPos(fretWireIdx)
 		}
 	}
 
@@ -87,7 +87,7 @@ func NewView(
 	}
 }
 
-func (v *View) Draw() {
+func (v *View) DrawInitBass() {
 	v.tcellScreen.Clear()
 
 	v.drawBassFretboard()
@@ -181,64 +181,123 @@ func (v *View) drawBassStrings() {
 		v.DrawLineText(C.StringBaseNoteNameMarginLeft, y, noteName, noteNameStyle)
 
 		// Draw string lines
-		rightMostPressedPos := -1
-		if curString.CurValidFret > 0 {
-			rightMostPressedPos = int(math.Round(float64(fretWireToX[curString.CurValidFret-1]+fretWireToX[curString.CurValidFret]) / 2))
-		}
 		for x := borderStartX; x <= borderEndX; x++ {
-			isVibrating := false
-			// If current string is plucked and current position is right to the pressed position
-			if curString.PluckedState && x > rightMostPressedPos {
-				isVibrating = true
-			}
-
 			charToDraw := C.StringChar
-			if isVibrating {
-				charToDraw = C.VibratingStringChar
-			}
 			if _, ok := xToFretWire[x]; ok || x == borderStartX {
 				charToDraw = C.StringOverFretChar
-				if isVibrating {
-					charToDraw = C.VibratingStringOverFretChar
-				}
 			}
 
 			_, _, originStyle, _ := s.GetContent(x, y)
-			stringStyle := originStyle.Foreground(C.StringColor)
-			s.SetContent(x, y, charToDraw, nil, stringStyle)
+			style := originStyle.Foreground(C.StringColor)
+			s.SetContent(x, y, charToDraw, nil, style)
 		}
 
-		// Draw pressed fret signs
-		for fretIdx := curString.CurValidFret; fretIdx > 0; fretIdx-- {
-			if fretIdx > C.DisplayedFretNum {
-				continue
-			}
-
-			if curString.FretPressedStates[fretIdx] {
-				charToDraw := C.PressedFretSignChar
-				x := int(math.Round(float64(fretWireToX[fretIdx-1]+fretWireToX[fretIdx]) / 2))
-				y := stringToY[stringIdx]
-				style := tcell.StyleDefault.Foreground(C.PressedFretSignColor).Background(C.FretboardBgColor)
-				s.SetContent(x, y, charToDraw, nil, style)
-			}
-		}
-
-		// Draw plucked string signs
-		x := v.width - C.PluckedStringSignMarginRight
-		style := tcell.StyleDefault.Foreground(C.StringColor).Background(C.FretboardBgColor)
-		if curString.PluckedState {
-			style = style.Foreground(C.PluckedStringSignColor)
-		}
-		s.SetContent(x, y, C.PluckedStringSignChar, nil, style)
+		// Draw plucked signs
+		v.restorePluckedString(stringIdx)
 	}
 }
 
-// calcFretWireXPos calculates the position (on the Screen) of the nth fret wire
+func (v *View) drawPressedFret(pressedPos C.PressedPos) {
+	s := v.tcellScreen
+
+	x := calcFretCenterXPos(pressedPos.Fret)
+	y := stringToY[pressedPos.String]
+	style := tcell.StyleDefault.Foreground(C.PressedFretSignColor).Background(C.FretboardBgColor)
+
+	s.SetContent(x, y, C.PressedFretSignChar, nil, style)
+	s.Show()
+}
+
+func (v *View) restorePressedFret(pressedPos C.PressedPos) {
+	s := v.tcellScreen
+
+	x := calcFretCenterXPos(pressedPos.Fret)
+	y := stringToY[pressedPos.String]
+	style := tcell.StyleDefault.Foreground(C.StringColor).Background(C.FretboardBgColor)
+
+	s.SetContent(x, y, C.StringChar, nil, style)
+	s.Show()
+}
+
+func (v *View) drawPluckedString(stringIdx int) {
+	s := v.tcellScreen
+
+	// Draw the sign
+	x := v.width - C.PluckedStringSignMarginRight
+	y := stringToY[stringIdx]
+	style := tcell.StyleDefault.Foreground(C.PluckedStringSignColor)
+	s.SetContent(x, y, C.PluckedStringSignChar, nil, style)
+
+	// Draw the vibrating string
+	curString := v.bassModel.Strings[stringIdx]
+	rightMostPressedPos := calcFretCenterXPos(curString.CurValidFret)
+	if curString.CurValidFret == 0 {
+		rightMostPressedPos = borderStartX
+	}
+	if rightMostPressedPos == -1 {
+		return
+	}
+	for x := rightMostPressedPos + 1; x <= borderEndX; x++ {
+		charToDraw := C.VibratingStringChar
+		if _, ok := xToFretWire[x]; ok || x == borderStartX {
+			charToDraw = C.VibratingStringOverFretChar
+		}
+
+		_, _, originStyle, _ := s.GetContent(x, y)
+		style := originStyle.Foreground(C.StringColor)
+		s.SetContent(x, y, charToDraw, nil, style)
+	}
+	s.Show()
+}
+
+func (v *View) restorePluckedString(stringIdx int) {
+	s := v.tcellScreen
+
+	// Restore the sign
+	x := v.width - C.PluckedStringSignMarginRight
+	y := stringToY[stringIdx]
+	style := tcell.StyleDefault.Foreground(C.StringColor).Background(C.FretboardBgColor)
+	s.SetContent(x, y, C.NotPluckedStringChar, nil, style)
+
+	// Restore the vibrating string
+	curString := v.bassModel.Strings[stringIdx]
+	rightMostPressedPos := calcFretCenterXPos(curString.CurValidFret)
+	if curString.CurValidFret == 0 {
+		rightMostPressedPos = borderStartX
+	}
+	if rightMostPressedPos == -1 {
+		return
+	}
+	for x := rightMostPressedPos + 1; x <= borderEndX; x++ {
+		charToDraw := C.StringChar
+		if _, ok := xToFretWire[x]; ok || x == borderStartX {
+			charToDraw = C.StringOverFretChar
+		}
+
+		_, _, originStyle, _ := s.GetContent(x, y)
+		style := originStyle.Foreground(C.StringColor)
+		s.SetContent(x, y, charToDraw, nil, style)
+	}
+	s.Show()
+}
+
+func calcFretCenterXPos(fretIdx int) int {
+	if fretIdx < 1 || fretIdx > C.DisplayedFretNum {
+		return -1
+	}
+
+	curFretWireX := fretWireToX[fretIdx]
+	prevFretWireX := fretWireToX[fretIdx-1]
+
+	return int(math.Round(float64(curFretWireX+prevFretWireX) / 2))
+}
+
+// calcNthFretWireXPos calculates the position (on the Screen) of the nth fret wire
 // Parameters:
 //   - n: The fret number (0 means the nut)
 //   - scaleFactor: fretboardLength / d(fretCnt)
 //   - offset: The starting position of the fretboard (x-coordinate)
-func calcFretWireXPos(n int, scaleFactor float64, offset int) int {
+func calcNthFretWireXPos(n int, scaleFactor float64, offset int) int {
 	dist := int(math.Round(calcDn(n) * scaleFactor))
 	return int(offset + dist)
 }

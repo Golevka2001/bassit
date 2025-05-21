@@ -60,5 +60,6 @@ var (
 	VibratingStringChar         = '━'
 	VibratingStringOverFretChar = '┿'
 	PressedFretSignChar         = '●'
+	NotPluckedStringChar        = '░'
 	PluckedStringSignChar       = '█'
 )

@@ -77,7 +77,11 @@ func runEventLoop(s tcell.Screen, v view.View) {
 	v.Draw()
 	for ev := range evChan {
 		if ev.Kind == hook.KeyDown || ev.Kind == hook.KeyUp {
-			if C.RawcodeToKey[ev.Rawcode] == "escape" {
+			curKey := C.RawcodeToKey[ev.Rawcode]
+			if C.OS == "darwin" {
+				curKey = C.RawcodeToKeyForDarwin[ev.Rawcode]
+			}
+			if curKey == "escape" {
 				// Escape key pressed, exit the program
 				quit()
 				return

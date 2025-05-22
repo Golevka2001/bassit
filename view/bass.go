@@ -60,6 +60,17 @@ func (bv *BassView) Draw() {
 	bv.drawStrings()
 }
 
+// RecalcPositions should be called when the window is resized
+func (bv *BassView) RecalcPositions() {
+	w, h := (*bv.screen).Size()
+
+	bv.screenW = w
+	bv.screenH = h
+	bv.endX = w
+
+	calcAuxValues(bv.startX, bv.endX, bv.startY, bv.endY)
+}
+
 func (bv *BassView) drawFretboard() {
 	s := *bv.screen
 

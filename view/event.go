@@ -60,3 +60,12 @@ func (v *ViewManager) HandleKeyEvent(event hook.Event) {
 		return
 	}
 }
+
+func (vm *ViewManager) HandleWindowResizing() {
+	(*vm.screen).Sync()
+
+	vm.titleView.RecalcPositions()
+	vm.bassView.RecalcPositions()
+
+	vm.Draw()
+}

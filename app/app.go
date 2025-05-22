@@ -46,13 +46,14 @@ func Run() {
 		os.Exit(1)
 	}
 
-	v := view.NewViewManager(&s, am, bm)
+	vm := view.NewViewManager(&s, am, bm)
 
 	// Start event loop
-	runEventLoop(&s, &v)
+	runEventLoop(&s, &vm)
 }
 
-func runEventLoop(s *tcell.Screen, v *view.ViewManager) {
+func runEventLoop(s *tcell.Screen, vm *view.ViewManager) {
+	vm.Draw()
 	// done := false
 
 	quit := func() {
@@ -70,11 +71,21 @@ func runEventLoop(s *tcell.Screen, v *view.ViewManager) {
 	}
 	defer quit()
 
-	evChan := hook.Start()
-	defer hook.End()
+	// Tcell event is used to handle window resizing
+	go func() {
+		for {
+			tcellEv := (*s).PollEvent()
+			switch tcellEv.(type) {
+			case *tcell.EventResize:
+				vm.HandleWindowResizing()
+			}
+		}
+	}()
 
-	v.Draw()
-	for ev := range evChan {
+	// Gohook event is used to handle key presses
+	gohookEvChan := hook.Start()
+	defer hook.End()
+	for ev := range gohookEvChan {
 		if ev.Kind == hook.KeyDown || ev.Kind == hook.KeyUp {
 			curKey := C.RawcodeToKey[ev.Rawcode]
 			if C.OS == "darwin" {
@@ -86,7 +97,7 @@ func runEventLoop(s *tcell.Screen, v *view.ViewManager) {
 				return
 			}
 
-			go v.HandleKeyEvent(ev)
+			go vm.HandleKeyEvent(ev)
 		}
 	}
 }

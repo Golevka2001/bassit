@@ -49,10 +49,10 @@ func NewViewManager(
 	}
 }
 
-func (v *ViewManager) Draw() {
-	(*v.screen).Clear()
+func (vm *ViewManager) Draw() {
+	(*vm.screen).Clear()
 
-	v.titleView.Draw()
-	v.bassView.Draw()
-	(*v.screen).Show()
+	vm.titleView.Draw()
+	vm.bassView.Draw()
+	(*vm.screen).Show()
 }

@@ -50,3 +50,12 @@ func (tv *TitleView) Draw() {
 	title := fmt.Sprintf("BASSIT v%s", C.Version)
 	DrawTextLine(tv.screen, 0, tv.screenW-1, y, title, AlignCenter, style)
 }
+
+// RecalcPositions should be called when the window is resized
+func (tv *TitleView) RecalcPositions() {
+	w, h := (*tv.screen).Size()
+
+	tv.screenW = w
+	tv.screenH = h
+	tv.endX = w
+}

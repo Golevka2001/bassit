@@ -5,7 +5,7 @@ import (
 	"os"
 	"runtime"
 
-	baudio "bassit/audio"
+	"bassit/audio"
 	C "bassit/constant"
 	"bassit/model"
 	"bassit/util"
@@ -28,7 +28,6 @@ func Run() {
 		fmt.Fprintln(os.Stderr, "Failed to create screen:", err)
 		os.Exit(1)
 	}
-
 	if err = s.Init(); err != nil {
 		fmt.Fprintln(os.Stderr, "Failed to initialize screen:", err)
 		os.Exit(1)
@@ -41,19 +40,19 @@ func Run() {
 		os.Exit(1)
 	}
 
-	am, err := baudio.NewAudioManager(bm.GetLowestAndHighestNotes())
+	am, err := audio.NewAudioManager(bm.GetLowestAndHighestNotes())
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, "Failed to create audio manager:", err)
 		os.Exit(1)
 	}
 
-	v := view.NewView(s, bm, am)
+	v := view.NewViewManager(&s, am, bm)
 
 	// Start event loop
-	runEventLoop(s, v)
+	runEventLoop(&s, &v)
 }
 
-func runEventLoop(s tcell.Screen, v view.View) {
+func runEventLoop(s *tcell.Screen, v *view.ViewManager) {
 	// done := false
 
 	quit := func() {
@@ -64,7 +63,7 @@ func runEventLoop(s tcell.Screen, v view.View) {
 		// done = true
 
 		maybePanic := recover()
-		s.Fini()
+		(*s).Fini()
 		if maybePanic != nil {
 			panic(maybePanic)
 		}
@@ -74,7 +73,7 @@ func runEventLoop(s tcell.Screen, v view.View) {
 	evChan := hook.Start()
 	defer hook.End()
 
-	v.DrawInitBass()
+	v.Draw()
 	for ev := range evChan {
 		if ev.Kind == hook.KeyDown || ev.Kind == hook.KeyUp {
 			curKey := C.RawcodeToKey[ev.Rawcode]

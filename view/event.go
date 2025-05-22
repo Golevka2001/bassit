@@ -9,25 +9,29 @@ import (
 	hook "github.com/robotn/gohook"
 )
 
-func (v *View) HandleKeyEvent(event hook.Event) {
+func (v *ViewManager) HandleKeyEvent(event hook.Event) {
+	am := v.audioManager
+	bm := v.bassModel
+	bv := v.bassView
+
 	pluckedStringIdx, ok := C.RawcodeToPluckedString[event.Rawcode]
 	if ok {
 		if event.Kind == hook.KeyDown {
-			v.bassModel.Pluck(pluckedStringIdx)
+			bm.Pluck(pluckedStringIdx)
 
 			// Draw vibrating string
-			v.drawPluckedString(pluckedStringIdx)
+			bv.drawPluckedString(pluckedStringIdx)
 
 			// Play corresponding sound
-			curNote := v.bassModel.Strings[pluckedStringIdx].GetNoteToPlay()
-			go v.audioManager.PlayBassNote(curNote)
+			curNote := bm.Strings[pluckedStringIdx].GetNoteToPlay()
+			go am.PlayBassNote(curNote)
 
 			// Release the pluck and refresh the view after a short delay
 			go func() {
 				time.Sleep(util.GetVibDuration())
-				v.bassModel.ReleasePluck(pluckedStringIdx)
-				v.restorePluckedString(pluckedStringIdx)
-				v.audioManager.StopBassNote(curNote)
+				bm.ReleasePluck(pluckedStringIdx)
+				bv.restorePluckedString(pluckedStringIdx)
+				am.StopBassNote(curNote)
 			}()
 		}
 		return
@@ -36,22 +40,22 @@ func (v *View) HandleKeyEvent(event hook.Event) {
 	pressedPos, ok := C.RawcodeToPressedPos[event.Rawcode]
 	if ok {
 		// Stop vibration
-		pressedString := v.bassModel.Strings[pressedPos.String]
+		pressedString := bm.Strings[pressedPos.String]
 		if pressedString.PluckedState && pressedPos.Fret >= pressedString.CurValidFret {
-			v.restorePluckedString(pressedPos.String)
-			v.audioManager.StopBassNote(pressedString.GetNoteToPlay())
+			bv.restorePluckedString(pressedPos.String)
+			am.StopBassNote(pressedString.GetNoteToPlay())
 		}
 
 		if event.Kind == hook.KeyDown {
-			v.bassModel.Press(pressedPos)
+			bm.Press(pressedPos)
 
 			// Draw pressed fret
-			v.drawPressedFret(pressedPos)
+			bv.drawPressedFret(pressedPos)
 		} else if event.Kind == hook.KeyUp {
-			v.bassModel.Release(pressedPos)
+			bm.Release(pressedPos)
 
 			// Restore pressed fret
-			v.restorePressedFret(pressedPos)
+			bv.restorePressedFret(pressedPos)
 		}
 		return
 	}

@@ -548,7 +548,7 @@ var (
 		50:  "`",
 		51:  "backspace",
 		53:  "escape",
-		54:  "apps", // right command
+		54:  "apps",    // right command
 		55:  "l-super", // left command
 		56:  "shift",
 		57:  "caps lock",

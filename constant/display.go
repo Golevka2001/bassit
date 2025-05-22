@@ -15,12 +15,12 @@ var (
 
 /* Spacing properties */
 var (
-	TitleMarginTop               = 1
+	TitleViewHeight              = 1
+	BassViewMarginTop            = 3
 	FretboardMarginLeft          = 5
-	FretboardMarginRight         = 6
-	FretboardMarginTop           = 2
+	FretboardMarginRight         = 5
 	StringBaseNoteNameMarginLeft = 2
-	PluckedStringSignMarginRight = 3
+	PluckedStringSignMarginRight = 2
 	NutWidth                     = 1
 	// StringSpacing defines the spacing between strings
 	StringSpacing = 2
@@ -30,8 +30,8 @@ var (
 
 /* Color properties */
 var (
-	TitleFgColor           = tcell.ColorWhite
-	TitleBgColor           = tcell.ColorNone
+	TitleFgColor           = tcell.ColorBlack
+	TitleBgColor           = tcell.ColorWhite
 	FretboardBorderColor   = tcell.ColorWhite
 	FretWireColor          = tcell.ColorSilver
 	PosMarkerColor         = tcell.ColorWhiteSmoke

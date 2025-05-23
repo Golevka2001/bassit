@@ -26,14 +26,11 @@ func NewViewManager(
 	am *audio.AudioManager,
 	bm *model.BassModel,
 ) ViewManager {
-	(*s).SetStyle(tcell.StyleDefault)
-	(*s).Clear()
-
-	w, h := (*s).Size()
-
+	// Do some checks
 	cv := NewCheckView(s)
-
 	failed := cv.RunChecks()
+	cv.Fini()
+	// Quit if any check failed
 	if len(failed) > 0 {
 		(*s).Fini()
 		
@@ -44,6 +41,9 @@ func NewViewManager(
 		os.Exit(1)
 	}
 
+	w, h := (*s).Size()
+
+	// Initialize other views
 	tv, tvEndX, tvEndY := NewTitleView(s, nil, 0, 0)
 	bv, bvEndX, bvEndY := NewBassView(s, am, bm, 0, tvEndY+C.BassViewMarginTop)
 

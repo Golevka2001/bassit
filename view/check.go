@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 
-	tcheck "github.com/Golevka2001/go-tcheck"
+	tcheck "bassit/go-tcheck"
+
 	"github.com/gdamore/tcell/v2"
 )
 
@@ -17,6 +19,7 @@ type CheckView struct {
 }
 
 func NewCheckView(s *tcell.Screen) *CheckView {
+	// Initialize `tcheck`
 	var ui *tcheck.UIRenderer
 	cm := tcheck.NewCheckManager(func() {
 		if ui != nil {
@@ -25,7 +28,10 @@ func NewCheckView(s *tcell.Screen) *CheckView {
 	}, 3)
 	ui = tcheck.NewUIRenderer(*s, cm)
 
-	addChecks(cm)
+	// Check if `rubberband` is available
+	cm.AddCheck("Checking `rubberband`", checkRubberband)
+	// Check if the audio files are available
+	cm.AddCheck("Checking audio resources", checkAudioResources)
 
 	return &CheckView{
 		screen:       s,
@@ -39,6 +45,7 @@ func (cv *CheckView) RunChecks() []string {
 	go cv.checkManager.RunAllChecks()
 	cv.checkUI.Run()
 
+	// Collect results
 	failed := []string{}
 	for _, item := range cv.checkManager.GetItems() {
 		if item.Status == tcheck.StatusFailed {
@@ -49,12 +56,14 @@ func (cv *CheckView) RunChecks() []string {
 	return failed
 }
 
-func addChecks(cm *tcheck.CheckManager) {
-	// Check if `rubberband` is available
-	cm.AddCheck(
-		"Checking if `rubberband` is available",
-		checkRubberband,
-	)
+// Fini stops the event loop and cleans up the UI
+func (cv *CheckView) Fini() {
+	if cv.checkUI != nil {
+		cv.checkUI.Stop()
+	}
+	// Sleep for a bit...zZZ
+	time.Sleep(500 * time.Millisecond)
+	(*cv.screen).Clear()
 }
 
 func checkRubberband(reporter tcheck.SubProgressReporter) error {
@@ -62,7 +71,7 @@ func checkRubberband(reporter tcheck.SubProgressReporter) error {
 
 	// Check if the binary exists
 	isExist := false
-	reporter.ReportSubProgress(0, "Checking existence")
+	reporter.ReportSubProgress(0, "Checking if binary exists")
 	if C.OS == "windows" || C.OS == "darwin" {
 		if _, err := os.Stat(C.RubberBandPathForWindows); err == nil {
 			isExist = true
@@ -75,7 +84,7 @@ func checkRubberband(reporter tcheck.SubProgressReporter) error {
 	}
 
 	// Check if the command is available
-	reporter.ReportSubProgress(50, "Checking availability")
+	reporter.ReportSubProgress(50, "Checking if command is available")
 	switch C.OS {
 	case "windows":
 		cmd = exec.Command("powershell", C.RubberBandPathForWindows, "-V")
@@ -96,6 +105,21 @@ func checkRubberband(reporter tcheck.SubProgressReporter) error {
 		return fmt.Errorf("%s", msg)
 	}
 
-	reporter.ReportSubProgress(100, "Available")
+	reporter.ReportSubProgress(100, "Passed")
+	return nil
+}
+
+func checkAudioResources(reporter tcheck.SubProgressReporter) error {
+	reporter.ReportSubProgress(0, "Checking if audio resources are readable")
+	filePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, C.SrcBassSampleNoteName)
+	if file, err := os.Open(filePath); err == nil {
+		defer file.Close()
+	} else {
+		msg := "Audio resources not found or not readable"
+		reporter.ReportSubProgress(100, msg)
+		return fmt.Errorf("%s", msg)
+	}
+
+	reporter.ReportSubProgress(100, "Passed")
 	return nil
 }

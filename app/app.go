@@ -32,6 +32,7 @@ func Run() {
 		fmt.Fprintln(os.Stderr, "Failed to initialize screen:", err)
 		os.Exit(1)
 	}
+	s.Clear()
 	defer s.Fini()
 
 	bm, err := model.NewBassModel(C.StandardTuning)

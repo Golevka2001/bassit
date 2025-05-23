@@ -3,7 +3,6 @@ module bassit
 go 1.24.2
 
 require (
-	github.com/Golevka2001/go-tcheck v1.0.2
 	github.com/ebitengine/oto/v3 v3.3.3
 	github.com/gdamore/tcell/v2 v2.8.1
 	github.com/go-music-theory/music-theory v0.0.5-0.20191125184038-bd9271db4dae

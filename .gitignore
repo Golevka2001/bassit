@@ -4,6 +4,8 @@
 assets/audio/note/*
 !assets/audio/note/C2.wav
 
+go-tcheck
+
 # Binaries for programs and plugins
 *.exe
 *.exe~

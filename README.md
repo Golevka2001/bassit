@@ -22,8 +22,6 @@ Install `rubberband-cli` or `rubberband`:
 ```sh
 # Debian, Ubuntu, openSUSE users should install `rubberband-cli`
 apt install rubberband-cli
-alias rubberband="rubberband-cli" # for convenience
-
 # Other Linux distributions should install `rubberband`
 apk add rubberband
 # OR dnf install rubberband
@@ -32,7 +30,8 @@ apk add rubberband
 # etc.
 ```
 
-If [pkgs.org](https://pkgs.org/download/rubberband) doesn't list your Linux distribution, you will need to install from source, see [their repository](https://github.com/breakfastquay/rubberband).
+If [pkgs.org](https://pkgs.org/download/rubberband) doesn't list your Linux distribution, you will need to install from
+source, see [their repository](https://github.com/breakfastquay/rubberband).
 
 ## 3rd Party Libraries & Assets
 

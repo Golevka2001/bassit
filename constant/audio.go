@@ -9,6 +9,7 @@ var (
 var (
 	RubberBandPathForWindows = "assets/3rdparty/rubberband-4.0.0-gpl-executable-windows/rubberband-r3.exe"
 	RubberBandPathForDarwin  = "assets/3rdparty/rubberband-4.0.0-gpl-executable-macos/rubberband-r3"
+	RubberBandCommand        = "rubberband-r3"
 	NoteSampleDir            = "assets/audio/note/"
 	SrcBassSampleNoteName    = "C2"
 )

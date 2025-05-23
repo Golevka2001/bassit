@@ -1,12 +1,11 @@
 package view
 
 import (
-	_ "math"
-
 	"bassit/audio"
 	C "bassit/constant"
 	"bassit/model"
-	_ "bassit/util"
+	"fmt"
+	"os"
 
 	"github.com/gdamore/tcell/v2"
 )
@@ -17,6 +16,7 @@ type ViewManager struct {
 	bassModel    *model.BassModel
 	width        int
 	height       int
+	checkView    *CheckView
 	titleView    *TitleView
 	bassView     *BassView
 }
@@ -31,6 +31,19 @@ func NewViewManager(
 
 	w, h := (*s).Size()
 
+	cv := NewCheckView(s)
+
+	failed := cv.RunChecks()
+	if len(failed) > 0 {
+		(*s).Fini()
+		
+		fmt.Println("❌ Exiting due to failed checks:")
+		for _, fail := range failed {
+			fmt.Printf(" - %s\n", fail)
+		}
+		os.Exit(1)
+	}
+
 	tv, tvEndX, tvEndY := NewTitleView(s, nil, 0, 0)
 	bv, bvEndX, bvEndY := NewBassView(s, am, bm, 0, tvEndY+C.BassViewMarginTop)
 
@@ -44,6 +57,7 @@ func NewViewManager(
 		audioManager: am,
 		width:        w,
 		height:       h,
+		checkView:    cv,
 		titleView:    tv,
 		bassView:     bv,
 	}

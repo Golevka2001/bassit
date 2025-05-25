@@ -91,12 +91,12 @@ func checkRubberband(reporter tcheck.SubProgressReporter) error {
 		cmd = exec.Command(C.RubberBandPathForDarwin, "-V")
 	default:
 		// Check if `rubberband-r3` is available
-		cmd = exec.Command(C.RubberBandCommand, "-V")
-		if err := cmd.Run(); err != nil {
+		tmp := exec.Command(C.RubberBandCommand, "-V") // A Cmd cannot be reused after calling its Run, Output or CombinedOutput methods
+		if err := tmp.Run(); err != nil {
 			// If not, check if `rubberband` is available
 			C.RubberBandCommand = "rubberband"
-			cmd = exec.Command(C.RubberBandCommand, "-V")
 		}
+		cmd = exec.Command(C.RubberBandCommand, "-V")
 	}
 	if err := cmd.Run(); err != nil {
 		msg := "Command not available"

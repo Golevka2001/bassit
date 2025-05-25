@@ -68,18 +68,18 @@ func (cv *CheckView) Fini() {
 func checkRubberband(reporter tcheck.SubProgressReporter) error {
 	var cmd *exec.Cmd
 
-	// Check if the binary exists
-	isExist := false
-	reporter.ReportSubProgress(0, "Checking if binary exists")
+	// Check if the binary exists (only for Windows and macOS)
 	if C.OS == "windows" || C.OS == "darwin" {
+		isExist := false
+		reporter.ReportSubProgress(0, "Checking if binary exists")
 		if _, err := os.Stat(C.RubberBandPathForWindows); err == nil {
 			isExist = true
 		}
-	}
-	if !isExist {
-		msg := "Rubberband binary not found or not executable"
-		reporter.ReportSubProgress(100, msg)
-		return fmt.Errorf("%s", msg)
+		if !isExist {
+			msg := "Rubberband binary not found or not executable"
+			reporter.ReportSubProgress(100, msg)
+			return fmt.Errorf("%s", msg)
+		}
 	}
 
 	// Check if the command is available

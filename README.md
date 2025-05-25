@@ -6,7 +6,7 @@
 
 ### MacOS
 
-Grant execute permission to `Rubber Band Library` binary file:
+**Grant execute permission to `rubberband` binary files:**
 
 ```sh
 cd /path/to/bassit
@@ -17,7 +17,11 @@ ls -l assets/3rdparty/rubberband-4.0.0-gpl-executable-macos/rubberband*
 
 ### Linux
 
-Install `rubberband-cli` or `rubberband`:
+**Install `alsa` (required by `Oto`):**
+
+See [Oto's README](https://github.com/ebitengine/oto?tab=readme-ov-file#linux).
+
+**Install `rubberband-cli` or `rubberband`:**
 
 ```sh
 # Debian, Ubuntu, openSUSE users should install `rubberband-cli`
@@ -30,8 +34,7 @@ apk add rubberband
 # etc.
 ```
 
-If [pkgs.org](https://pkgs.org/download/rubberband) doesn't list your Linux distribution, you will need to install from
-source, see [their repository](https://github.com/breakfastquay/rubberband).
+If [pkgs.org](https://pkgs.org/download/rubberband) doesn't list your Linux distribution, you will need to install from source, see [their repository](https://github.com/breakfastquay/rubberband).
 
 ## 3rd Party Libraries & Assets
 

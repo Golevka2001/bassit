@@ -3,6 +3,7 @@ package view
 import (
 	"bassit/audio"
 	C "bassit/constant"
+	"bassit/util"
 	"fmt"
 
 	"github.com/gdamore/tcell/v2"
@@ -48,7 +49,8 @@ func (tv *TitleView) Draw() {
 
 	// Title
 	title := fmt.Sprintf("BASSIT v%s", C.Version)
-	DrawTextLine(tv.screen, 0, tv.screenW-1, y, title, AlignCenter, style)
+	util.DrawTextLine(tv.screen, 0, tv.screenW-1, y, title, util.AlignCenter, style)
+	s.Show()
 }
 
 // RecalcPositions should be called when the window is resized

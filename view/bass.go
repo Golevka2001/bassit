@@ -156,7 +156,7 @@ func (bv *BassView) drawStrings() {
 		x := bv.startX + C.StringBaseNoteNameMarginLeft
 		noteName := util.GetNoteNameWithOctave(curString.BaseNote)
 		noteNameStyle := tcell.StyleDefault.Foreground(C.BaseNoteNameFgColor).Background(C.BaseNoteNameBgColor)
-		DrawTextLine(bv.screen, x, x+2, y, noteName, AlignLeft, noteNameStyle)
+		util.DrawTextLine(bv.screen, x, x+2, y, noteName, util.AlignLeft, noteNameStyle)
 
 		// Draw string lines
 		style := tcell.StyleDefault.Foreground(C.StringColor).Background(C.NutBgColor)

@@ -7,8 +7,7 @@ import (
 	"os/exec"
 	"time"
 
-	tcheck "bassit/go-tcheck"
-
+	tcheck "github.com/Golevka2001/go-tcheck"
 	"github.com/gdamore/tcell/v2"
 )
 

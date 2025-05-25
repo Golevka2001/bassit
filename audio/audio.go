@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"os/exec"
 	"time"
 
 	C "bassit/constant"
@@ -20,7 +19,7 @@ type AudioManager struct {
 	noteNameToPlayer map[string]*oto.Player
 }
 
-func NewAudioManager(lowestNote, highestNote note.Note) (*AudioManager, error) {
+func NewAudioManager() (*AudioManager, error) {
 	// Prepare an Oto context
 	op := &oto.NewContextOptions{
 		SampleRate:   C.SampleRate,
@@ -39,9 +38,6 @@ func NewAudioManager(lowestNote, highestNote note.Note) (*AudioManager, error) {
 		otoCtx:           otoCtx,
 		noteNameToPlayer: make(map[string]*oto.Player),
 	}
-
-	genAllPossibleNotes(lowestNote, highestNote)
-	am.loadNoteSamples(lowestNote, highestNote)
 
 	return am, nil
 }
@@ -77,101 +73,7 @@ func (am *AudioManager) StopBassNote(n note.Note) {
 	player.Seek(0, 0)
 }
 
-func genAllPossibleNotes(lowestNote, highestNote note.Note) error {
-	// Shift up
-	lastNote := *note.Named(C.SrcBassSampleNoteName)
-	for {
-		curNote := util.GetNoteStepFrom(lastNote, 1)
-		curNoteName := util.GetNoteNameWithOctave(curNote)
-
-		srcFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, util.GetNoteNameWithOctave(lastNote))
-		dstFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, curNoteName)
-
-		_, err := os.Stat(dstFilePath)
-		if err == nil {
-			// File already exists
-			if curNoteName == util.GetNoteNameWithOctave(highestNote) {
-				break
-			}
-
-			lastNote = curNote
-			continue
-		}
-
-		var cmd *exec.Cmd
-		switch C.OS {
-		case "windows":
-			cmd = exec.Command("powershell", C.RubberBandPathForWindows, "-p", "1.0", srcFilePath, dstFilePath)
-		case "darwin":
-			cmd = exec.Command(C.RubberBandPathForDarwin, "-p", "1.0", srcFilePath, dstFilePath)
-		default:
-			cmd = exec.Command(C.RubberBandCommand, "-p", "1.0", srcFilePath, dstFilePath)
-		}
-		if cmd == nil {
-			return fmt.Errorf("unsupported OS: %s", C.OS)
-		}
-
-		err = cmd.Run()
-		if err != nil {
-			return err
-		}
-
-		if curNoteName == util.GetNoteNameWithOctave(highestNote) {
-			break
-		}
-
-		lastNote = curNote
-	}
-
-	// Shift down
-	lastNote = *note.Named(C.SrcBassSampleNoteName)
-	for {
-		curNote := util.GetNoteStepFrom(lastNote, -1)
-		curNoteName := util.GetNoteNameWithOctave(curNote)
-
-		srcFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, util.GetNoteNameWithOctave(lastNote))
-		dstFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, curNoteName)
-
-		_, err := os.Stat(dstFilePath)
-		if err == nil {
-			// File already exists
-			if curNoteName == util.GetNoteNameWithOctave(lowestNote) {
-				break
-			}
-
-			lastNote = curNote
-			continue
-		}
-
-		var cmd *exec.Cmd
-		switch C.OS {
-		case "windows":
-			cmd = exec.Command("powershell", C.RubberBandPathForWindows, "-p", "-1.0", srcFilePath, dstFilePath)
-		case "darwin":
-			cmd = exec.Command(C.RubberBandPathForDarwin, "-p", "-1.0", srcFilePath, dstFilePath)
-		default:
-			cmd = exec.Command(C.RubberBandCommand, "-p", "-1.0", srcFilePath, dstFilePath)
-		}
-		if cmd == nil {
-			return fmt.Errorf("unsupported OS: %s", C.OS)
-		}
-
-		err = cmd.Run()
-		if err != nil {
-			return err
-		}
-
-		if curNoteName == util.GetNoteNameWithOctave(lowestNote) {
-			break
-		}
-
-		lastNote = curNote
-	}
-
-	return nil
-}
-
-func (am *AudioManager) loadNoteSamples(lowestNote, highestNote note.Note) {
+func (am *AudioManager) LoadNoteSamples(lowestNote, highestNote note.Note) {
 	curNote := lowestNote
 	curNoteName := util.GetNoteNameWithOctave(curNote)
 	for {

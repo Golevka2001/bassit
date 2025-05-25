@@ -6,6 +6,11 @@ import (
 )
 
 var (
+	SkipWelcome     = false
+	WelcomeDuration = 1500 // in ms
+)
+
+var (
 	// DisplayedFretNum defines the number of frets to be displayed
 	DisplayedFretNum = 12
 

@@ -41,7 +41,7 @@ func Run() {
 		os.Exit(1)
 	}
 
-	am, err := audio.NewAudioManager(bm.GetLowestAndHighestNotes())
+	am, err := audio.NewAudioManager()
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, "Failed to create audio manager:", err)
 		os.Exit(1)

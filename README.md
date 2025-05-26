@@ -1,6 +1,24 @@
-# Bassit
+# 𝄢 bassit – bass in terminal
 
-`Bassit` is the bass in the terminal
+Tired of typing commands? Time to play some bass 🎸
+
+`bassit` is a terminal-based bass guitar simulator written in Go. It allows you to play bass lines using your keyboard.
+
+## Quick Start
+
+```sh
+# Clone the repository
+git clone git@github.com:Golevka2001/bassit.git
+cd bassit
+
+# Install dependencies (see prerequisites below)
+
+# Build
+go build
+
+# Run
+./bassit
+```
 
 ## Prerequisites
 

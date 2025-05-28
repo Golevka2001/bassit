@@ -1,4 +1,4 @@
-# 𝄢 bassit – bass in terminal
+# 𝄢 bassit - bass in terminal
 
 Tired of typing commands? Time to play some bass 🎸
 

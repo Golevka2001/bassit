@@ -1,7 +1,14 @@
 package main
 
-import "bassit/cmd"
+import (
+	"os"
+
+	"bassit/cmd"
+)
 
 func main() {
-	cmd.Execute()
+	err := cmd.Execute()
+	if err != nil {
+		os.Exit(1)
+	}
 }

@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"bassit/audio"
+	"bassit/config"
 	C "bassit/constant"
 	"bassit/model"
 	"bassit/util"
@@ -18,7 +19,7 @@ func Run() {
 	util.MapRawcodeToPressedPos()
 	util.MapRawcodeToPluckedString()
 
-	// Initialize
+	// Initialize screen
 	s, err := tcell.NewScreen()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Failed to create screen:", err)
@@ -31,18 +32,21 @@ func Run() {
 	s.Clear()
 	defer s.Fini()
 
-	bm, err := model.NewBassModel(C.StandardTuning)
+	// Initialize bass
+	bm, err := model.NewBassModel(config.Config.Tuning)
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, "Failed to create bass model:", err)
 		os.Exit(1)
 	}
 
+	// Initialize audio manager
 	am, err := audio.NewAudioManager()
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, "Failed to create audio manager:", err)
 		os.Exit(1)
 	}
 
+	// Initialize view manager
 	vm := view.NewViewManager(&s, am, bm)
 
 	// Start event loop

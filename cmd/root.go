@@ -5,6 +5,7 @@ import (
 
 	"bassit/app"
 	A "bassit/assets"
+	"bassit/config"
 	C "bassit/constant"
 
 	"github.com/spf13/cobra"
@@ -62,7 +63,7 @@ func initConfig() {
 		}
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Search config in baseDir
+		// Search default config in baseDir
 		viper.AddConfigPath(C.BaseDir)
 		viper.SetConfigName("config")
 		viper.SetConfigType("yaml")
@@ -72,6 +73,10 @@ func initConfig() {
 
 	// Load config
 	if err := viper.ReadInConfig(); err != nil {
+		cobra.CheckErr(err)
+	}
+	err = config.Unmarshal()
+	if err != nil {
 		cobra.CheckErr(err)
 	}
 }

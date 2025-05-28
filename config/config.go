@@ -1,21 +1,28 @@
 package config
 
 import (
-	_ "embed"
 	"fmt"
-	"os"
 
-	A "bassit/assets"
+	C "bassit/constant"
+
+	"github.com/spf13/viper"
 )
 
-func WriteDefaultConfig(path string) error {
-	// Write the embedded default configuration to the specified path
-	data, err := A.Assets.ReadFile("config.yaml")
+var (
+	IsModified = false
+	Config     = config{}
+)
+
+type config struct {
+	Tuning [C.StringCnt]string
+
+	PositionMarkerChar string
+}
+
+func Unmarshal() error {
+	err := viper.Unmarshal(&Config)
 	if err != nil {
-		return fmt.Errorf("failed to read embedded config: %w", err)
-	}
-	if err := os.WriteFile(path, data, 0644); err != nil {
-		return fmt.Errorf("failed to write default config to %s: %w", path, err)
+		return fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 	return nil
 }

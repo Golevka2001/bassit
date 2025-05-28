@@ -4,3 +4,6 @@ tuning:
   - D2
   - A1
   - E1
+
+# You can change the position marker here
+positionMarkerChar: ★

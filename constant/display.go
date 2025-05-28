@@ -51,7 +51,6 @@ const (
 	FretWireChar                = '│'
 	FretWireUpperChar           = '┬'
 	FretWireLowerChar           = '┴'
-	PosMarkerChar               = '◍'
 	StringChar                  = '━'
 	StringOverFretChar          = '┿'
 	VibratingStringChar         = '═'

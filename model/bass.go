@@ -10,7 +10,7 @@ type BassModel struct {
 	Strings []*BassStringModel // from highest to lowest
 }
 
-func NewBassModel(tuning []string) (*BassModel, error) {
+func NewBassModel(tuning [C.StringCnt]string) (*BassModel, error) {
 	strings := make([]*BassStringModel, C.StringCnt)
 	for i, noteName := range tuning {
 		baseNote := *note.Named(noteName)

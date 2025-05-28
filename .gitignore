@@ -4,13 +4,9 @@
 assets/audio/note/*
 !assets/audio/note/C2.wav
 
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
+# Compiled binaries
 bassit
+bassit.exe
 
 # Test binary, built with `go test -c`
 *.test

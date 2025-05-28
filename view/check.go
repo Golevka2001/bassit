@@ -1,11 +1,13 @@
 package view
 
 import (
-	C "bassit/constant"
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
+
+	C "bassit/constant"
 
 	tcheck "github.com/Golevka2001/go-tcheck"
 	"github.com/gdamore/tcell/v2"
@@ -66,13 +68,11 @@ func (cv *CheckView) Fini() {
 }
 
 func checkRubberband(reporter tcheck.SubProgressReporter) error {
-	var cmd *exec.Cmd
-
 	// Check if the binary exists (only for Windows and macOS)
 	if C.OS == "windows" || C.OS == "darwin" {
 		isExist := false
 		reporter.ReportSubProgress(0, "Checking if binary exists")
-		if _, err := os.Stat(C.RubberBandPathForWindows); err == nil {
+		if _, err := os.Stat(C.RubberbandCommand); err == nil {
 			isExist = true
 		}
 		if !isExist {
@@ -84,19 +84,20 @@ func checkRubberband(reporter tcheck.SubProgressReporter) error {
 
 	// Check if the command is available
 	reporter.ReportSubProgress(50, "Checking if command is available")
+	var cmd *exec.Cmd
 	switch C.OS {
 	case "windows":
-		cmd = exec.Command("powershell", C.RubberBandPathForWindows, "-V")
+		cmd = exec.Command("powershell", C.RubberbandCommand, "-V")
 	case "darwin":
-		cmd = exec.Command(C.RubberBandPathForDarwin, "-V")
+		cmd = exec.Command(C.RubberbandCommand, "-V")
 	default:
 		// Check if `rubberband-r3` is available
-		tmp := exec.Command(C.RubberBandCommand, "-V") // A Cmd cannot be reused after calling its Run, Output or CombinedOutput methods
+		tmp := exec.Command(C.RubberbandCommand, "-V") // A Cmd cannot be reused after calling its Run, Output or CombinedOutput methods
 		if err := tmp.Run(); err != nil {
 			// If not, check if `rubberband` is available
-			C.RubberBandCommand = "rubberband"
+			C.RubberbandCommand = "rubberband"
 		}
-		cmd = exec.Command(C.RubberBandCommand, "-V")
+		cmd = exec.Command(C.RubberbandCommand, "-V")
 	}
 	if err := cmd.Run(); err != nil {
 		msg := "Command not available"
@@ -110,7 +111,7 @@ func checkRubberband(reporter tcheck.SubProgressReporter) error {
 
 func checkAudioResources(reporter tcheck.SubProgressReporter) error {
 	reporter.ReportSubProgress(0, "Checking if audio resources are readable")
-	filePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, C.SrcBassSampleNoteName)
+	filePath := filepath.Join(C.NoteSampleDir, C.SrcBassSampleNoteName+".wav")
 	if file, err := os.Open(filePath); err == nil {
 		defer file.Close()
 	} else {

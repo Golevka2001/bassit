@@ -1,6 +1,10 @@
 package constant
 
-var (
+const (
+	MinWelcomeDuration = 1000 // in ms
+)
+
+const (
 	StringVibDurnMean = 850.0  // in ms
 	StringVibDurStd   = 50.0   // in ms
 	StringVibDurnMin  = 1000.0 // in ms

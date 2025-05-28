@@ -50,7 +50,10 @@ func initConfig() {
 	}
 
 	// Extract embedded resources
-	A.ExtractTo(C.BaseDir)
+	err = A.ExtractTo(C.BaseDir)
+	if err != nil {
+		cobra.CheckErr(err)
+	}
 
 	// `cfgFile`
 	if cfgFile != "" {

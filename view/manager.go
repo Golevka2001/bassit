@@ -1,13 +1,14 @@
 package view
 
 import (
+	"fmt"
+	"os"
+	"time"
+
 	"bassit/audio"
 	C "bassit/constant"
 	"bassit/model"
 	"bassit/util"
-	"fmt"
-	"os"
-	"time"
 
 	"github.com/gdamore/tcell/v2"
 )
@@ -56,9 +57,7 @@ func NewViewManager(
 	}
 
 	// Draw welcome screen if not skipped
-	if !C.SkipWelcome {
-		util.DrawWelcome(s)
-	}
+	util.DrawWelcome(s)
 	startTime := time.Now()
 
 	// All checks passed. Then generate and load audio resources
@@ -70,11 +69,9 @@ func NewViewManager(
 	}
 	am.LoadNoteSamples(lowestNote, highestNote)
 
-	if !C.SkipWelcome {
-		elapsed := time.Since(startTime)
-		if elapsed < time.Duration(C.WelcomeDuration)*time.Millisecond {
-			time.Sleep(time.Duration(C.WelcomeDuration)*time.Millisecond - elapsed)
-		}
+	elapsed := time.Since(startTime)
+	if elapsed < time.Duration(C.MinWelcomeDuration)*time.Millisecond {
+		time.Sleep(time.Duration(C.MinWelcomeDuration)*time.Millisecond - elapsed)
 	}
 
 	w, h := (*s).Size()

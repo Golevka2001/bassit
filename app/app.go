@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"os"
-	"runtime"
 
 	"bassit/audio"
 	C "bassit/constant"
@@ -16,9 +15,6 @@ import (
 )
 
 func Run() {
-	// Detect OS
-	C.OS = runtime.GOOS
-
 	util.MapRawcodeToPressedPos()
 	util.MapRawcodeToPluckedString()
 

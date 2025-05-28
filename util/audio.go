@@ -1,9 +1,9 @@
 package util
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	C "bassit/constant"
 
@@ -17,8 +17,8 @@ func GenAllPossibleNotes(lowestNote, highestNote note.Note) error {
 		curNote := GetNoteStepFrom(lastNote, 1)
 		curNoteName := GetNoteNameWithOctave(curNote)
 
-		srcFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, GetNoteNameWithOctave(lastNote))
-		dstFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, curNoteName)
+		srcFilePath := filepath.Join(C.NoteSampleDir, GetNoteNameWithOctave(lastNote)+".wav")
+		dstFilePath := filepath.Join(C.NoteSampleDir, curNoteName+".wav")
 
 		_, err := os.Stat(dstFilePath)
 		if err == nil {
@@ -32,13 +32,10 @@ func GenAllPossibleNotes(lowestNote, highestNote note.Note) error {
 		}
 
 		var cmd *exec.Cmd
-		switch C.OS {
-		case "windows":
-			cmd = exec.Command("powershell", C.RubberBandPathForWindows, "-p", "1.0", srcFilePath, dstFilePath)
-		case "darwin":
-			cmd = exec.Command(C.RubberBandPathForDarwin, "-p", "1.0", srcFilePath, dstFilePath)
-		default:
-			cmd = exec.Command(C.RubberBandCommand, "-p", "1.0", srcFilePath, dstFilePath)
+		if C.OS == "windows" {
+			cmd = exec.Command("powershell", C.RubberbandCommand, "-p", "1.0", srcFilePath, dstFilePath)
+		} else {
+			cmd = exec.Command(C.RubberbandCommand, "-p", "1.0", srcFilePath, dstFilePath)
 		}
 
 		err = cmd.Run()
@@ -59,8 +56,8 @@ func GenAllPossibleNotes(lowestNote, highestNote note.Note) error {
 		curNote := GetNoteStepFrom(lastNote, -1)
 		curNoteName := GetNoteNameWithOctave(curNote)
 
-		srcFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, GetNoteNameWithOctave(lastNote))
-		dstFilePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, curNoteName)
+		srcFilePath := filepath.Join(C.NoteSampleDir, GetNoteNameWithOctave(lastNote)+".wav")
+		dstFilePath := filepath.Join(C.NoteSampleDir, curNoteName+".wav")
 
 		_, err := os.Stat(dstFilePath)
 		if err == nil {
@@ -74,13 +71,10 @@ func GenAllPossibleNotes(lowestNote, highestNote note.Note) error {
 		}
 
 		var cmd *exec.Cmd
-		switch C.OS {
-		case "windows":
-			cmd = exec.Command("powershell", C.RubberBandPathForWindows, "-p", "-1.0", srcFilePath, dstFilePath)
-		case "darwin":
-			cmd = exec.Command(C.RubberBandPathForDarwin, "-p", "-1.0", srcFilePath, dstFilePath)
-		default:
-			cmd = exec.Command(C.RubberBandCommand, "-p", "-1.0", srcFilePath, dstFilePath)
+		if C.OS == "windows" {
+			cmd = exec.Command("powershell", C.RubberbandCommand, "-p", "-1.0", srcFilePath, dstFilePath)
+		} else {
+			cmd = exec.Command(C.RubberbandCommand, "-p", "-1.0", srcFilePath, dstFilePath)
 		}
 
 		err = cmd.Run()

@@ -11,7 +11,8 @@ Tired of typing commands? Time to play some bass 🎸
 git clone git@github.com:Golevka2001/bassit.git
 cd bassit
 
-# Install dependencies (see prerequisites below)
+# Install dependencies
+# See prerequisites section below
 
 # Build
 go build
@@ -21,17 +22,6 @@ go build
 ```
 
 ## Prerequisites
-
-### MacOS
-
-**Grant execute permission to `rubberband` binary files:**
-
-```sh
-cd /path/to/bassit
-chmod +x assets/3rdparty/rubberband-4.0.0-gpl-executable-macos/rubberband*
-# Check if the permission is `-rwxr-xr-x`
-ls -l assets/3rdparty/rubberband-4.0.0-gpl-executable-macos/rubberband*
-```
 
 ### Linux
 
@@ -57,8 +47,8 @@ If [pkgs.org](https://pkgs.org/download/rubberband) doesn't list your Linux dist
 ## 3rd Party Libraries & Assets
 
 - [Rubber Band Library](https://breakfastquay.com/rubberband/)
-    - License: [GPLv2](https://github.com/breakfastquay/rubberband/blob/default/COPYING)
-    - It is used for generating pitch-shifted audio samples.
+  - License: [GPLv2](https://github.com/breakfastquay/rubberband/blob/default/COPYING)
+  - It is used for generating pitch-shifted audio samples.
 - [A bass sound sample from Pixabay](https://pixabay.com/sound-effects/bass-guitar-c2-raw-101274/)
-    - License: [Pixabay Content License](https://pixabay.com/service/license-summary/)
-    - It is trimmed and pitch-shifted to create the bass sound.
+  - License: [Pixabay Content License](https://pixabay.com/service/license-summary/)
+  - It is trimmed and pitch-shifted to create the bass sound.

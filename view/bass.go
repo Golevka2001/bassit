@@ -1,11 +1,12 @@
 package view
 
 import (
+	"math"
+
 	"bassit/audio"
 	C "bassit/constant"
 	"bassit/model"
 	"bassit/util"
-	"math"
 
 	"github.com/gdamore/tcell/v2"
 )

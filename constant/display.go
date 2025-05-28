@@ -6,20 +6,12 @@ import (
 )
 
 var (
-	SkipWelcome     = false
-	WelcomeDuration = 1500 // in ms
-)
-
-var (
-	// DisplayedFretNum defines the number of frets to be displayed
-	DisplayedFretNum = 12
-
 	// AdjSymbolType defines how to display accidental notes
 	AdjSymbolType = note.Sharp // or note.Flat
 )
 
 /* Spacing properties */
-var (
+const (
 	TitleViewHeight              = 1
 	BassViewMarginTop            = 3
 	FretboardMarginLeft          = 5
@@ -34,7 +26,7 @@ var (
 )
 
 /* Color properties */
-var (
+const (
 	TitleFgColor           = tcell.ColorBlack
 	TitleBgColor           = tcell.ColorWhite
 	FretboardBorderColor   = tcell.ColorWhite
@@ -51,7 +43,7 @@ var (
 )
 
 /* Characters for display */
-var (
+const (
 	FretboardVBorderChar        = '│'
 	FretboardHBorderChar        = '─'
 	FretboardULCornerChar       = '┌'

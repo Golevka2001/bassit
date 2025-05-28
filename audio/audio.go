@@ -2,8 +2,8 @@ package audio
 
 import (
 	"bytes"
-	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	C "bassit/constant"
@@ -82,7 +82,7 @@ func (am *AudioManager) LoadNoteSamples(lowestNote, highestNote note.Note) {
 			break
 		}
 
-		filePath := fmt.Sprintf("%s%s.wav", C.NoteSampleDir, curNoteName)
+		filePath := filepath.Join(C.NoteSampleDir, curNoteName+".wav")
 
 		// Read the file into memory
 		fileBytes, err := os.ReadFile(filePath)

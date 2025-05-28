@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"bassit/audio"
+	"bassit/config"
 	C "bassit/constant"
 	"bassit/model"
 	"bassit/util"
@@ -132,15 +133,16 @@ func (bv *BassView) drawFretboard() {
 			break
 		}
 
+		posMarkerChar := config.Config.PositionMarkerChar
 		switch posMarkerIdx {
 		case 3, 5, 7, 9, 15, 17, 19, 21:
 			y := int(math.Round(float64(stringToY[1]+stringToY[2]) / 2)) // TODO: `StringNum` is regarded as 4
-			s.SetContent(x, y, C.PosMarkerChar, nil, style)
+			util.DrawTextLine(bv.screen, x-1, x+1, y, posMarkerChar, util.AlignCenter, style)
 		case 12, 24:
 			y1 := int(math.Round(float64(stringToY[0]+stringToY[1]) / 2))
 			y2 := int(math.Round(float64(stringToY[2]+stringToY[3]) / 2))
-			s.SetContent(x, y1, C.PosMarkerChar, nil, style)
-			s.SetContent(x, y2, C.PosMarkerChar, nil, style)
+			util.DrawTextLine(bv.screen, x-1, x+1, y1, posMarkerChar, util.AlignCenter, style)
+			util.DrawTextLine(bv.screen, x-1, x+1, y2, posMarkerChar, util.AlignCenter, style)
 		}
 	}
 	s.Show()
@@ -174,7 +176,7 @@ func (bv *BassView) drawPressedFret(pressedPos C.PressedPos) {
 	y := stringToY[pressedPos.String]
 	style := tcell.StyleDefault.Foreground(C.PressedFretSignColor).Background(C.FretboardBgColor)
 
-	s.SetContent(x, y, C.PressedFretSignChar, nil, style)
+	util.DrawTextLine(bv.screen, x-1, x+1, y, string(C.PressedFretSignChar), util.AlignCenter, style)
 	s.Show()
 }
 
@@ -196,7 +198,7 @@ func (bv *BassView) drawPluckedString(stringIdx int) {
 	x := bv.screenW - 1 - C.PluckedStringSignMarginRight
 	y := stringToY[stringIdx]
 	style := tcell.StyleDefault.Foreground(C.PluckedStringSignColor)
-	s.SetContent(x, y, C.PluckedStringSignChar, nil, style)
+	util.DrawTextLine(bv.screen, x-1, x+1, y, string(C.PluckedStringSignChar), util.AlignCenter, style)
 
 	// Draw the vibrating string
 	curString := bv.bassModel.Strings[stringIdx]
@@ -227,7 +229,7 @@ func (bv *BassView) restorePluckedString(stringIdx int) {
 	x := bv.screenW - 1 - C.PluckedStringSignMarginRight
 	y := stringToY[stringIdx]
 	style := tcell.StyleDefault.Foreground(C.StringColor).Background(C.FretboardBgColor)
-	s.SetContent(x, y, C.NotPluckedStringChar, nil, style)
+	util.DrawTextLine(bv.screen, x-1, x+1, y, string(C.NotPluckedStringChar), util.AlignCenter, style)
 
 	// Restore the vibrating string
 	curString := bv.bassModel.Strings[stringIdx]

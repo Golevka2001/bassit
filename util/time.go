@@ -10,10 +10,10 @@ import (
 
 // GetVibDuration returns a random duration for string vibration
 func GetVibDuration() time.Duration {
-	duration := normalRand(C.StringVibDurnMean, C.StringVibDurStd)
+	duration := normalRand(C.StringVibDurMean, C.StringVibDurStd)
 
-	if duration < C.StringVibDurnMin {
-		duration = C.StringVibDurnMin
+	if duration < C.StringVibDurMin {
+		duration = C.StringVibDurMin
 	} else if duration > C.StringVibDurMax {
 		duration = C.StringVibDurMax
 	}

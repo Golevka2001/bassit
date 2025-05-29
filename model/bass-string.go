@@ -1,6 +1,8 @@
 package model
 
 import (
+	"fmt"
+
 	C "bassit/constant"
 	"bassit/util"
 
@@ -10,22 +12,22 @@ import (
 type BassStringModel struct {
 	// BaseNote is the open string note
 	BaseNote note.Note
-
 	// FretToNote maps the fret number to the corresponding note
 	FretToNote map[int]note.Note
-
 	// FretPressedStates records which fret is pressed, "0" is meaningless
 	FretPressedStates []bool
-
 	// PluckedState records whether the string is plucked
 	PluckedState bool
-
 	// CurValidFret records the "valid" fret number among the pressed frets
 	// (e.g. if 3rd, 5th, and 7th frets are pressed, `CurValidFret` should be 7)
 	CurValidFret int
 }
 
 func NewBassStringModel(baseNote note.Note) (*BassStringModel, error) {
+	if baseNote.Class == note.Nil || baseNote.Octave <= 0 {
+		return nil, fmt.Errorf("invalid base note")
+	}
+
 	fretToNote := make(map[int]note.Note)
 	fretToNote[0] = baseNote
 	for i := 1; i <= C.MaxFretCnt; i++ {

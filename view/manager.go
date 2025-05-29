@@ -5,10 +5,10 @@ import (
 	"os"
 	"time"
 
-	"bassit/audio"
-	C "bassit/constant"
-	"bassit/model"
-	"bassit/util"
+	"github.com/Golevka2001/bassit/audio"
+	C "github.com/Golevka2001/bassit/constant"
+	"github.com/Golevka2001/bassit/model"
+	"github.com/Golevka2001/bassit/util"
 
 	"github.com/gdamore/tcell/v2"
 )

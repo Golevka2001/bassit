@@ -3,11 +3,11 @@ package view
 import (
 	"math"
 
-	"bassit/audio"
-	"bassit/config"
-	C "bassit/constant"
-	"bassit/model"
-	"bassit/util"
+	"github.com/Golevka2001/bassit/audio"
+	"github.com/Golevka2001/bassit/config"
+	C "github.com/Golevka2001/bassit/constant"
+	"github.com/Golevka2001/bassit/model"
+	"github.com/Golevka2001/bassit/util"
 
 	"github.com/gdamore/tcell/v2"
 )

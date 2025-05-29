@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	C "bassit/constant"
+	C "github.com/Golevka2001/bassit/constant"
 )
 
 //go:embed *

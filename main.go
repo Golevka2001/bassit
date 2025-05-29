@@ -4,8 +4,8 @@ import (
 	"os"
 	"runtime"
 
-	"bassit/cmd"
-	C "bassit/constant"
+	"github.com/Golevka2001/bassit/cmd"
+	C "github.com/Golevka2001/bassit/constant"
 )
 
 func main() {

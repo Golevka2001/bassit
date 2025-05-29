@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"time"
 
-	C "bassit/constant"
-	"bassit/util"
+	C "github.com/Golevka2001/bassit/constant"
+	"github.com/Golevka2001/bassit/util"
 
 	"github.com/ebitengine/oto/v3"
 	"github.com/go-music-theory/music-theory/note"

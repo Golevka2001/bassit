@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	C "bassit/constant"
+	C "github.com/Golevka2001/bassit/constant"
 
 	tcheck "github.com/Golevka2001/go-tcheck"
 	"github.com/gdamore/tcell/v2"

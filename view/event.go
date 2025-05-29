@@ -3,8 +3,8 @@ package view
 import (
 	"time"
 
-	C "bassit/constant"
-	"bassit/util"
+	C "github.com/Golevka2001/bassit/constant"
+	"github.com/Golevka2001/bassit/util"
 
 	hook "github.com/robotn/gohook"
 )

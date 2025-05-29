@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"bassit/audio"
-	"bassit/config"
-	C "bassit/constant"
-	"bassit/model"
-	"bassit/util"
-	"bassit/view"
+	"github.com/Golevka2001/bassit/audio"
+	"github.com/Golevka2001/bassit/config"
+	C "github.com/Golevka2001/bassit/constant"
+	"github.com/Golevka2001/bassit/model"
+	"github.com/Golevka2001/bassit/util"
+	"github.com/Golevka2001/bassit/view"
 
 	"github.com/gdamore/tcell/v2"
 	hook "github.com/robotn/gohook"

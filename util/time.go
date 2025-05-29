@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	C "bassit/constant"
+	C "github.com/Golevka2001/bassit/constant"
 )
 
 // GetVibDuration returns a random duration for string vibration

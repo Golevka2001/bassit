@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bassit/util"
+	"github.com/Golevka2001/bassit/util"
 
 	"github.com/gdamore/tcell/v2"
 )

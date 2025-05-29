@@ -3,9 +3,9 @@ package view
 import (
 	"fmt"
 
-	"bassit/audio"
-	C "bassit/constant"
-	"bassit/util"
+	"github.com/Golevka2001/bassit/audio"
+	C "github.com/Golevka2001/bassit/constant"
+	"github.com/Golevka2001/bassit/util"
 
 	"github.com/gdamore/tcell/v2"
 )

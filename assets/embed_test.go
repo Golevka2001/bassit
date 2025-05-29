@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	C "bassit/constant"
+	C "github.com/Golevka2001/bassit/constant"
 
 	"github.com/stretchr/testify/assert"
 )

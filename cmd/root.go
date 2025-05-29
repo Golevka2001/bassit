@@ -3,10 +3,10 @@ package cmd
 import (
 	"path/filepath"
 
-	"bassit/app"
-	A "bassit/assets"
-	"bassit/config"
-	C "bassit/constant"
+	"github.com/Golevka2001/bassit/app"
+	A "github.com/Golevka2001/bassit/assets"
+	"github.com/Golevka2001/bassit/config"
+	C "github.com/Golevka2001/bassit/constant"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

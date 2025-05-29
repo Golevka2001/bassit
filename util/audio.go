@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	C "bassit/constant"
+	C "github.com/Golevka2001/bassit/constant"
 
 	"github.com/go-music-theory/music-theory/note"
 )

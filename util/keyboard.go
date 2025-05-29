@@ -1,7 +1,7 @@
 package util
 
 import (
-	C "bassit/constant"
+	C "github.com/Golevka2001/bassit/constant"
 )
 
 func MapRawcodeToPressedPos() {

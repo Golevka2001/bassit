@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	C "bassit/constant"
+	C "github.com/Golevka2001/bassit/constant"
 
 	"github.com/spf13/viper"
 )

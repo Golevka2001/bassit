@@ -4,26 +4,59 @@ Tired of typing commands? Time to play some bass 🎸
 
 `bassit` is a terminal-based bass guitar simulator written in Go. It allows you to play bass lines using your keyboard.
 
-## Quick Start
+## :rocket: Quick Start
+
+### :computer: Install
 
 ```sh
-# Clone the repository
-git clone git@github.com:Golevka2001/bassit.git
-cd bassit
+# Ensure Go>=1.23 is installed
+go version
+
+# Install bassit
+go install github.com/Golevka2001/bassit@latest
 
 # Install dependencies
 # See prerequisites section below
-
-# Build
-go build
 
 # Run
 ./bassit
 ```
 
-## Prerequisites
+### :keyboard: Keybindings
 
-### Linux
+![Keybindings](./README.assets/keybindings.png)
+
+#### Basic Controls
+
+- `Esc`: Exit the program
+
+#### Fret Controls
+
+Press one of the following keys to **press a fret** on a specific string:
+
+|    Key    | String |    Range     |
+| :-------: | :----: | :----------: |
+| `1` ~ `-` |   G    | fret 1 to 11 |
+| `q` ~ `p` |   D    | fret 1 to 10 |
+| `a` ~ `l` |   A    | fret 1 to 9  |
+| `z` ~ `,` |   E    | fret 1 to 8  |
+
+#### Pluck Controls
+
+Press one of the following keys to **pluck** the corresponding string (make the note sound):
+
+|       Key        | String |
+| :--------------: | :----: |
+| `=`, `Backspace` |   G    |
+|     `[`, `]`     |   D    |
+|     `;`, `'`     |   A    |
+|     `.`, `/`     |   E    |
+
+> 💡 **Tip:** To play a note, first press a fret key, then pluck the corresponding string.
+
+## :building_construction: Prerequisites
+
+### :penguin: Linux
 
 **Install `alsa` (required by `Oto`):**
 
@@ -44,7 +77,7 @@ apk add rubberband
 
 If [pkgs.org](https://pkgs.org/download/rubberband) doesn't list your Linux distribution, you will need to install from source, see [their repository](https://github.com/breakfastquay/rubberband).
 
-## 3rd Party Libraries & Assets
+## :toolbox: 3rd Party Libraries & Assets
 
 - [Rubber Band Library](https://breakfastquay.com/rubberband/)
   - License: [GPLv2](https://github.com/breakfastquay/rubberband/blob/default/COPYING)

@@ -14,7 +14,7 @@ jobs:
   build-on-linux:
     strategy:
       matrix:
-        os: [ubuntu-latest, centos-latest]
+        os: [ubuntu-latest, fedora-latest]
         go-version: ['1.24']
         
     runs-on: ${{ matrix.os }}
@@ -30,11 +30,11 @@ jobs:
 
     - name: Install dependencies
       run: |
-        if [ "${{ matrix.os }}" == "centos-latest" ]; then
-          sudo yum install -y alsa-lib-devel libXtst-devel libxkbcommon-devel libxkbcommon-x11-devel xorg-x11-xkb-utils-devel rubberband-cli
+        if [ "${{ matrix.os }}" == "fedora-latest" ]; then
+          sudo dnf install -y alsa-lib-devel libXtst-devel libxkbcommon-devel libxkbcommon-x11-devel xorg-x11-xkb-utils-devel rubberband-cli
         elif [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
           sudo apt-get update
-          sudo apt-get install -y libasound2-dev libx11-dev xorg-dev libxtst-dev xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev libxkbcommon-dev rubberband
+          sudo apt-get install -y libasound2-dev libx11-dev xorg-dev libxtst-dev xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev libxkbcommon-dev rubberband-cli
         fi
         go get -v -d ./...
 

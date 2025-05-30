@@ -11,10 +11,10 @@ on:
 
 jobs:
 
-  build-on-linux:
+  build:
     strategy:
       matrix:
-        os: [ubuntu-latest, fedora-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         go-version: ['1.24']
         
     runs-on: ${{ matrix.os }}
@@ -30,39 +30,11 @@ jobs:
 
     - name: Install dependencies
       run: |
-        if [ "${{ matrix.os }}" == "fedora-latest" ]; then
-          sudo dnf install -y alsa-lib-devel libXtst-devel libxkbcommon-devel libxkbcommon-x11-devel xorg-x11-xkb-utils-devel rubberband-cli
-        elif [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+        if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libx11-dev xorg-dev libxtst-dev xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev libxkbcommon-dev rubberband-cli
         fi
         go get -v -d ./...
-
-    - name: Build
-      run: go build -v ./...
-
-    - name: Test
-      run: go test -v ./...
-
-  build-on-macos-and-windows:
-    strategy:
-      matrix:
-        os: [macos-latest, windows-latest]
-        go-version: ['1.24']
-        
-    runs-on: ${{ matrix.os }}
-        
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v5
-      with:
-          go-version: ${{ matrix.go-version }}
-          cache-dependency-path: go.sum
-
-    - name: Install dependencies
-      run: go get -v -d ./...
 
     - name: Build
       run: go build -v ./...

@@ -10,57 +10,56 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build-on-linux:
     strategy:
       matrix:
-        go-version: ['1.24']
+        go-version: [ "1.24" ]
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v5
-      with:
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
           go-version: ${{ matrix.go-version }}
           cache-dependency-path: go.sum
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libasound2-dev libx11-dev xorg-dev libxtst-dev xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev libxkbcommon-dev rubberband-cli
-        go get -v -d ./...
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libx11-dev xorg-dev libxtst-dev xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev libxkbcommon-dev rubberband-cli
+          go get -v -d ./...
 
-    - name: Build
-      run: go build -v ./...
+      - name: Build
+        run: go build -v ./...
 
-    - name: Test
-      run: go test -v ./...
+      - name: Test
+        run: go test -v ./...
 
   build-on-macos-and-windows:
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
-        go-version: ['1.24']
-        
-    runs-on: ${{ matrix.os }}
-        
-    steps:
-    - uses: actions/checkout@v4
+        os: [ macos-latest, windows-latest ]
+        go-version: [ "1.24" ]
 
-    - name: Setup Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v5
-      with:
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
           go-version: ${{ matrix.go-version }}
           cache-dependency-path: go.sum
 
-    - name: Install dependencies
-      run: go get -v -d ./...
+      - name: Install dependencies
+        run: go get -v -d ./...
 
-    - name: Build
-      run: go build -v ./...
+      - name: Build
+        run: go build -v ./...
 
-    - name: Test
-      run: go test -v ./...
+      - name: Test
+        run: go test -v ./...

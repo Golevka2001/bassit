@@ -3,6 +3,7 @@ package assets
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	C "github.com/Golevka2001/bassit/constant"
@@ -60,7 +61,10 @@ func TestExtractFile(t *testing.T) {
 	info, err := os.Stat(dst)
 	assert.NoError(t, err, "File not created")
 
-	assert.Equal(t, os.FileMode(0644), info.Mode().Perm(), "File permissions incorrect")
+	// Skip permission check on Windows
+	if runtime.GOOS != "windows" {
+		assert.Equal(t, os.FileMode(0644), info.Mode().Perm(), "File permissions incorrect")
+	}
 
 	// Test extracting file that already exists (should not return error)
 	err = extractFile(cfgFile, dst, 0644)

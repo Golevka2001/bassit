@@ -7,6 +7,7 @@ import (
 	A "github.com/Golevka2001/bassit/assets"
 	"github.com/Golevka2001/bassit/config"
 	C "github.com/Golevka2001/bassit/constant"
+	"github.com/Golevka2001/bassit/view"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -34,8 +35,9 @@ func Execute() error {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&baseDir, "base-dir", "", "set base directory to store resources")
+	rootCmd.PersistentFlags().StringVarP(&baseDir, "base-dir", "d", "", "set base directory to store resources")
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "specify configuration file")
+	rootCmd.PersistentFlags().BoolVar(&view.SkipCheck, "skip-check", false, "skip checking pre-requisites (not recommended)")
 }
 
 func initConfig() {

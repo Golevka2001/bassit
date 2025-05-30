@@ -26,12 +26,12 @@ func TestExtractTo(t *testing.T) {
 	assert.False(t, os.IsNotExist(err), "Config file not extracted: %s", configPath)
 
 	// Verify audio file exists
-	audioPath := filepath.Join(tempDir, "audio/note/C2.wav")
+	audioPath := filepath.Join(tempDir, "audio/bass/pluck/default/C2.wav")
 	_, err = os.Stat(audioPath)
 	assert.False(t, os.IsNotExist(err), "Audio file not extracted: %s", audioPath)
 
 	// Verify NoteSampleDir is set correctly
-	expectedNoteSampleDir := filepath.Join(tempDir, "audio/note/")
+	expectedNoteSampleDir := filepath.Join(tempDir, "audio/bass/pluck/default/")
 	assert.Equal(t, expectedNoteSampleDir, C.NoteSampleDir, "NoteSampleDir not set correctly")
 
 	// Verify RubberbandCommand is set (OS-specific)

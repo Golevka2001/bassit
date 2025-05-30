@@ -8,6 +8,6 @@ const (
 
 var (
 	RubberbandCommand     = "rubberband-r3"
-	NoteSampleDir         = BaseDir + "/audio/note/"
+	NoteSampleDir         = BaseDir + "/audio/bass/pluck/default/"
 	SrcBassSampleNoteName = "C2"
 )

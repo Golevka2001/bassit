@@ -75,9 +75,9 @@ func ExtractTo(path string) error {
 	}
 
 	// Audio files
-	C.NoteSampleDir = filepath.Join(path, "audio/note/")
+	C.NoteSampleDir = filepath.Join(path, "audio/bass/pluck/default/")
 	files = append(files, FileToExtract{
-		Src:  "audio/note/C2.wav",
+		Src:  "audio/bass/pluck/default/C2.wav",
 		Dst:  filepath.Join(C.NoteSampleDir, "C2.wav"),
 		Perm: 0644,
 	})

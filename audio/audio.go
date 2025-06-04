@@ -77,11 +77,6 @@ func (am *AudioManager) LoadNoteSamples(lowestNote, highestNote note.Note) {
 	curNote := lowestNote
 	curNoteName := U.GetNoteNameWithOctave(curNote)
 	for {
-		nextNoteName := U.GetNoteNameWithOctave(U.GetNoteStepFrom(curNote, 1))
-		if nextNoteName == U.GetNoteNameWithOctave(highestNote) {
-			break
-		}
-
 		filePath := filepath.Join(C.NoteSampleDir, curNoteName+".wav")
 
 		// Read the file into memory
@@ -94,7 +89,6 @@ func (am *AudioManager) LoadNoteSamples(lowestNote, highestNote note.Note) {
 		// Convert the pure bytes into a reader object
 		fileBytesReader := bytes.NewReader(fileBytes)
 		// Decode file
-		// decodedWav, err := wav.NewDecoder(fileBytesReader)
 		decodedWav, err := wav.DecodeWithoutResampling(fileBytesReader)
 		if err != nil {
 			curNote = U.GetNoteStepFrom(curNote, 1)
@@ -102,11 +96,16 @@ func (am *AudioManager) LoadNoteSamples(lowestNote, highestNote note.Note) {
 			continue
 		}
 
-		// Create a new 'player' that will handle our sound. Paused by default.
+		// Create a new player that will handle our sound
 		player := am.otoCtx.NewPlayer(decodedWav)
-		am.noteNameToPlayer[curNoteName] = player
 
 		// Store to the map
+		am.noteNameToPlayer[curNoteName] = player
+
+		if curNoteName == U.GetNoteNameWithOctave(highestNote) {
+			break
+		}
+		// Move to the next note
 		curNote = U.GetNoteStepFrom(curNote, 1)
 		curNoteName = U.GetNoteNameWithOctave(curNote)
 	}

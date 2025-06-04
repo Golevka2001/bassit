@@ -9,10 +9,10 @@ import (
 	hook "github.com/robotn/gohook"
 )
 
-func (v *ViewManager) HandleKeyEvent(event hook.Event) {
-	am := v.audioManager
-	bm := v.bassModel
-	bv := v.bassView
+func (vm *ViewManager) HandleKeyEvent(event hook.Event) {
+	am := vm.audioManager
+	bm := vm.bassModel
+	bv := vm.bassView
 
 	pluckedStringIdx, ok := C.RawcodeToPluckedString[event.Rawcode]
 	if ok {

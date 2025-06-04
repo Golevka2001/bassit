@@ -2,11 +2,10 @@ package config
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	C "github.com/Golevka2001/bassit/constant"
-	
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/spf13/viper"
@@ -111,21 +110,13 @@ type theme struct {
 	PluckedStringSignChar           rune
 }
 
-func loadRawTheme(name string) error {
-	themeFilePath := filepath.Join(C.BaseDir, "themes", name+".yaml")
-	tViper.SetConfigFile(themeFilePath)
-	tViper.SetConfigType("yaml")
-
-	if err := tViper.ReadInConfig(); err != nil {
-		return fmt.Errorf("error reading theme '%s': %w", name, err)
-	}
-	if err := tViper.Unmarshal(&RawTheme, func(c *mapstructure.DecoderConfig) { c.TagName = "yaml" }); err != nil {
-		return fmt.Errorf("failed to unmarshal theme '%s': %w", name, err)
-	}
-	return nil
-}
-
 func LoadTheme(name string) error {
+	// Remove file extension if present
+	if strings.HasSuffix(name, ".yaml") || strings.HasSuffix(name, ".yml") {
+		name = strings.TrimSuffix(name, ".yaml")
+		name = strings.TrimSuffix(name, ".yml")
+	}
+
 	if err := loadRawTheme(name); err != nil {
 		return err
 	}
@@ -170,6 +161,20 @@ func LoadTheme(name string) error {
 		PluckedStringSignChar:           stringToRune(RawTheme.PluckedStringSignChar),
 	}
 
+	return nil
+}
+
+func loadRawTheme(name string) error {
+	tViper.AddConfigPath(C.ThemeDir())
+	tViper.SetConfigName(name)
+	tViper.SetConfigType("yaml")
+
+	if err := tViper.ReadInConfig(); err != nil {
+		return fmt.Errorf("error reading theme '%s': %w", name, err)
+	}
+	if err := tViper.Unmarshal(&RawTheme, func(c *mapstructure.DecoderConfig) { c.TagName = "yaml" }); err != nil {
+		return fmt.Errorf("failed to unmarshal theme '%s': %w", name, err)
+	}
 	return nil
 }
 

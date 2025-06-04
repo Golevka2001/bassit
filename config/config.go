@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	C "github.com/Golevka2001/bassit/constant"
-	
+
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/spf13/viper"
 )
@@ -25,7 +25,7 @@ func LoadConfig(cfgFile string) error {
 		cViper.SetConfigFile(cfgFile)
 	} else {
 		// Search default config in baseDir
-		cViper.AddConfigPath(C.BaseDir)
+		cViper.AddConfigPath(C.BaseDir())
 		cViper.SetConfigName("config")
 		cViper.SetConfigType("yaml")
 	}

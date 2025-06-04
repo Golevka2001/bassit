@@ -21,16 +21,20 @@ var (
 		}
 		baseDir = filepath.Join(homeDir, ".config", "bassit")
 		return baseDir
-	}()
+	}
 
 	ThemeDir = func() string {
-		return filepath.Join(BaseDir, "themes")
-	}()
+		return filepath.Join(BaseDir(), "themes")
+	}
+
+	SampleDir = func() string {
+		return filepath.Join(BaseDir(), "audio", "bass")
+	}
 )
 
 func SetBaseDir(path string) error {
 	if path == "" {
-		baseDir = BaseDir
+		baseDir = BaseDir()
 		// Check if the base directory exists
 		_, err := os.Stat(baseDir)
 		if err != nil {

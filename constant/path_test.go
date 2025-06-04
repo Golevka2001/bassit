@@ -22,7 +22,7 @@ func TestSetBaseDir(t *testing.T) {
 		testBaseDir := filepath.Join(tempDir, ".config", "bassit")
 
 		// Mock the BaseDir value
-		BaseDir = testBaseDir
+		baseDir = testBaseDir
 
 		err := SetBaseDir("")
 		assert.NoError(t, err)

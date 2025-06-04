@@ -5,7 +5,7 @@ import (
 
 	"github.com/Golevka2001/bassit/audio"
 	C "github.com/Golevka2001/bassit/constant"
-	"github.com/Golevka2001/bassit/util"
+	U "github.com/Golevka2001/bassit/util"
 
 	"github.com/gdamore/tcell/v2"
 )
@@ -50,7 +50,7 @@ func (tv *TitleView) Draw() {
 
 	// Title
 	title := fmt.Sprintf("BASSIT v%s", C.Version)
-	util.DrawTextLine(tv.screen, 0, tv.screenW-1, y, title, util.AlignCenter, style)
+	U.DrawTextLine(tv.screen, 0, tv.screenW-1, y, title, U.AlignCenter, style)
 	s.Show()
 }
 

@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/Golevka2001/bassit/app"
-	A "github.com/Golevka2001/bassit/assets"
+	"github.com/Golevka2001/bassit/assets"
 	"github.com/Golevka2001/bassit/config"
 	C "github.com/Golevka2001/bassit/constant"
 	"github.com/Golevka2001/bassit/view"
@@ -51,7 +51,7 @@ func initConfig() {
 	}
 
 	// Extract embedded resources
-	if err := A.ExtractTo(C.BaseDir); err != nil {
+	if err := assets.ExtractTo(C.BaseDir); err != nil {
 		cobra.CheckErr(err)
 	}
 

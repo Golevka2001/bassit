@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	C "github.com/Golevka2001/bassit/constant"
-	"github.com/Golevka2001/bassit/util"
+	U "github.com/Golevka2001/bassit/util"
 
 	"github.com/go-music-theory/music-theory/note"
 )
@@ -31,7 +31,7 @@ func NewBassStringModel(baseNote note.Note) (*BassStringModel, error) {
 	fretToNote := make(map[int]note.Note)
 	fretToNote[0] = baseNote
 	for i := 1; i <= C.MaxFretCnt; i++ {
-		fretToNote[i] = util.GetNoteStepFrom(fretToNote[i-1], 1)
+		fretToNote[i] = U.GetNoteStepFrom(fretToNote[i-1], 1)
 	}
 
 	return &BassStringModel{

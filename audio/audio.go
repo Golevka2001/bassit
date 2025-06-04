@@ -7,7 +7,7 @@ import (
 	"time"
 
 	C "github.com/Golevka2001/bassit/constant"
-	"github.com/Golevka2001/bassit/util"
+	U "github.com/Golevka2001/bassit/util"
 
 	"github.com/ebitengine/oto/v3"
 	"github.com/go-music-theory/music-theory/note"
@@ -43,7 +43,7 @@ func NewAudioManager() (*AudioManager, error) {
 }
 
 func (am *AudioManager) PlayBassNote(n note.Note) {
-	noteName := util.GetNoteNameWithOctave(n)
+	noteName := U.GetNoteNameWithOctave(n)
 
 	player, ok := am.noteNameToPlayer[noteName]
 	if !ok {
@@ -63,7 +63,7 @@ func (am *AudioManager) PlayBassNote(n note.Note) {
 func (am *AudioManager) StopBassNote(n note.Note) {
 	// FIXME: When the same note is played at different positions (e.g. (0,2) and (1,7) are both A2), this function stops both of them.
 	// One possible solution is to assign a unique player to each position, but this would consume more memory and introduce noise.
-	noteName := util.GetNoteNameWithOctave(n)
+	noteName := U.GetNoteNameWithOctave(n)
 
 	player, ok := am.noteNameToPlayer[noteName]
 	if !ok {
@@ -75,10 +75,10 @@ func (am *AudioManager) StopBassNote(n note.Note) {
 
 func (am *AudioManager) LoadNoteSamples(lowestNote, highestNote note.Note) {
 	curNote := lowestNote
-	curNoteName := util.GetNoteNameWithOctave(curNote)
+	curNoteName := U.GetNoteNameWithOctave(curNote)
 	for {
-		nextNoteName := util.GetNoteNameWithOctave(util.GetNoteStepFrom(curNote, 1))
-		if nextNoteName == util.GetNoteNameWithOctave(highestNote) {
+		nextNoteName := U.GetNoteNameWithOctave(U.GetNoteStepFrom(curNote, 1))
+		if nextNoteName == U.GetNoteNameWithOctave(highestNote) {
 			break
 		}
 
@@ -87,8 +87,8 @@ func (am *AudioManager) LoadNoteSamples(lowestNote, highestNote note.Note) {
 		// Read the file into memory
 		fileBytes, err := os.ReadFile(filePath)
 		if err != nil {
-			curNote = util.GetNoteStepFrom(curNote, 1)
-			curNoteName = util.GetNoteNameWithOctave(curNote)
+			curNote = U.GetNoteStepFrom(curNote, 1)
+			curNoteName = U.GetNoteNameWithOctave(curNote)
 			continue
 		}
 		// Convert the pure bytes into a reader object
@@ -97,8 +97,8 @@ func (am *AudioManager) LoadNoteSamples(lowestNote, highestNote note.Note) {
 		// decodedWav, err := wav.NewDecoder(fileBytesReader)
 		decodedWav, err := wav.DecodeWithoutResampling(fileBytesReader)
 		if err != nil {
-			curNote = util.GetNoteStepFrom(curNote, 1)
-			curNoteName = util.GetNoteNameWithOctave(curNote)
+			curNote = U.GetNoteStepFrom(curNote, 1)
+			curNoteName = U.GetNoteNameWithOctave(curNote)
 			continue
 		}
 
@@ -107,7 +107,7 @@ func (am *AudioManager) LoadNoteSamples(lowestNote, highestNote note.Note) {
 		am.noteNameToPlayer[curNoteName] = player
 
 		// Store to the map
-		curNote = util.GetNoteStepFrom(curNote, 1)
-		curNoteName = util.GetNoteNameWithOctave(curNote)
+		curNote = U.GetNoteStepFrom(curNote, 1)
+		curNoteName = U.GetNoteNameWithOctave(curNote)
 	}
 }

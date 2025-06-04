@@ -8,7 +8,7 @@ import (
 	"github.com/Golevka2001/bassit/config"
 	C "github.com/Golevka2001/bassit/constant"
 	"github.com/Golevka2001/bassit/model"
-	"github.com/Golevka2001/bassit/util"
+	U "github.com/Golevka2001/bassit/util"
 	"github.com/Golevka2001/bassit/view"
 
 	"github.com/gdamore/tcell/v2"
@@ -16,8 +16,8 @@ import (
 )
 
 func Run() {
-	util.MapRawcodeToPressedPos()
-	util.MapRawcodeToPluckedString()
+	U.MapRawcodeToPressedPos()
+	U.MapRawcodeToPluckedString()
 
 	// Initialize screen
 	s, err := tcell.NewScreen()

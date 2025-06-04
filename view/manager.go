@@ -8,7 +8,7 @@ import (
 	"github.com/Golevka2001/bassit/audio"
 	C "github.com/Golevka2001/bassit/constant"
 	"github.com/Golevka2001/bassit/model"
-	"github.com/Golevka2001/bassit/util"
+	U "github.com/Golevka2001/bassit/util"
 
 	"github.com/gdamore/tcell/v2"
 )
@@ -63,12 +63,12 @@ func NewViewManager(
 	}
 
 	// Draw welcome screen if not skipped
-	util.DrawWelcome(s)
+	U.DrawWelcome(s)
 	startTime := time.Now()
 
 	// All checks passed. Then generate and load audio resources
 	lowestNote, highestNote := bm.GetLowestAndHighestNotes()
-	if err := util.GenAllPossibleNotes(lowestNote, highestNote); err != nil {
+	if err := U.GenAllPossibleNotes(lowestNote, highestNote); err != nil {
 		(*s).Fini()
 		fmt.Printf("❌ Failed to generate audio resources: %v\n", err)
 		os.Exit(1)

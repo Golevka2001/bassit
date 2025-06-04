@@ -7,7 +7,7 @@ import (
 	"github.com/Golevka2001/bassit/config"
 	C "github.com/Golevka2001/bassit/constant"
 	"github.com/Golevka2001/bassit/model"
-	"github.com/Golevka2001/bassit/util"
+	U "github.com/Golevka2001/bassit/util"
 
 	"github.com/gdamore/tcell/v2"
 )
@@ -172,12 +172,12 @@ func (bv *BassView) drawFretboard() {
 			switch fretIdx {
 			case 3, 5, 7, 9, 15, 17, 19, 21:
 				y := int(math.Round(float64(stringToY[1]+stringToY[2]) / 2)) // TODO: `StringNum` is regarded as 4
-				util.DrawTextLine(bv.screen, x-1, x+1, y, charToDraw, util.AlignCenter, style)
+				U.DrawTextLine(bv.screen, x-1, x+1, y, charToDraw, U.AlignCenter, style)
 			case 12, 24:
 				y1 := int(math.Round(float64(stringToY[0]+stringToY[1]) / 2))
 				y2 := int(math.Round(float64(stringToY[2]+stringToY[3]) / 2))
-				util.DrawTextLine(bv.screen, x-1, x+1, y1, charToDraw, util.AlignCenter, style)
-				util.DrawTextLine(bv.screen, x-1, x+1, y2, charToDraw, util.AlignCenter, style)
+				U.DrawTextLine(bv.screen, x-1, x+1, y1, charToDraw, U.AlignCenter, style)
+				U.DrawTextLine(bv.screen, x-1, x+1, y2, charToDraw, U.AlignCenter, style)
 			}
 		}
 	case config.BlockInlayShape:
@@ -191,7 +191,7 @@ func (bv *BassView) drawFretboard() {
 			x1 := fretWireToX[fretIdx-1] + margin
 			x2 := fretWireToX[fretIdx] - margin
 			style := tcell.StyleDefault.Background(t.InlayColor)
-			util.FillArea(bv.screen, x1, x2, blockInlayStartY, blockInlayEndY, true, ' ', style)
+			U.FillArea(bv.screen, x1, x2, blockInlayStartY, blockInlayEndY, true, ' ', style)
 		}
 	}
 
@@ -207,9 +207,9 @@ func (bv *BassView) drawStrings() {
 
 		// Draw base note names
 		x := bv.startX + C.StringBaseNoteNameMarginLeft
-		noteName := util.GetNoteNameWithOctave(curString.BaseNote)
+		noteName := U.GetNoteNameWithOctave(curString.BaseNote)
 		noteNameStyle := tcell.StyleDefault.Foreground(t.BaseNoteNameFgColor).Background(t.BaseNoteNameBgColor)
-		util.DrawTextLine(bv.screen, x, x+2, y, noteName, util.AlignLeft, noteNameStyle)
+		U.DrawTextLine(bv.screen, x, x+2, y, noteName, U.AlignLeft, noteNameStyle)
 
 		// Draw string lines
 		bv.restorePluckedString(stringIdx)
@@ -230,7 +230,7 @@ func (bv *BassView) drawPressedFret(pressedPos C.PressedPos) {
 	_, _, origStyle, _ := s.GetContent(x, y)
 	style := origStyle.Foreground(t.PressedFretSignColor)
 
-	util.DrawTextLine(bv.screen, x-1, x+1, y, string(t.PressedFretSignChar), util.AlignCenter, style)
+	U.DrawTextLine(bv.screen, x-1, x+1, y, string(t.PressedFretSignChar), U.AlignCenter, style)
 	s.Show()
 }
 
@@ -254,7 +254,7 @@ func (bv *BassView) drawPluckedString(stringIdx int) {
 	x := bv.screenW - 1 - C.PluckedStringSignMarginRight
 	y := stringToY[stringIdx]
 	style := tcell.StyleDefault.Foreground(t.PluckedStringSignColor)
-	util.DrawTextLine(bv.screen, x-1, x+1, y, string(t.PluckedStringSignChar), util.AlignCenter, style)
+	U.DrawTextLine(bv.screen, x-1, x+1, y, string(t.PluckedStringSignChar), U.AlignCenter, style)
 
 	// Draw the vibrating string
 	curString := bv.bassModel.Strings[stringIdx]
@@ -287,7 +287,7 @@ func (bv *BassView) restorePluckedString(stringIdx int) {
 	x := bv.screenW - 1 - C.PluckedStringSignMarginRight
 	y := stringToY[stringIdx]
 	style := tcell.StyleDefault
-	util.DrawTextLine(bv.screen, x-1, x+1, y, string(t.NotPluckedStringChar), util.AlignCenter, style)
+	U.DrawTextLine(bv.screen, x-1, x+1, y, string(t.NotPluckedStringChar), U.AlignCenter, style)
 
 	// Restore the vibrating string
 	curString := bv.bassModel.Strings[stringIdx]

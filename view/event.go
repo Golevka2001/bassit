@@ -4,7 +4,7 @@ import (
 	"time"
 
 	C "github.com/Golevka2001/bassit/constant"
-	"github.com/Golevka2001/bassit/util"
+	U "github.com/Golevka2001/bassit/util"
 
 	hook "github.com/robotn/gohook"
 )
@@ -28,7 +28,7 @@ func (v *ViewManager) HandleKeyEvent(event hook.Event) {
 
 			// Release the pluck and refresh the view after a short delay
 			go func() {
-				time.Sleep(util.GetVibDuration())
+				time.Sleep(U.GetVibDuration())
 				bm.ReleasePluck(pluckedStringIdx)
 				bv.restorePluckedString(pluckedStringIdx)
 				am.StopBassNote(curNote)

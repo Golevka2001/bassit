@@ -60,24 +60,24 @@ func NewViewManager(
 			}
 			os.Exit(1)
 		}
+	}
 
-		// Draw welcome screen if not skipped
-		util.DrawWelcome(s)
-		startTime := time.Now()
+	// Draw welcome screen if not skipped
+	util.DrawWelcome(s)
+	startTime := time.Now()
 
-		// All checks passed. Then generate and load audio resources
-		lowestNote, highestNote := bm.GetLowestAndHighestNotes()
-		if err := util.GenAllPossibleNotes(lowestNote, highestNote); err != nil {
-			(*s).Fini()
-			fmt.Printf("❌ Failed to generate audio resources: %v\n", err)
-			os.Exit(1)
-		}
-		am.LoadNoteSamples(lowestNote, highestNote)
+	// All checks passed. Then generate and load audio resources
+	lowestNote, highestNote := bm.GetLowestAndHighestNotes()
+	if err := util.GenAllPossibleNotes(lowestNote, highestNote); err != nil {
+		(*s).Fini()
+		fmt.Printf("❌ Failed to generate audio resources: %v\n", err)
+		os.Exit(1)
+	}
+	am.LoadNoteSamples(lowestNote, highestNote)
 
-		elapsed := time.Since(startTime)
-		if elapsed < time.Duration(C.MinWelcomeDuration)*time.Millisecond {
-			time.Sleep(time.Duration(C.MinWelcomeDuration)*time.Millisecond - elapsed)
-		}
+	elapsed := time.Since(startTime)
+	if elapsed < time.Duration(C.MinWelcomeDuration)*time.Millisecond {
+		time.Sleep(time.Duration(C.MinWelcomeDuration)*time.Millisecond - elapsed)
 	}
 
 	w, h := (*s).Size()

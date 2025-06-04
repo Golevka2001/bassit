@@ -135,6 +135,39 @@ func DrawTextArea(
 	}
 }
 
+// FillArea fills a rectangular area on the screen with a specified rune and style.
+// Parameters:
+// - s: The screen to draw on
+// - x1, x2: The horizontal boundary of the area (inclusive)
+// - y1, y2: The vertical boundary of the area (inclusive)
+// - bgOnly: If true, only the background color will be changed; if false, both character and style will be set
+// - r: The rune to fill the area with (if bgOnly is false)
+// - style: The style to apply to the area
+// Note: If bgOnly is true, the rune parameter is ignored.
+func FillArea(
+	s *tcell.Screen,
+	x1, x2 int,
+	y1, y2 int,
+	bgOnly bool,
+	r rune,
+	style tcell.Style,
+) {
+	for y := y1; y <= y2; y++ {
+		for x := x1; x <= x2; x++ {
+			origR, _, origStyle, _ := (*s).GetContent(x, y)
+			if bgOnly {
+				// Only change the background color
+				_, newBgColor, _ := style.Decompose()
+				newStyle := origStyle.Background(newBgColor)
+				(*s).SetContent(x, y, origR, nil, newStyle)
+			} else {
+				// Change both the character and the style
+				(*s).SetContent(x, y, r, nil, style)
+			}
+		}
+	}
+}
+
 func DrawWelcome(s *tcell.Screen) {
 	content := `
               ╭◜‾‾◝╮        ╭◜‾‾◝╮        ╭◜‾‾◝╮        ╭◜‾‾◝╮             

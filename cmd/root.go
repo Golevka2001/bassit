@@ -10,7 +10,6 @@ import (
 	"github.com/Golevka2001/bassit/view"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -47,14 +46,12 @@ func initConfig() {
 			baseDir, _ = filepath.Abs(baseDir)
 		}
 	}
-	err := C.SetBaseDir(baseDir)
-	if err != nil {
+	if err := C.SetBaseDir(baseDir); err != nil {
 		cobra.CheckErr(err)
 	}
 
 	// Extract embedded resources
-	err = A.ExtractTo(C.BaseDir)
-	if err != nil {
+	if err := A.ExtractTo(C.BaseDir); err != nil {
 		cobra.CheckErr(err)
 	}
 
@@ -63,22 +60,8 @@ func initConfig() {
 		if !filepath.IsAbs(cfgFile) {
 			cfgFile, _ = filepath.Abs(cfgFile)
 		}
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Search default config in baseDir
-		viper.AddConfigPath(C.BaseDir)
-		viper.SetConfigName("config")
-		viper.SetConfigType("yaml")
 	}
-
-	viper.AutomaticEnv()
-
-	// Load config
-	if err := viper.ReadInConfig(); err != nil {
-		cobra.CheckErr(err)
-	}
-	err = config.Unmarshal()
-	if err != nil {
+	if err := config.LoadConfig(cfgFile); err != nil {
 		cobra.CheckErr(err)
 	}
 }

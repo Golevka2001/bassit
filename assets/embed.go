@@ -39,6 +39,20 @@ func ExtractTo(path string) error {
 		},
 	}
 
+	// Theme files
+	themeDir := filepath.Join(path, "themes")
+	themeFiles, err := Assets.ReadDir("themes")
+	if err != nil {
+		return fmt.Errorf("failed to read themes directory: %w", err)
+	}
+	for _, file := range themeFiles {
+		files = append(files, FileToExtract{
+			Src:  filepath.Join("themes", file.Name()),
+			Dst:  filepath.Join(themeDir, file.Name()),
+			Perm: 0644,
+		})
+	}
+
 	// Rubberband binary for Windows and Darwin
 	rbDstPrefix := filepath.Join(path, "3rdparty/rubberband/")
 	switch C.OS {

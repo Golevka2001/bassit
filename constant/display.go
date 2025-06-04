@@ -1,7 +1,6 @@
 package constant
 
 import (
-	"github.com/gdamore/tcell/v2"
 	"github.com/go-music-theory/music-theory/note"
 )
 
@@ -14,48 +13,65 @@ var (
 const (
 	TitleViewHeight              = 1
 	BassViewMarginTop            = 3
-	FretboardMarginLeft          = 5
-	FretboardMarginRight         = 5
+	FretboardMarginX             = 5
 	StringBaseNoteNameMarginLeft = 2
 	PluckedStringSignMarginRight = 2
-	NutWidth                     = 1
+	NutWidth                     = 2
+	BlockInlayMarginY            = 2
 	// StringSpacing defines the spacing between strings
 	StringSpacing = 2
-	// StringMarginTop defines the spacing between the string and the fretboard edge
-	StringMarginTop = 1
+	// StringMarginY defines the spacing between the string and the fretboard edge
+	StringMarginY = 1
 )
 
-/* Color properties */
-const (
-	TitleFgColor           = tcell.ColorBlack
-	TitleBgColor           = tcell.ColorWhite
-	FretboardBorderColor   = tcell.ColorWhite
-	FretWireColor          = tcell.ColorSilver
-	PosMarkerColor         = tcell.ColorWhiteSmoke
-	FretboardBgColor       = tcell.ColorNone
-	NutBorderColor         = tcell.ColorWhite
-	NutBgColor             = tcell.ColorNone
-	BaseNoteNameFgColor    = tcell.ColorGreen
-	BaseNoteNameBgColor    = tcell.ColorNone
-	StringColor            = tcell.ColorSilver
-	PressedFretSignColor   = tcell.ColorRed
-	PluckedStringSignColor = tcell.ColorRed
-)
+// /* Color properties */
+// var (
+// 	TitleFgColor = tcell.ColorBlack
+// 	TitleBgColor = tcell.ColorWhite
 
-/* Characters for display */
-const (
-	FretboardVBorderChar        = '│'
-	FretboardHBorderChar        = '─'
-	FretboardULCornerChar       = '┌'
-	FretboardLLCornerChar       = '└'
-	FretWireChar                = '│'
-	FretWireUpperChar           = '┬'
-	FretWireLowerChar           = '┴'
-	StringChar                  = '━'
-	StringOverFretChar          = '┿'
-	VibratingStringChar         = '═'
-	VibratingStringOverFretChar = '╪'
-	PressedFretSignChar         = '●'
-	NotPluckedStringChar        = '░'
-	PluckedStringSignChar       = '█'
-)
+// 	FretboardBorderColor = tcell.NewHexColor(0xefc08c)
+// 	FretboardBgColor     = tcell.NewHexColor(0xefc08c)
+
+// 	NutBorderColor = tcell.NewHexColor(0xefeeeb)
+// 	NutBgColor     = tcell.NewHexColor(0xefeeeb)
+
+// 	FretWireColor = tcell.NewHexColor(0x9e9084)
+
+// 	StringColor = tcell.NewHexColor(0xa29285)
+
+// 	PosMarkerColor = tcell.NewHexColor(0x332e30)
+
+// 	PressedFretSignColor   = tcell.ColorRed
+// 	PluckedStringSignColor = tcell.ColorRed
+// 	BaseNoteNameFgColor    = tcell.ColorGreen
+// 	BaseNoteNameBgColor    = tcell.ColorNone
+// )
+
+// /* Characters for display */
+// const (
+// 	FretboardVBorderChar = '│'
+// 	FretboardHBorderChar = ' ' // '─'
+
+// 	NutVBorderChar  = '│'
+// 	NutHBorderChar  = ' ' // '─'
+// 	NutULCornerChar = ' ' // '┌'
+// 	NutLLCornerChar = ' ' // '└'
+// 	NutURCornerChar = ' ' // '┬'
+// 	NutLRCornerChar = ' ' // '┴'
+
+// 	FretWireChar      = '║'
+// 	FretWireUpperChar = ' ' // '╥'
+// 	FretWireLowerChar = ' ' // '╨'
+
+// 	StringChar            = '━'
+// 	StringOverFretChar    = '╫'
+// 	StringOverBoarderChar = '┿'
+
+// 	VibratingStringChar            = '═'
+// 	VibratingStringOverFretChar    = '╬'
+// 	VibratingStringOverBoarderChar = '╪'
+
+// 	PressedFretSignChar   = '●'
+// 	NotPluckedStringChar  = '░'
+// 	PluckedStringSignChar = '█'
+// )

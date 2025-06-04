@@ -26,6 +26,15 @@ func TestExtractTo(t *testing.T) {
 	_, err = os.Stat(configPath)
 	assert.False(t, os.IsNotExist(err), "Config file not extracted: %s", configPath)
 
+	// Verify themes directory exists
+	themesDir := filepath.Join(tempDir, "themes/")
+	_, err = os.Stat(themesDir)
+	assert.False(t, os.IsNotExist(err), "Themes directory not extracted: %s", themesDir)
+	// Verify themes are extracted
+	themeFiles, err := os.ReadDir(themesDir)
+	assert.NoError(t, err, "Failed to read themes directory")
+	assert.Greater(t, len(themeFiles), 0, "No theme files extracted")
+
 	// Verify audio file exists
 	audioPath := filepath.Join(tempDir, "audio/bass/pluck/default/C2.wav")
 	_, err = os.Stat(audioPath)

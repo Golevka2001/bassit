@@ -5,5 +5,5 @@ tuning:
   - A1
   - E1
 
-# You can change the position marker here
-positionMarkerChar: ○
+# Name of the theme to use, not path
+theme: default

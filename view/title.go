@@ -39,7 +39,7 @@ func NewTitleView(
 func (tv *TitleView) Draw() {
 	s := *tv.screen
 	y := (tv.startY + tv.endY) / 2
-	style := tcell.StyleDefault.Foreground(C.TitleFgColor).Background(C.TitleBgColor)
+	style := tcell.StyleDefault.Foreground(t.TitleFgColor).Background(t.TitleBgColor)
 
 	// Background
 	for r := tv.startY; r < tv.endY; r++ {

@@ -22,6 +22,10 @@ var (
 		baseDir = filepath.Join(homeDir, ".config", "bassit")
 		return baseDir
 	}()
+
+	ThemeDir = func() string {
+		return filepath.Join(BaseDir, "themes")
+	}()
 )
 
 func SetBaseDir(path string) error {

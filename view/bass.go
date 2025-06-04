@@ -13,15 +13,20 @@ import (
 )
 
 var (
-	fretboardStartX int
-	fretboardEndX   int
-	fretboardLen    int
-	fretWireToX     []int
-	xToFretWire     map[int]int
-	posMarkerToX    []int
-	stringToY       []int
-	yToString       map[int]int
+	fretboardStartX  int
+	fretboardEndX    int
+	fretboardLen     int
+	blockInlayStartY int
+	blockInlayEndY   int
+
+	fretWireToX  []int
+	xToFretWire  map[int]int
+	posMarkerToX []int
+	stringToY    []int
+	yToString    map[int]int
 )
+
+var t = &config.Theme
 
 type BassView struct {
 	BaseView
@@ -37,7 +42,7 @@ func NewBassView(
 ) (*BassView, int, int) {
 	w, h := (*s).Size()
 
-	bvH := 2*C.StringMarginTop + (C.StringCnt-1)*C.StringSpacing
+	bvH := 2*C.StringMarginY + (C.StringCnt-1)*C.StringSpacing
 	calcAuxValues(startX, w, startY, startY+bvH)
 
 	return &BassView{
@@ -80,71 +85,116 @@ func (bv *BassView) drawFretboard() {
 	for x := fretboardStartX; x <= fretboardEndX; x++ {
 		for y := bv.startY; y <= bv.endY; y++ {
 			charToDraw := ' '
-			style := tcell.StyleDefault.Foreground(C.FretboardBorderColor).Background(C.FretboardBgColor)
+			style := tcell.StyleDefault
 
-			if x >= bv.startX && x < fretWireToX[0] {
-				// The nut
+			if x == fretboardStartX {
+				// The left side of the nut
 				if y == bv.startY {
 					// The upper left corner
-					charToDraw = C.FretboardULCornerChar
+					charToDraw = config.Theme.NutULCornerChar
 				} else if y == bv.endY {
 					// The lower left corner
-					charToDraw = C.FretboardLLCornerChar
+					charToDraw = config.Theme.NutLLCornerChar
 				} else {
 					// The vertical border
-					charToDraw = C.FretboardVBorderChar
+					charToDraw = config.Theme.NutVBorderChar
 				}
-
-				style = tcell.StyleDefault.Foreground(C.NutBorderColor).Background(C.NutBgColor)
-			} else if fretWireIdx, ok := xToFretWire[x]; ok {
-				// The fret wire
+				style = style.Foreground(config.Theme.NutBorderColor)
+			} else if x > fretboardStartX && x < fretWireToX[0] {
+				// The nut
+				if y == bv.startY || y == bv.endY {
+					// The horizontal border
+					charToDraw = config.Theme.NutHBorderChar
+					style = style.Foreground(config.Theme.NutBorderColor)
+				} else {
+					charToDraw = ' '
+					style = style.Background(config.Theme.NutBgColor)
+				}
+			} else if x == fretWireToX[0] {
+				// The right side of the nut
+				style = style.Foreground(t.NutBorderColor)
+				if t.NutBgColor == tcell.ColorDefault {
+					if y == bv.startY {
+						// The upper right corner
+						charToDraw = t.NutURCornerChar
+					} else if y == bv.endY {
+						// The lower right corner
+						charToDraw = t.NutLRCornerChar
+					} else {
+						charToDraw = t.NutVBorderChar
+						style = style.Background(t.NutBgColor)
+					}
+				} else {
+					if y == bv.startY || y == bv.endY {
+						// The horizontal border
+						charToDraw = t.NutHBorderChar
+					} else {
+						style = style.Background(t.NutBgColor)
+					}
+				}
+			} else if fretWireIdx, ok := xToFretWire[x]; ok && fretWireIdx != 0 {
+				// Fret wires
 				if y == bv.startY {
 					// Fret wire at the upper border
-					charToDraw = C.FretWireUpperChar
+					charToDraw = t.FretWireUpperChar
 				} else if y == bv.endY {
 					// Fret wire at the lower border
-					charToDraw = C.FretWireLowerChar
+					charToDraw = t.FretWireLowerChar
 				} else {
-					// The fret wire
-					charToDraw = C.FretWireChar
+					charToDraw = t.FretWireChar
 				}
-
-				if fretWireIdx == 0 {
-					// The right side of the nut
-					style = tcell.StyleDefault.Foreground(C.NutBorderColor).Background(C.NutBgColor)
-				} else {
-					style = tcell.StyleDefault.Foreground(C.FretWireColor).Background(C.FretboardBgColor)
-				}
+				style = style.Foreground(t.FretWireColor)
 			} else {
 				if y == bv.startY || y == bv.endY {
 					// The horizontal border
-					charToDraw = C.FretboardHBorderChar
+					charToDraw = t.FretboardHBorderChar
+					style = style.Foreground(t.FretboardBorderColor)
 				}
+			}
+
+			if x > fretWireToX[0] && x <= fretboardEndX && y > bv.startY && y < bv.endY {
+				style = style.Background(t.FretboardBgColor)
 			}
 
 			s.SetContent(x, y, charToDraw, nil, style)
 		}
 	}
 
-	// Draw the position markers
-	style := tcell.StyleDefault.Foreground(C.PosMarkerColor).Background(C.FretboardBgColor)
-	for posMarkerIdx, x := range posMarkerToX {
-		if posMarkerIdx > C.DisplayedFretNum {
-			break
+	// Draw fretboard inlays (or position markers)
+	switch t.InlayShape {
+	case config.DotInlayShape:
+		for fretIdx, x := range posMarkerToX {
+			if fretIdx > C.DisplayedFretNum {
+				break
+			}
+			charToDraw := string(t.InlayChar)
+			style := tcell.StyleDefault.Foreground(t.InlayColor).Background(t.FretboardBgColor)
+			switch fretIdx {
+			case 3, 5, 7, 9, 15, 17, 19, 21:
+				y := int(math.Round(float64(stringToY[1]+stringToY[2]) / 2)) // TODO: `StringNum` is regarded as 4
+				util.DrawTextLine(bv.screen, x-1, x+1, y, charToDraw, util.AlignCenter, style)
+			case 12, 24:
+				y1 := int(math.Round(float64(stringToY[0]+stringToY[1]) / 2))
+				y2 := int(math.Round(float64(stringToY[2]+stringToY[3]) / 2))
+				util.DrawTextLine(bv.screen, x-1, x+1, y1, charToDraw, util.AlignCenter, style)
+				util.DrawTextLine(bv.screen, x-1, x+1, y2, charToDraw, util.AlignCenter, style)
+			}
 		}
-
-		posMarkerChar := config.Config.PositionMarkerChar
-		switch posMarkerIdx {
-		case 3, 5, 7, 9, 15, 17, 19, 21:
-			y := int(math.Round(float64(stringToY[1]+stringToY[2]) / 2)) // TODO: `StringNum` is regarded as 4
-			util.DrawTextLine(bv.screen, x-1, x+1, y, posMarkerChar, util.AlignCenter, style)
-		case 12, 24:
-			y1 := int(math.Round(float64(stringToY[0]+stringToY[1]) / 2))
-			y2 := int(math.Round(float64(stringToY[2]+stringToY[3]) / 2))
-			util.DrawTextLine(bv.screen, x-1, x+1, y1, posMarkerChar, util.AlignCenter, style)
-			util.DrawTextLine(bv.screen, x-1, x+1, y2, posMarkerChar, util.AlignCenter, style)
+	case config.BlockInlayShape:
+		for _, fretIdx := range []int{1, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24} {
+			if fretIdx > C.DisplayedFretNum {
+				break
+			}
+			fretWidth := fretWireToX[fretIdx] - fretWireToX[fretIdx-1]
+			margin := int(math.Round(float64(fretWidth) / 3))
+			margin = max(margin, 2)
+			x1 := fretWireToX[fretIdx-1] + margin
+			x2 := fretWireToX[fretIdx] - margin
+			style := tcell.StyleDefault.Background(t.InlayColor)
+			util.FillArea(bv.screen, x1, x2, blockInlayStartY, blockInlayEndY, true, ' ', style)
 		}
 	}
+
 	s.Show()
 }
 
@@ -158,13 +208,15 @@ func (bv *BassView) drawStrings() {
 		// Draw base note names
 		x := bv.startX + C.StringBaseNoteNameMarginLeft
 		noteName := util.GetNoteNameWithOctave(curString.BaseNote)
-		noteNameStyle := tcell.StyleDefault.Foreground(C.BaseNoteNameFgColor).Background(C.BaseNoteNameBgColor)
+		noteNameStyle := tcell.StyleDefault.Foreground(t.BaseNoteNameFgColor).Background(t.BaseNoteNameBgColor)
 		util.DrawTextLine(bv.screen, x, x+2, y, noteName, util.AlignLeft, noteNameStyle)
 
 		// Draw string lines
-		style := tcell.StyleDefault.Foreground(C.StringColor).Background(C.NutBgColor)
-		s.SetContent(fretboardStartX, y, C.StringOverFretChar, nil, style)
 		bv.restorePluckedString(stringIdx)
+		// Draw the string over the left side of the nut
+		_, _, origStyle, _ := s.GetContent(fretboardStartX, y)
+		style := origStyle.Foreground(t.StringColor)
+		s.SetContent(fretboardStartX, y, t.StringOverBoarderChar, nil, style)
 	}
 	s.Show()
 }
@@ -174,9 +226,11 @@ func (bv *BassView) drawPressedFret(pressedPos C.PressedPos) {
 
 	x := calcFretCenterXPos(pressedPos.Fret)
 	y := stringToY[pressedPos.String]
-	style := tcell.StyleDefault.Foreground(C.PressedFretSignColor).Background(C.FretboardBgColor)
 
-	util.DrawTextLine(bv.screen, x-1, x+1, y, string(C.PressedFretSignChar), util.AlignCenter, style)
+	_, _, origStyle, _ := s.GetContent(x, y)
+	style := origStyle.Foreground(t.PressedFretSignColor)
+
+	util.DrawTextLine(bv.screen, x-1, x+1, y, string(t.PressedFretSignChar), util.AlignCenter, style)
 	s.Show()
 }
 
@@ -185,9 +239,11 @@ func (bv *BassView) restorePressedFret(pressedPos C.PressedPos) {
 
 	x := calcFretCenterXPos(pressedPos.Fret)
 	y := stringToY[pressedPos.String]
-	style := tcell.StyleDefault.Foreground(C.StringColor).Background(C.FretboardBgColor)
 
-	s.SetContent(x, y, C.StringChar, nil, style)
+	_, _, origStyle, _ := s.GetContent(x, y)
+	style := origStyle.Foreground(t.StringColor)
+
+	s.SetContent(x, y, t.StringChar, nil, style)
 	s.Show()
 }
 
@@ -197,26 +253,28 @@ func (bv *BassView) drawPluckedString(stringIdx int) {
 	// Draw the sign
 	x := bv.screenW - 1 - C.PluckedStringSignMarginRight
 	y := stringToY[stringIdx]
-	style := tcell.StyleDefault.Foreground(C.PluckedStringSignColor)
-	util.DrawTextLine(bv.screen, x-1, x+1, y, string(C.PluckedStringSignChar), util.AlignCenter, style)
+	style := tcell.StyleDefault.Foreground(t.PluckedStringSignColor)
+	util.DrawTextLine(bv.screen, x-1, x+1, y, string(t.PluckedStringSignChar), util.AlignCenter, style)
 
 	// Draw the vibrating string
 	curString := bv.bassModel.Strings[stringIdx]
 	rightMostPressedPos := calcFretCenterXPos(curString.CurValidFret)
 	if curString.CurValidFret == 0 {
-		rightMostPressedPos = fretboardStartX
+		rightMostPressedPos = fretboardStartX + C.NutWidth
 	}
 	if rightMostPressedPos == -1 {
 		return
 	}
 	for x := rightMostPressedPos + 1; x <= fretboardEndX; x++ {
-		charToDraw := C.VibratingStringChar
-		if _, ok := xToFretWire[x]; ok || x == fretboardStartX {
-			charToDraw = C.VibratingStringOverFretChar
+		charToDraw := t.VibratingStringChar
+		if x == fretboardStartX+C.NutWidth {
+			charToDraw = t.VibratingStringOverBoarderChar
+		} else if _, ok := xToFretWire[x]; ok {
+			charToDraw = t.VibratingStringOverFretWireChar
 		}
 
-		_, _, originStyle, _ := s.GetContent(x, y)
-		style := originStyle.Foreground(C.StringColor)
+		_, _, origStyle, _ := s.GetContent(x, y)
+		style := origStyle.Foreground(t.StringColor)
 		s.SetContent(x, y, charToDraw, nil, style)
 	}
 	s.Show()
@@ -228,8 +286,8 @@ func (bv *BassView) restorePluckedString(stringIdx int) {
 	// Restore the sign
 	x := bv.screenW - 1 - C.PluckedStringSignMarginRight
 	y := stringToY[stringIdx]
-	style := tcell.StyleDefault.Foreground(C.StringColor).Background(C.FretboardBgColor)
-	util.DrawTextLine(bv.screen, x-1, x+1, y, string(C.NotPluckedStringChar), util.AlignCenter, style)
+	style := tcell.StyleDefault
+	util.DrawTextLine(bv.screen, x-1, x+1, y, string(t.NotPluckedStringChar), util.AlignCenter, style)
 
 	// Restore the vibrating string
 	curString := bv.bassModel.Strings[stringIdx]
@@ -241,13 +299,19 @@ func (bv *BassView) restorePluckedString(stringIdx int) {
 		return
 	}
 	for x := rightMostPressedPos + 1; x <= fretboardEndX; x++ {
-		charToDraw := C.StringChar
-		if _, ok := xToFretWire[x]; ok || x == fretboardStartX {
-			charToDraw = C.StringOverFretChar
+		charToDraw := t.StringChar
+		if x == fretboardStartX+C.NutWidth {
+			if t.NutBgColor == tcell.ColorDefault {
+				charToDraw = t.StringOverBoarderChar
+			} else {
+				charToDraw = t.StringChar
+			}
+		} else if _, ok := xToFretWire[x]; ok {
+			charToDraw = t.StringOverFretWireChar
 		}
 
-		_, _, originStyle, _ := s.GetContent(x, y)
-		style := originStyle.Foreground(C.StringColor)
+		_, _, origStyle, _ := s.GetContent(x, y)
+		style := origStyle.Foreground(t.StringColor)
 		s.SetContent(x, y, charToDraw, nil, style)
 	}
 	s.Show()
@@ -258,9 +322,11 @@ func (bv *BassView) restorePluckedString(stringIdx int) {
 //   - x1, x2: The starting and ending x-coordinates of the fretboard
 //   - y1, y2: The starting and ending y-coordinates of the fretboard
 func calcAuxValues(x1, x2, y1, y2 int) {
-	fretboardStartX = x1 + C.FretboardMarginLeft
-	fretboardEndX = x2 - C.FretboardMarginRight
+	fretboardStartX = x1 + C.FretboardMarginX
+	fretboardEndX = x2 - C.FretboardMarginX
 	fretboardLen = fretboardEndX - fretboardStartX
+	blockInlayStartY = y1 + C.BlockInlayMarginY
+	blockInlayEndY = y2 - C.BlockInlayMarginY
 
 	fretWireToX = make([]int, C.DisplayedFretNum+1)
 	xToFretWire = make(map[int]int)
@@ -283,8 +349,8 @@ func calcAuxValues(x1, x2, y1, y2 int) {
 	}
 
 	// Calculate the position of strings
-	for stringIdx := 0; stringIdx < C.StringCnt; stringIdx++ {
-		y := y1 + C.StringMarginTop
+	for stringIdx := range C.StringCnt {
+		y := y1 + C.StringMarginY
 		if stringIdx > 0 {
 			y = stringToY[stringIdx-1] + C.StringSpacing
 		}

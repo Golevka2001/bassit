@@ -15,6 +15,7 @@ import (
 var (
 	baseDir string // default: $HOME/.config/bassit
 	cfgFile string // default: $HOME/.config/bassit/config.yaml
+	theme   string // default: specified in `cfgFile`
 
 	rootCmd = &cobra.Command{
 		Use:   "bassit",
@@ -32,14 +33,18 @@ func Execute() error {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initApp)
 
 	rootCmd.PersistentFlags().StringVarP(&baseDir, "base-dir", "d", "", "set base directory to store resources")
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "specify configuration file")
-	rootCmd.PersistentFlags().BoolVar(&view.SkipCheck, "skip-check", false, "skip checking pre-requisites (not recommended)")
+
+	rootCmd.Flags().StringVarP(&cfgFile, "config", "c", "", "specify configuration file")
+	rootCmd.Flags().StringVarP(&theme, "theme", "t", "", "specify theme, overrides the one in config file")
+	rootCmd.Flags().BoolVar(&view.SkipCheck, "skip-check", false, "skip checking pre-requisites (not recommended)")
+
+	rootCmd.AddCommand(listCmd)
 }
 
-func initConfig() {
+func initApp() {
 	// `baseDir`
 	if baseDir != "" {
 		if !filepath.IsAbs(baseDir) {
@@ -51,7 +56,7 @@ func initConfig() {
 	}
 
 	// Extract embedded resources
-	if err := assets.ExtractTo(C.BaseDir); err != nil {
+	if err := assets.ExtractTo(C.BaseDir()); err != nil {
 		cobra.CheckErr(err)
 	}
 
@@ -63,5 +68,12 @@ func initConfig() {
 	}
 	if err := config.LoadConfig(cfgFile); err != nil {
 		cobra.CheckErr(err)
+	}
+
+	// `theme`
+	if theme != "" {
+		if err := config.LoadTheme(theme); err != nil {
+			cobra.CheckErr(err)
+		}
 	}
 }

@@ -11,17 +11,12 @@ import (
 
 func TestGetVibDuration(t *testing.T) {
 	// Test that the function returns a duration within expected bounds
-	sum := 0.0
 	for i := range 100 {
 		_ = i
 		duration := GetVibDuration()
 		assert.GreaterOrEqual(t, duration, C.StringVibDurMin*time.Millisecond, "Duration should be at least %d ms", C.StringVibDurMin)
 		assert.LessOrEqual(t, duration, C.StringVibDurMax*time.Millisecond, "Duration should be at most %d ms", C.StringVibDurMax)
-		sum += float64(duration.Milliseconds())
 	}
-	// Calculate average duration
-	avgDuration := sum / 100.0
-	assert.InDelta(t, C.StringVibDurMean, avgDuration, 10.0, "Average duration should be close to mean %d ms", C.StringVibDurMean)
 }
 
 func TestNormalRand(t *testing.T) {

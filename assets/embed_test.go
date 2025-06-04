@@ -27,11 +27,11 @@ func TestExtractTo(t *testing.T) {
 	assert.False(t, os.IsNotExist(err), "Config file not extracted: %s", configPath)
 
 	// Verify themes directory exists
-	themesDir := filepath.Join(tempDir, "themes/")
-	_, err = os.Stat(themesDir)
-	assert.False(t, os.IsNotExist(err), "Themes directory not extracted: %s", themesDir)
+	themeDir := filepath.Join(tempDir, "themes/")
+	_, err = os.Stat(themeDir)
+	assert.False(t, os.IsNotExist(err), "Themes directory not extracted: %s", themeDir)
 	// Verify themes are extracted
-	themeFiles, err := os.ReadDir(themesDir)
+	themeFiles, err := os.ReadDir(themeDir)
 	assert.NoError(t, err, "Failed to read themes directory")
 	assert.Greater(t, len(themeFiles), 0, "No theme files extracted")
 

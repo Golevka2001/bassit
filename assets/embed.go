@@ -12,8 +12,11 @@ import (
 //go:embed *
 var Assets embed.FS
 
+// NOTE: The paths of embedded resources must use `/`, even on Windows
 const (
 	cfgFile = "config.yaml"
+
+	themeDir = "themes/"
 
 	rbBinForWindows  = "3rdparty/rubberband-4.0.0-gpl-executable-windows/rubberband.exe"
 	rb3BinForWindows = "3rdparty/rubberband-4.0.0-gpl-executable-windows/rubberband-r3.exe"
@@ -21,6 +24,8 @@ const (
 
 	rbBinForDarwin  = "3rdparty/rubberband-4.0.0-gpl-executable-macos/rubberband"
 	rb3BinForDarwin = "3rdparty/rubberband-4.0.0-gpl-executable-macos/rubberband-r3"
+
+	audioFile = "audio/bass/pluck/default/C2.wav"
 )
 
 type FileToExtract struct {
@@ -40,58 +45,58 @@ func ExtractTo(path string) error {
 	}
 
 	// Theme files
-	themeDir := filepath.Join(path, "themes")
+	themeDstDir := filepath.Join(path, "themes")
 	themeFiles, err := Assets.ReadDir("themes")
 	if err != nil {
 		return fmt.Errorf("failed to read themes directory: %w", err)
 	}
 	for _, file := range themeFiles {
 		files = append(files, FileToExtract{
-			Src:  filepath.Join("themes", file.Name()),
-			Dst:  filepath.Join(themeDir, file.Name()),
+			Src:  themeDir + file.Name(),
+			Dst:  filepath.Join(themeDstDir, file.Name()),
 			Perm: 0644,
 		})
 	}
 
 	// Rubberband binary for Windows and Darwin
-	rbDstPrefix := filepath.Join(path, "3rdparty/rubberband/")
+	rbDstDir := filepath.Join(path, "3rdparty/rubberband/")
 	switch C.OS {
 	case "windows":
 		files = append(files, FileToExtract{
 			Src:  rbBinForWindows,
-			Dst:  filepath.Join(rbDstPrefix, "rubberband.exe"),
+			Dst:  filepath.Join(rbDstDir, "rubberband.exe"),
 			Perm: 0755,
 		}, FileToExtract{
 			Src:  rb3BinForWindows,
-			Dst:  filepath.Join(rbDstPrefix, "rubberband-r3.exe"),
+			Dst:  filepath.Join(rbDstDir, "rubberband-r3.exe"),
 			Perm: 0755,
 		}, FileToExtract{
 			Src:  rbDllForWindows,
-			Dst:  filepath.Join(rbDstPrefix, "sndfile.dll"),
+			Dst:  filepath.Join(rbDstDir, "sndfile.dll"),
 			Perm: 0644,
 		})
 
 		// Set the Rubberband command for Windows
-		C.RubberbandCommand = filepath.Join(rbDstPrefix, "rubberband-r3.exe")
+		C.RubberbandCommand = filepath.Join(rbDstDir, "rubberband-r3.exe")
 	case "darwin":
 		files = append(files, FileToExtract{
 			Src:  rbBinForDarwin,
-			Dst:  filepath.Join(rbDstPrefix, "rubberband"),
+			Dst:  filepath.Join(rbDstDir, "rubberband"),
 			Perm: 0755,
 		}, FileToExtract{
 			Src:  rb3BinForDarwin,
-			Dst:  filepath.Join(rbDstPrefix, "rubberband-r3"),
+			Dst:  filepath.Join(rbDstDir, "rubberband-r3"),
 			Perm: 0755,
 		})
 
 		// Set the Rubberband command for Darwin
-		C.RubberbandCommand = filepath.Join(rbDstPrefix, "rubberband-r3")
+		C.RubberbandCommand = filepath.Join(rbDstDir, "rubberband-r3")
 	}
 
 	// Audio files
 	C.NoteSampleDir = filepath.Join(path, "audio/bass/pluck/default/")
 	files = append(files, FileToExtract{
-		Src:  "audio/bass/pluck/default/C2.wav",
+		Src:  audioFile,
 		Dst:  filepath.Join(C.NoteSampleDir, "C2.wav"),
 		Perm: 0644,
 	})

@@ -5,6 +5,7 @@
 [![go.dev reference](https://godoc.org/github.com/Golevka2001/bassit?status.svg)](https://pkg.go.dev/github.com/Golevka2001/bassit)
 
 > :warning: **Notice:** This branch ([tcell-based](https://github.com/Golevka2001/bassit/tree/tcell-based)) is built on the [tcell](https://github.com/gdamore/tcell) library and is **no longer maintained**.
+>
 > :point_right: For the latest updates and ongoing development, please switch to the **[main branch](https://github.com/Golevka2001/bassit/tree/main)**, which uses [Bubbletea](https://github.com/charmbracelet/bubbletea) as the TUI framework.
 
 Tired of typing commands? Time to play some bass 🎸

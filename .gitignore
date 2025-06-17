@@ -23,7 +23,12 @@ go.work.sum
 
 # IDE files
 .idea/
-.vscode/
+
+# .vscode contains `Run and Debug` configurations
+# .vscode/
 
 # Build directories
 build/
+
+# macOS Finder directory attributes
+.DS_Store

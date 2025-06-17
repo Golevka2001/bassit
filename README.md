@@ -35,7 +35,9 @@ go install github.com/Golevka2001/bassit@latest
 
 #### Basic Controls
 
-- `Esc`: Exit the program
+- `Ctrl+C`: Exit the application
+- `→` / `Tab`: Switch to the next tab
+- `←` / `Shift+Tab`: Switch to the previous tab
 
 #### Fret Controls
 
@@ -70,12 +72,10 @@ Press one of the following keys to **pluck** the corresponding string (make the 
 
 - On **Debian-based** distributions, the following packages are required:
   - `libasound2-dev` (required by [Oto](https://github.com/ebitengine/oto?tab=readme-ov-file#linux))
-  - `libx11-dev xorg-dev libxtst-dev xcb libxcb-xkb-dev x11-xkb-utils libx11-xcb-dev libxkbcommon-x11-dev libxkbcommon-dev` (required by [GoHook](https://github.com/robotn/gohook?tab=readme-ov-file#requirements-linux))
   - `rubberband-cli`
 
 - On **RedHat-based** distributions, the following packages are required:
   - `alsa-lib-devel` (required by [Oto](https://github.com/ebitengine/oto?tab=readme-ov-file#linux))
-  - `libXtst-devel libxkbcommon-devel libxkbcommon-x11-devel xorg-x11-xkb-utils-devel` (required by [GoHook](https://github.com/robotn/gohook?tab=readme-ov-file#requirements-linux))
   - `rubberband` *(except for OpenSUSE, which uses `rubberband-cli`)*
 
 </details>
@@ -84,10 +84,6 @@ Press one of the following keys to **pluck** the corresponding string (make the 
 **Install `alsa` (required by Oto):**
 
 See [Oto's README](https://github.com/ebitengine/oto?tab=readme-ov-file#linux).
-
-**Install `x11` related packages (required by GoHook):**
-
-See [RobotGo's README](https://github.com/go-vgo/robotgo?tab=readme-ov-file#requirements).
 
 **Install `rubberband-cli` or `rubberband`:**
 

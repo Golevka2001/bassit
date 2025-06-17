@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"testing"
 
-	C "github.com/Golevka2001/bassit/constant"
+	"github.com/Golevka2001/bassit/audio"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -42,17 +42,17 @@ func TestExtractTo(t *testing.T) {
 
 	// Verify NoteSampleDir is set correctly
 	expectedNoteSampleDir := filepath.Join(tempDir, "audio/bass/pluck/default/")
-	assert.Equal(t, expectedNoteSampleDir, C.NoteSampleDir, "NoteSampleDir not set correctly")
+	assert.Equal(t, expectedNoteSampleDir, audio.NoteSampleDir, "NoteSampleDir not set correctly")
 
 	// Verify RubberbandCommand is set (OS-specific)
 	rbDstPrefix := filepath.Join(tempDir, "3rdparty/rubberband/")
-	switch C.OS {
+	switch runtime.GOOS {
 	case "windows":
 		expectedCmd := filepath.Join(rbDstPrefix, "rubberband-r3.exe")
-		assert.Equal(t, expectedCmd, C.RubberbandCommand, "RubberbandCommand not set correctly for Windows")
+		assert.Equal(t, expectedCmd, audio.RubberbandCommand, "RubberbandCommand not set correctly for Windows")
 	case "darwin":
 		expectedCmd := filepath.Join(rbDstPrefix, "rubberband-r3")
-		assert.Equal(t, expectedCmd, C.RubberbandCommand, "RubberbandCommand not set correctly for Darwin")
+		assert.Equal(t, expectedCmd, audio.RubberbandCommand, "RubberbandCommand not set correctly for Darwin")
 	}
 }
 

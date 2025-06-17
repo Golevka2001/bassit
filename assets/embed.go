@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 
-	C "github.com/Golevka2001/bassit/constant"
+	"github.com/Golevka2001/bassit/audio"
 )
 
 //go:embed *
@@ -60,7 +61,7 @@ func ExtractTo(path string) error {
 
 	// Rubberband binary for Windows and Darwin
 	rbDstDir := filepath.Join(path, "3rdparty/rubberband/")
-	switch C.OS {
+	switch runtime.GOOS {
 	case "windows":
 		files = append(files, FileToExtract{
 			Src:  rbBinForWindows,
@@ -77,7 +78,7 @@ func ExtractTo(path string) error {
 		})
 
 		// Set the Rubberband command for Windows
-		C.RubberbandCommand = filepath.Join(rbDstDir, "rubberband-r3.exe")
+		audio.RubberbandCommand = filepath.Join(rbDstDir, "rubberband-r3.exe")
 	case "darwin":
 		files = append(files, FileToExtract{
 			Src:  rbBinForDarwin,
@@ -90,14 +91,14 @@ func ExtractTo(path string) error {
 		})
 
 		// Set the Rubberband command for Darwin
-		C.RubberbandCommand = filepath.Join(rbDstDir, "rubberband-r3")
+		audio.RubberbandCommand = filepath.Join(rbDstDir, "rubberband-r3")
 	}
 
 	// Audio files
-	C.NoteSampleDir = filepath.Join(path, "audio/bass/pluck/default/")
+	audio.NoteSampleDir = filepath.Join(path, "audio/bass/pluck/default/")
 	files = append(files, FileToExtract{
 		Src:  audioFile,
-		Dst:  filepath.Join(C.NoteSampleDir, "C2.wav"),
+		Dst:  filepath.Join(audio.NoteSampleDir, "C2.wav"),
 		Perm: 0644,
 	})
 

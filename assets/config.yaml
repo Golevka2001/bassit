@@ -1,9 +1,20 @@
-# The tuning of the 4-string bass guitar (from highest to lowest string)
+# Tuning defines the tuning for the 4-string bass guitar
+# Octave number is required
+# From the highest string to the lowest string
 tuning:
-  - G2
-  - D2
-  - A1
-  - E1
+  - "G#2"
+  - "D#2"
+  - "A#1"
+  - "E#1"
 
-# Name of the theme to use, not path
+# Theme defines the name of the theme to be used
+# The theme will be loaded from the `${BASSIT_BASE_DIR}/themes/` directory
+# It should match the yaml file name in that directory, excluding the `.yaml` extension
 theme: default
+
+# AccidentalStyle defines how to display accidental notes
+# It can be "sharp" or "flat"
+accidental_style: sharp
+
+# DisplayedFretCount defines the number of frets to be displayed
+displayed_fret_count: 12

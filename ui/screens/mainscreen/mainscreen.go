@@ -82,6 +82,10 @@ func NewModel(csm *common.CommonScreenModel) Model {
 func (m Model) Init() tea.Cmd {
 	var cmds []tea.Cmd
 
+	cmds = append(cmds,
+		tea.EnterAltScreen,
+		tea.ClearScreen,
+	)
 	cmds = append(cmds, m.tabs.Init())
 
 	switch m.state {

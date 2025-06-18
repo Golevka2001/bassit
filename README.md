@@ -6,15 +6,21 @@
 
 Tired of typing commands? Time to play some bass 🎸
 
-`bassit` is a terminal-based bass guitar simulator written in Go. It allows you to play bass lines using your keyboard.
+`bassit` is a terminal-based bass guitar simulator written in Go. It allows you to play bass lines on your keyboard.
 
-Supported platforms include **Linux**, **macOS**, and **Windows**.
+Supported on **Linux**, **macOS**, and **Windows**.
 
 ## :rocket: Quick Start
 
-### :building_construction: Install Dependencies
+### :vertical_traffic_light: Before You Begin
 
-See the [prerequisites](#building_construction-prerequisites) section below for instructions on installing dependencies.
+1. See the [Dependencies](#building_construction-dependencies) section below for installation instructions.
+
+2. To avoid character encoding or alignment issues, please make sure:
+   - You are using the **UTF-8 character set**
+     - On Linux or macOS, you can check your current character set settings by running the `locale` command.
+     - On Windows, you can check your current character set settings in PowerShell by running `$OutputEncoding`.
+   - You are using a **monospace font** (fixed-width font) in your terminal.
 
 ### :computer: Install and Run
 
@@ -26,7 +32,9 @@ go version
 go install github.com/Golevka2001/bassit@latest
 
 # Run
-./bassit
+$GOPATH/bin/bassit
+# OR if you have the Go bin directory in your PATH
+bassit
 ```
 
 ### :keyboard: Keybindings
@@ -63,7 +71,7 @@ Press one of the following keys to **pluck** the corresponding string (make the 
 
 > 💡 **Tip:** To play a note, first press a fret key, then pluck the corresponding string.
 
-## :building_construction: Prerequisites
+## :building_construction: Dependencies
 
 ### :penguin: Linux
 
@@ -102,9 +110,10 @@ apk add rubberband
 # etc.
 ```
 
-If [pkgs.org](https://pkgs.org/download/rubberband) doesn't list your Linux distribution, you will need to install from source, see [their repository](https://github.com/breakfastquay/rubberband).
+If your Linux distribution is not listed on [pkgs.org](https://pkgs.org/download/rubberband), you may need to build from source, see [their repository](https://github.com/breakfastquay/rubberband).
 
-## :toolbox: 3rd Party Libraries & Assets
+
+## :toolbox: Third-Party Libraries & Assets
 
 - [Rubber Band Library](https://breakfastquay.com/rubberband/)
   - License: [GPLv2](https://github.com/breakfastquay/rubberband/blob/default/COPYING)

@@ -2,10 +2,10 @@
 # Octave number is required
 # From the highest string to the lowest string
 tuning:
-  - "G#2"
-  - "D#2"
-  - "A#1"
-  - "E#1"
+  - "G2"
+  - "D2"
+  - "A1"
+  - "E1"
 
 # Theme defines the name of the theme to be used
 # The theme will be loaded from the `${BASSIT_BASE_DIR}/themes/` directory

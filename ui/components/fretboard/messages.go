@@ -13,6 +13,7 @@ type ReleaseFretMsg struct {
 type PluckStringMsg struct {
 	StringIdx int
 	FretIdx   int
+	Position  int
 }
 
 type RestorePluckedStringMsg struct {

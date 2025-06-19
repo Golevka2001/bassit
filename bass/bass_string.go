@@ -9,56 +9,60 @@ import (
 	"github.com/go-music-theory/music-theory/note"
 )
 
-type BassStringModel struct {
-	// BaseNote is the open string note
-	BaseNote note.Note
-	// FretToNote maps the fret number to the corresponding note
-	FretToNote map[int]note.Note
-	// FretPressedStates records which fret is pressed, "0" is meaningless
-	FretPressedStates []bool
-	// PluckedState records whether the string is plucked
-	PluckedState bool
+type bassStringModel struct {
+	// baseNote is the open string note
+	baseNote note.Note
+	// fretIdxToNote maps the fret number to the corresponding note
+	fretIdxToNote map[int]note.Note
+	// fretPressedStates records which fret is pressed, "0" is meaningless
+	fretPressedStates []bool
+	// IsVibrating indicates whether the string is vibrating
+	IsVibrating bool
+	// pluckStates records the state of the two pluck keys
+	pluckStates [2]bool
 	// CurValidFret records the "valid" fret number among the pressed frets
 	// (e.g. if 3rd, 5th, and 7th frets are pressed, `CurValidFret` should be 7)
 	CurValidFret int
+
+	LastPluckID int64
 }
 
-func newBassString(baseNote note.Note) (*BassStringModel, error) {
+func newBassString(baseNote note.Note) (*bassStringModel, error) {
 	if baseNote.Class == note.Nil || baseNote.Octave <= 0 {
 		return nil, fmt.Errorf("invalid base note")
 	}
 
-	fretToNote := make(map[int]note.Note)
-	fretToNote[0] = baseNote
+	fretIdxToNote := make(map[int]note.Note)
+	fretIdxToNote[0] = baseNote
 	for i := 1; i <= config.MaxFretCnt; i++ {
-		fretToNote[i] = utils.GetNoteStepFrom(fretToNote[i-1], 1)
+		fretIdxToNote[i] = utils.GetNoteStepFrom(fretIdxToNote[i-1], 1)
 	}
 
-	return &BassStringModel{
-		BaseNote:          baseNote,
-		FretToNote:        fretToNote,
-		FretPressedStates: make([]bool, config.MaxFretCnt+1),
-		PluckedState:      false,
+	return &bassStringModel{
+		baseNote:          baseNote,
+		fretIdxToNote:     fretIdxToNote,
+		fretPressedStates: make([]bool, config.MaxFretCnt+1),
+		IsVibrating:       false,
 		CurValidFret:      0,
 	}, nil
 }
 
-func (bsm *BassStringModel) pressFret(n int) {
-	if n < 0 || n > config.MaxFretCnt {
+func (bsm *bassStringModel) pressFret(fretIdx int) {
+	if fretIdx < 0 || fretIdx > config.MaxFretCnt {
 		return
 	}
-	bsm.FretPressedStates[n] = true
-	bsm.CurValidFret = max(bsm.CurValidFret, n)
+	bsm.fretPressedStates[fretIdx] = true
+	bsm.CurValidFret = max(bsm.CurValidFret, fretIdx)
 }
 
-func (bsm *BassStringModel) releaseFret(n int) {
-	if n < 0 || n > config.MaxFretCnt {
+func (bsm *bassStringModel) releaseFret(fretIdx int) {
+	if fretIdx < 0 || fretIdx > config.MaxFretCnt {
 		return
 	}
-	bsm.FretPressedStates[n] = false
-	if bsm.CurValidFret <= n {
-		for i := n - 1; i >= 0; i-- {
-			if bsm.FretPressedStates[i] {
+	bsm.fretPressedStates[fretIdx] = false
+	if bsm.CurValidFret <= fretIdx {
+		for i := fretIdx - 1; i >= 0; i-- {
+			if bsm.fretPressedStates[i] {
 				bsm.CurValidFret = i
 				return
 			}
@@ -68,9 +72,23 @@ func (bsm *BassStringModel) releaseFret(n int) {
 	}
 }
 
-func (bsm *BassStringModel) GetNoteToPlay() note.Note {
-	if bsm.CurValidFret == 0 {
-		return bsm.BaseNote
+func (bsm *bassStringModel) pluckString(position int) {
+	if position < 0 || position >= 2 {
+		return
 	}
-	return bsm.FretToNote[bsm.CurValidFret]
+	bsm.pluckStates[position] = true
+	bsm.pluckStates[1-position] = false
+	bsm.IsVibrating = true
+}
+
+func (bsm *bassStringModel) restoreString() {
+	bsm.pluckStates = [2]bool{false, false}
+	bsm.IsVibrating = false
+}
+
+func (bsm *bassStringModel) GetNoteToPlay() note.Note {
+	if bsm.CurValidFret == 0 {
+		return bsm.baseNote
+	}
+	return bsm.fretIdxToNote[bsm.CurValidFret]
 }

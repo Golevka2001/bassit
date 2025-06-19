@@ -15,11 +15,12 @@ func TestNewBassStringModel(t *testing.T) {
 	bsm, err := newBassString(baseNote)
 
 	require.NoError(t, err)
-	assert.Equal(t, baseNote, bsm.BaseNote)
-	assert.Equal(t, baseNote, bsm.FretToNote[0])
-	assert.Len(t, bsm.FretPressedStates, config.MaxFretCnt+1)
-	assert.False(t, bsm.PluckedState)
+	assert.Equal(t, baseNote, bsm.baseNote)
+	assert.Equal(t, baseNote, bsm.fretIdxToNote[0])
+	assert.Len(t, bsm.fretPressedStates, config.MaxFretCnt+1)
+	assert.False(t, bsm.IsVibrating)
 	assert.Equal(t, 0, bsm.CurValidFret)
+	assert.Equal(t, [2]bool{false, false}, bsm.pluckStates)
 
 	// Verify fret-to-note mapping
 	expectedNoteNames := [config.MaxFretCnt + 1]string{
@@ -33,7 +34,7 @@ func TestNewBassStringModel(t *testing.T) {
 		expectedNotes[i] = *note.Named(name)
 	}
 	for i := 0; i <= config.MaxFretCnt; i++ {
-		assert.Equal(t, expectedNotes[i], bsm.FretToNote[i], "Fret %d should map to %s", i, expectedNoteNames[i])
+		assert.Equal(t, expectedNotes[i], bsm.fretIdxToNote[i], "Fret %d should map to %s", i, expectedNoteNames[i])
 	}
 }
 
@@ -57,17 +58,17 @@ func TestPressFret(t *testing.T) {
 
 	// Test pressing valid fret
 	bsm.pressFret(3)
-	assert.True(t, bsm.FretPressedStates[3])
+	assert.True(t, bsm.fretPressedStates[3])
 	assert.Equal(t, 3, bsm.CurValidFret)
 
 	// Test pressing higher fret
 	bsm.pressFret(5)
-	assert.True(t, bsm.FretPressedStates[5])
+	assert.True(t, bsm.fretPressedStates[5])
 	assert.Equal(t, 5, bsm.CurValidFret)
 
 	// Test pressing lower fret (should not change CurValidFret)
 	bsm.pressFret(2)
-	assert.True(t, bsm.FretPressedStates[2])
+	assert.True(t, bsm.fretPressedStates[2])
 	assert.Equal(t, 5, bsm.CurValidFret)
 
 	// Test pressing invalid frets
@@ -88,17 +89,17 @@ func TestReleaseFret(t *testing.T) {
 
 	// Release middle fret (should not change CurValidFret)
 	bsm.releaseFret(5)
-	assert.False(t, bsm.FretPressedStates[5])
+	assert.False(t, bsm.fretPressedStates[5])
 	assert.Equal(t, 7, bsm.CurValidFret)
 
 	// Release highest fret (should update CurValidFret)
 	bsm.releaseFret(7)
-	assert.False(t, bsm.FretPressedStates[7])
+	assert.False(t, bsm.fretPressedStates[7])
 	assert.Equal(t, 2, bsm.CurValidFret)
 
 	// Release last fret (should reset to open string)
 	bsm.releaseFret(2)
-	assert.False(t, bsm.FretPressedStates[2])
+	assert.False(t, bsm.fretPressedStates[2])
 	assert.Equal(t, 0, bsm.CurValidFret)
 
 	// Test releasing invalid frets
@@ -120,13 +121,55 @@ func TestGetNoteToPlay(t *testing.T) {
 	// Test pressed fret
 	bsm.pressFret(3)
 	note = bsm.GetNoteToPlay()
-	assert.Equal(t, bsm.FretToNote[3], note)
+	assert.Equal(t, bsm.fretIdxToNote[3], note)
 
 	// Test multiple pressed frets (should return highest)
 	bsm.pressFret(1)
 	bsm.pressFret(5)
 	note = bsm.GetNoteToPlay()
-	assert.Equal(t, bsm.FretToNote[5], note)
+	assert.Equal(t, bsm.fretIdxToNote[5], note)
+}
+
+func TestPluckString(t *testing.T) {
+	baseNote := *note.Named("E2")
+	bsm, _ := newBassString(baseNote)
+
+	// Test plucking position 0
+	bsm.pluckString(0)
+	assert.True(t, bsm.pluckStates[0])
+	assert.False(t, bsm.pluckStates[1])
+	assert.True(t, bsm.IsVibrating)
+
+	// Test plucking position 1
+	bsm.pluckString(1)
+	assert.False(t, bsm.pluckStates[0])
+	assert.True(t, bsm.pluckStates[1])
+	assert.True(t, bsm.IsVibrating)
+
+	// Test invalid pluck position
+	bsm.pluckString(-1)
+	assert.False(t, bsm.pluckStates[0])
+	assert.True(t, bsm.pluckStates[1])
+
+	bsm.pluckString(2)
+	assert.False(t, bsm.pluckStates[0])
+	assert.True(t, bsm.pluckStates[1])
+}
+
+func TestRestoreString(t *testing.T) {
+	baseNote := *note.Named("G2")
+	bsm, _ := newBassString(baseNote)
+
+	// First pluck the string
+	bsm.pluckString(0)
+	assert.True(t, bsm.pluckStates[0])
+	assert.True(t, bsm.IsVibrating)
+
+	// Then restore it
+	bsm.restoreString()
+	assert.False(t, bsm.pluckStates[0])
+	assert.False(t, bsm.pluckStates[1])
+	assert.False(t, bsm.IsVibrating)
 }
 
 func TestComplexFretOperations(t *testing.T) {
@@ -140,7 +183,7 @@ func TestComplexFretOperations(t *testing.T) {
 	bsm.pressFret(2)
 
 	assert.Equal(t, 7, bsm.CurValidFret)
-	assert.Equal(t, bsm.FretToNote[7], bsm.GetNoteToPlay())
+	assert.Equal(t, bsm.fretIdxToNote[7], bsm.GetNoteToPlay())
 
 	// Release frets in different order
 	bsm.releaseFret(3)
@@ -153,4 +196,30 @@ func TestComplexFretOperations(t *testing.T) {
 	bsm.releaseFret(5)
 	assert.Equal(t, 0, bsm.CurValidFret)
 	assert.Equal(t, baseNote, bsm.GetNoteToPlay())
+}
+
+func TestPluckAndFretInteraction(t *testing.T) {
+	baseNote := *note.Named("A1")
+	bsm, _ := newBassString(baseNote)
+
+	// Press fret and then pluck
+	bsm.pressFret(3)
+	bsm.pluckString(0)
+
+	assert.Equal(t, 3, bsm.CurValidFret)
+	assert.True(t, bsm.IsVibrating)
+	assert.Equal(t, bsm.fretIdxToNote[3], bsm.GetNoteToPlay())
+
+	// Restore string but keep fret pressed
+	bsm.restoreString()
+	assert.Equal(t, 3, bsm.CurValidFret)
+	assert.False(t, bsm.IsVibrating)
+	assert.Equal(t, bsm.fretIdxToNote[3], bsm.GetNoteToPlay())
+
+	// Pluck again and then change fret
+	bsm.pluckString(1)
+	bsm.pressFret(5)
+	assert.Equal(t, 5, bsm.CurValidFret)
+	assert.True(t, bsm.IsVibrating)
+	assert.Equal(t, bsm.fretIdxToNote[5], bsm.GetNoteToPlay())
 }

@@ -5,7 +5,7 @@ import (
 
 	"github.com/Golevka2001/bassit/config"
 	"github.com/Golevka2001/bassit/utils"
-	
+
 	"github.com/charmbracelet/lipgloss/v2"
 )
 
@@ -13,7 +13,7 @@ const (
 	stringSpacing     = 1
 	nutWidth          = 3
 	baseNoteNameWidth = 4
-	pluckSignWidth    = 2
+	pluckSignWidth    = 4
 	blockInlayMarginX = 1
 	blockInlayMarginY = 2
 )
@@ -151,7 +151,8 @@ func (m *Model) drawStrings() {
 		m.frameBuf.DrawString(0, y, utils.GetNoteNameWithOctave(m.baseNotes[stringIdx]), m.style.baseNoteStyle, false)
 
 		// Draw the pluck signs
-		m.frameBuf.DrawRune(m.Width-1, y, m.theme.NotPluckedStringChar, m.style.stringStyle, false)
+		m.frameBuf.DrawRune(m.fretboardEndX+2, y, m.theme.NotPluckedStringChar, m.style.stringStyle, false)
+		m.frameBuf.DrawRune(m.fretboardEndX+4, y, m.theme.NotPluckedStringChar, m.style.stringStyle, false)
 
 		// Draw the strings
 		for x := m.fretboardStartX; x <= m.fretboardEndX; x++ {
@@ -192,10 +193,16 @@ func (m *Model) restorePressedFret(stringIdx, fretIdx int) {
 	m.frameBuf.DrawRune(x, y, r, m.style.stringStyle, true)
 }
 
-func (m *Model) drawVibratingString(stringIdx int, fretIdx int) {
+func (m *Model) drawVibratingString(stringIdx int, fretIdx int, position int) {
 	// Draw the sign
 	y := m.stringY[stringIdx]
-	m.frameBuf.DrawRune(m.Width-1, y, m.theme.PluckedStringSignChar, m.style.pluckedStringSignStyle, false)
+	if position == 0 {
+		m.frameBuf.DrawRune(m.fretboardEndX+2, y, m.theme.PluckedStringSignChar, m.style.pluckedStringSignStyle, false)
+		m.frameBuf.DrawRune(m.fretboardEndX+4, y, m.theme.NotPluckedStringChar, m.style.stringStyle, false)
+	} else {
+		m.frameBuf.DrawRune(m.fretboardEndX+4, y, m.theme.PluckedStringSignChar, m.style.pluckedStringSignStyle, false)
+		m.frameBuf.DrawRune(m.fretboardEndX+2, y, m.theme.NotPluckedStringChar, m.style.stringStyle, false)
+	}
 
 	// Draw the vibrating string
 	rightMostPressedPos := m.fretCenterX[fretIdx]
@@ -224,7 +231,8 @@ func (m *Model) drawVibratingString(stringIdx int, fretIdx int) {
 func (m *Model) restoreVibratingString(stringIdx int, fretIdx int) {
 	// Restore the sign
 	y := m.stringY[stringIdx]
-	m.frameBuf.DrawRune(m.Width-1, y, m.theme.NotPluckedStringChar, m.style.stringStyle, false)
+	m.frameBuf.DrawRune(m.fretboardEndX+2, y, m.theme.NotPluckedStringChar, m.style.stringStyle, false)
+	m.frameBuf.DrawRune(m.fretboardEndX+4, y, m.theme.NotPluckedStringChar, m.style.stringStyle, false)
 
 	// Restore the vibrating string
 	rightMostPressedPos := m.fretCenterX[fretIdx]

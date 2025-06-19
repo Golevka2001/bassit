@@ -1,17 +1,19 @@
 package bass
 
 import (
+	"time"
+
 	"github.com/Golevka2001/bassit/config"
 
 	"github.com/go-music-theory/music-theory/note"
 )
 
 type BassModel struct {
-	Strings []*BassStringModel // from highest to lowest
+	Strings []*bassStringModel // from highest to lowest
 }
 
 func New(tuning [config.StringCnt]string) (*BassModel, error) {
-	strings := make([]*BassStringModel, config.StringCnt)
+	strings := make([]*bassStringModel, config.StringCnt)
 	for i, noteName := range tuning {
 		baseNote := *note.Named(noteName)
 		bsm, err := newBassString(baseNote)
@@ -29,14 +31,14 @@ func New(tuning [config.StringCnt]string) (*BassModel, error) {
 func (bm *BassModel) GetBaseNotes() []note.Note {
 	notes := make([]note.Note, config.StringCnt)
 	for i := range bm.Strings {
-		notes[i] = bm.Strings[i].BaseNote
+		notes[i] = bm.Strings[i].baseNote
 	}
 	return notes
 }
 
 func (bm *BassModel) GetLowestAndHighestNotes() (lowest, highest note.Note) {
-	lowest = bm.Strings[config.StringCnt-1].BaseNote
-	highest = bm.Strings[0].FretToNote[config.DisplayedFretCount]
+	lowest = bm.Strings[config.StringCnt-1].baseNote
+	highest = bm.Strings[0].fretIdxToNote[config.DisplayedFretCount]
 	return
 }
 
@@ -54,16 +56,17 @@ func (bm *BassModel) Release(stringIdx, fretIdx int) {
 	bm.Strings[stringIdx].releaseFret(fretIdx)
 }
 
-func (bm *BassModel) PluckString(stringIdx int) {
-	if stringIdx < 0 || stringIdx >= config.StringCnt {
+func (bm *BassModel) PluckString(stringIdx, position int) {
+	if stringIdx < 0 || stringIdx >= config.StringCnt || position < 0 || position >= 2 {
 		return
 	}
-	bm.Strings[stringIdx].PluckedState = true
+	bm.Strings[stringIdx].pluckString(position)
+	bm.Strings[stringIdx].LastPluckID = time.Now().UnixNano()
 }
 
 func (bm *BassModel) RestoreString(stringIdx int) {
 	if stringIdx < 0 || stringIdx >= config.StringCnt {
 		return
 	}
-	bm.Strings[stringIdx].PluckedState = false
+	bm.Strings[stringIdx].restoreString()
 }

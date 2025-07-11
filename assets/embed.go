@@ -17,16 +17,16 @@ var Assets embed.FS
 const (
 	cfgFile = "config.yaml"
 
-	themeDir = "themes/"
+	thirdPartyDir = "3rdparty"
+	soundpackDir  = "soundpacks"
+	themeDir      = "themes"
 
-	rbBinForWindows  = "3rdparty/rubberband-4.0.0-gpl-executable-windows/rubberband.exe"
-	rb3BinForWindows = "3rdparty/rubberband-4.0.0-gpl-executable-windows/rubberband-r3.exe"
-	rbDllForWindows  = "3rdparty/rubberband-4.0.0-gpl-executable-windows/sndfile.dll"
+	rbBinForWindows  = thirdPartyDir + "/rubberband-4.0.0-gpl-executable-windows/rubberband.exe"
+	rb3BinForWindows = thirdPartyDir + "/rubberband-4.0.0-gpl-executable-windows/rubberband-r3.exe"
+	rbDllForWindows  = thirdPartyDir + "/rubberband-4.0.0-gpl-executable-windows/sndfile.dll"
 
-	rbBinForDarwin  = "3rdparty/rubberband-4.0.0-gpl-executable-macos/rubberband"
-	rb3BinForDarwin = "3rdparty/rubberband-4.0.0-gpl-executable-macos/rubberband-r3"
-
-	audioFile = "audio/bass/pluck/default/C2.wav"
+	rbBinForDarwin  = thirdPartyDir + "/rubberband-4.0.0-gpl-executable-macos/rubberband"
+	rb3BinForDarwin = thirdPartyDir + "/rubberband-4.0.0-gpl-executable-macos/rubberband-r3"
 )
 
 type FileToExtract struct {
@@ -35,32 +35,33 @@ type FileToExtract struct {
 	Perm os.FileMode
 }
 
+// ExtractTo extracts all the embedded resources to the given path
 func ExtractTo(path string) error {
 	// Configuration file
 	files := []FileToExtract{
 		{
 			Src:  cfgFile,
-			Dst:  filepath.Join(path, "config.yaml"),
+			Dst:  filepath.Join(path, cfgFile),
 			Perm: 0644,
 		},
 	}
 
 	// Theme files
-	themeDstDir := filepath.Join(path, "themes")
-	themeFiles, err := Assets.ReadDir("themes")
+	themeDstDir := filepath.Join(path, themeDir)
+	themeFiles, err := Assets.ReadDir(themeDir)
 	if err != nil {
 		return fmt.Errorf("failed to read themes directory: %w", err)
 	}
 	for _, file := range themeFiles {
 		files = append(files, FileToExtract{
-			Src:  themeDir + file.Name(),
+			Src:  filepath.Join(themeDir, file.Name()),
 			Dst:  filepath.Join(themeDstDir, file.Name()),
 			Perm: 0644,
 		})
 	}
 
 	// Rubberband binary for Windows and Darwin
-	rbDstDir := filepath.Join(path, "3rdparty/rubberband/")
+	rbDstDir := filepath.Join(path, thirdPartyDir, "rubberband")
 	switch runtime.GOOS {
 	case "windows":
 		files = append(files, FileToExtract{
@@ -76,9 +77,9 @@ func ExtractTo(path string) error {
 			Dst:  filepath.Join(rbDstDir, "sndfile.dll"),
 			Perm: 0644,
 		})
-
 		// Set the Rubberband command for Windows
 		audio.RubberbandCommand = filepath.Join(rbDstDir, "rubberband-r3.exe")
+
 	case "darwin":
 		files = append(files, FileToExtract{
 			Src:  rbBinForDarwin,
@@ -89,21 +90,36 @@ func ExtractTo(path string) error {
 			Dst:  filepath.Join(rbDstDir, "rubberband-r3"),
 			Perm: 0755,
 		})
-
 		// Set the Rubberband command for Darwin
 		audio.RubberbandCommand = filepath.Join(rbDstDir, "rubberband-r3")
 	}
 
-	// Audio files
-	audio.NoteSampleDir = filepath.Join(path, "audio/bass/pluck/default/")
-	files = append(files, FileToExtract{
-		Src:  audioFile,
-		Dst:  filepath.Join(audio.NoteSampleDir, "C2.wav"),
-		Perm: 0644,
-	})
+	// Soundpacks
+	soundpackDstDir := filepath.Join(path, soundpackDir)
+	soundpackEntries, err := Assets.ReadDir(soundpackDir)
+	if err != nil {
+		return fmt.Errorf("failed to read soundpacks directory: %w", err)
+	}
+	for _, entry := range soundpackEntries {
+		if entry.IsDir() {
+			subDir := filepath.Join(soundpackDir, entry.Name())
+			subFiles, err := Assets.ReadDir(subDir)
+			if err != nil {
+				return fmt.Errorf("failed to read soundpack subdir %s: %w", subDir, err)
+			}
+			for _, f := range subFiles {
+				files = append(files, FileToExtract{
+					Src:  filepath.Join(subDir, f.Name()),
+					Dst:  filepath.Join(soundpackDstDir, entry.Name(), f.Name()),
+					Perm: 0644,
+				})
+			}
+		}
+	}
 
+	// Extract all files
 	for _, file := range files {
-		if err := extractFile(file.Src, file.Dst, file.Perm); err != nil {
+		if err := extractFile(file); err != nil {
 			return err
 		}
 	}
@@ -111,23 +127,24 @@ func ExtractTo(path string) error {
 	return nil
 }
 
-func extractFile(src, dst string, perm os.FileMode) error {
+// extractFile extracts a file from the embedded assets to the given destination path, with the given permissions
+func extractFile(file FileToExtract) error {
 	// Check if the file exists
-	if _, err := os.Stat(dst); err == nil {
+	if _, err := os.Stat(file.Dst); err == nil {
 		return nil
 	}
 
 	// Create the directory if it doesn't exist
-	if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(file.Dst), 0755); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
-	data, err := Assets.ReadFile(src)
+	data, err := Assets.ReadFile(file.Src)
 	if err != nil {
 		return fmt.Errorf("failed to read embedded file: %w", err)
 	}
-	if err := os.WriteFile(dst, data, perm); err != nil {
-		return fmt.Errorf("failed to write file to %s: %w", dst, err)
+	if err := os.WriteFile(file.Dst, data, file.Perm); err != nil {
+		return fmt.Errorf("failed to write file to %s: %w", file.Dst, err)
 	}
 	return nil
 }

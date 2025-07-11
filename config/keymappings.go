@@ -49,22 +49,25 @@ var (
 		",": {StringIdx: 3, FretIdx: 8},
 	}
 
-	KeyToPluckState = map[string]struct {
+	SlapModeKey = "\\"
+	MuteModeKey = "space"
+
+	KeyToPluckInfo = map[string]struct {
 		StringIdx int
-		// Position can be `0` or `1`
-		Position int
+		// Type can be `0` or `1`
+		Type int
 	}{
 		// The 1st string (G string)
-		"=":         {StringIdx: 0, Position: 0},
-		"backspace": {StringIdx: 0, Position: 1},
+		"=":         {StringIdx: 0, Type: 0},
+		"backspace": {StringIdx: 0, Type: 1},
 		// The 2nd string (D string)
-		"[": {StringIdx: 1, Position: 0},
-		"]": {StringIdx: 1, Position: 1},
+		"[": {StringIdx: 1, Type: 0},
+		"]": {StringIdx: 1, Type: 1},
 		// The 3rd string (A string)
-		";": {StringIdx: 2, Position: 0},
-		"'": {StringIdx: 2, Position: 1},
+		";": {StringIdx: 2, Type: 0},
+		"'": {StringIdx: 2, Type: 1},
 		// The 4th string (E string)
-		".": {StringIdx: 3, Position: 0},
-		"/": {StringIdx: 3, Position: 1},
+		".": {StringIdx: 3, Type: 0},
+		"/": {StringIdx: 3, Type: 1},
 	}
 )

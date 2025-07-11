@@ -1,22 +1,14 @@
 package fretboard
 
-type PressFretMsg struct {
-	StringIdx int
-	FretIdx   int
-}
+import "github.com/Golevka2001/bassit/bass"
 
-type ReleaseFretMsg struct {
-	StringIdx int
-	FretIdx   int
-}
+type PressFretMsg bass.FretboardPosition
+
+type ReleaseFretMsg bass.FretboardPosition
 
 type PluckStringMsg struct {
-	StringIdx int
-	FretIdx   int
-	Position  int
+	bass.FretboardPosition
+	Type bass.PluckType
 }
 
-type RestorePluckedStringMsg struct {
-	StringIdx int
-	FretIdx   int
-}
+type RestorePluckedStringMsg bass.FretboardPosition

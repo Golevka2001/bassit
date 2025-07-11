@@ -8,7 +8,7 @@ require (
 	github.com/charmbracelet/lipgloss/v2 v2.0.0-beta1
 	github.com/ebitengine/oto/v3 v3.3.3
 	github.com/go-music-theory/music-theory v0.0.5-0.20191125184038-bd9271db4dae
-	github.com/go-viper/mapstructure/v2 v2.2.1
+	github.com/go-viper/mapstructure/v2 v2.3.0
 	github.com/hajimehoshi/ebiten/v2 v2.8.8
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
@@ -17,7 +17,6 @@ require (
 
 require (
 	github.com/charmbracelet/colorprofile v0.3.0 // indirect
-	github.com/charmbracelet/harmonica v0.2.0 // indirect
 	github.com/charmbracelet/x/ansi v0.8.0 // indirect
 	github.com/charmbracelet/x/cellbuf v0.0.13 // indirect
 	github.com/charmbracelet/x/input v0.3.4 // indirect

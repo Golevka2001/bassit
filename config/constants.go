@@ -12,6 +12,6 @@ const (
 	// MaxFretCnt is NOT the number of frets to be displayed
 	MaxFretCnt = 24
 
-	// DefaultDisplayedFretCount defines the default number of frets to be displayed
-	DefaultDisplayedFretCount = 12
+	// PluckTypeCount defines the number of pluck types
+	PluckTypeCount = 6
 )

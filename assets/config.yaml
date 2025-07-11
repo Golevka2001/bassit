@@ -1,20 +1,25 @@
-# Tuning defines the tuning for the 4-string bass guitar
-# Octave number is required
-# From the highest string to the lowest string
+# `tuning` defines the tuning for a 4-string bass guitar.
+# Octave number is required.
+# Strings are ordered from string 1 (highest) to string 4 (lowest).
 tuning:
   - "G2"
   - "D2"
   - "A1"
   - "E1"
 
-# Theme defines the name of the theme to be used
-# The theme will be loaded from the `${BASSIT_BASE_DIR}/themes/` directory
-# It should match the yaml file name in that directory, excluding the `.yaml` extension
-theme: default
-
-# AccidentalStyle defines how to display accidental notes
-# It can be "sharp" or "flat"
-accidental_style: sharp
-
-# DisplayedFretCount defines the number of frets to be displayed
+# `displayed_fret_count` defines how many frets to display on the fretboard.
 displayed_fret_count: 12
+
+# `accidental_style` determines how to display accidental notes.
+# Valid values are "sharp" or "flat".
+accidental_style: "sharp"
+
+# `theme` defines the name of the UI theme to use.
+# The theme file will be loaded from `${BASSIT_BASE_DIR}/themes/`.
+# This should match the filename (without `.yaml`) in that directory.
+theme: "default"
+
+# `soundpack` defines the name of the sound pack to use.
+# The sound pack will be loaded from `${BASSIT_BASE_DIR}/assets/soundpacks/`.
+# This should match the folder name in that directory.
+soundpack: "default"

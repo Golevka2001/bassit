@@ -15,15 +15,16 @@ import (
 
 // Flags
 var (
-	baseDir   string // default: $HOME/.config/bassit
-	cfgPath   string // default: $HOME/.config/bassit/config.yaml
-	themeName string // default: specified in `cfgPath`
-	skipCheck bool   // default: false
+	baseDir       string // default: $HOME/.config/bassit
+	cfgPath       string // default: $HOME/.config/bassit/config.yaml
+	themeName     string // default: specified in `cfgPath`
+	soundpackName string // default: specified in `cfgPath`
 )
 
 var (
-	cfg   *config.Config
-	theme *config.Theme
+	cfg           *config.Config
+	theme         *config.Theme
+	soundpackInfo *config.SoundpackInfo
 )
 
 var (
@@ -34,11 +35,11 @@ var (
 It allows you to play bass lines using your keyboard.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			// Create an audio manager
-			am, err := audio.New()
+			am, err := audio.NewAudioManager()
 			cobra.CheckErr(err)
 
 			// Create a bass model with the specified tuning
-			bm, err := bass.New(cfg.Tuning)
+			bm, err := bass.NewBass(cfg.Tuning)
 			cobra.CheckErr(err)
 
 			ctx := common.UIContext{
@@ -46,7 +47,7 @@ It allows you to play bass lines using your keyboard.`,
 				Bass:      bm,
 				Config:    cfg,
 				Theme:     theme,
-				SkipCheck: skipCheck,
+				Soundpack: soundpackInfo,
 			}
 
 			// Create a bubbletea program and run it
@@ -68,7 +69,7 @@ func init() {
 
 	rootCmd.Flags().StringVarP(&cfgPath, "config", "c", "", "specify configuration file")
 	rootCmd.Flags().StringVarP(&themeName, "theme", "t", "", "specify theme, overrides the one in config file")
-	rootCmd.Flags().BoolVar(&skipCheck, "skip-check", false, "skip checking pre-requisites (not recommended)")
+	rootCmd.Flags().StringVarP(&soundpackName, "soundpack", "s", "", "specify soundpack, overrides the one in config file")
 
 	// rootCmd.AddCommand(listCmd)
 }
@@ -80,33 +81,33 @@ func initApp() {
 			baseDir, _ = filepath.Abs(baseDir)
 		}
 	}
-	if err := config.SetBaseDir(baseDir); err != nil {
-		cobra.CheckErr(err)
-	}
+	err := config.SetBaseDir(baseDir)
+	cobra.CheckErr(err)
 
 	// Extract embedded resources
-	if err := assets.ExtractTo(config.BaseDir()); err != nil {
-		cobra.CheckErr(err)
-	}
+	err = assets.ExtractTo(config.BaseDir)
+	cobra.CheckErr(err)
 
-	// `cfgFile`
+	// `cfgPath`
 	if cfgPath != "" {
 		if !filepath.IsAbs(cfgPath) {
 			cfgPath, _ = filepath.Abs(cfgPath)
 		}
 	}
-	var err error
 	cfg, err = config.LoadConfig(cfgPath)
-	if err != nil {
-		cobra.CheckErr(err)
-	}
+	cobra.CheckErr(err)
 
 	// `theme`
 	if themeName == "" {
 		themeName = cfg.Theme
 	}
 	theme, err = config.LoadTheme(themeName)
-	if err != nil {
-		cobra.CheckErr(err)
+	cobra.CheckErr(err)
+
+	// `soundpack`
+	if soundpackName == "" {
+		soundpackName = cfg.Soundpack
 	}
+	soundpackInfo, err = config.LoadSoundpackInfo(soundpackName)
+	cobra.CheckErr(err)
 }

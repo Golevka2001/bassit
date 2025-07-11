@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/Golevka2001/bassit/ui/common"
-	"github.com/Golevka2001/bassit/ui/screens/checkscreen"
 	"github.com/Golevka2001/bassit/ui/screens/mainscreen"
 	"github.com/Golevka2001/bassit/ui/screens/welcomescreen"
 
@@ -15,14 +14,12 @@ import (
 type screenState int
 
 const (
-	stateCheckScreen screenState = iota
-	stateWelcomeScreen
+	stateWelcomeScreen screenState = iota
 	stateMainScreen
 )
 
 func (s screenState) String() string {
 	return map[screenState]string{
-		stateCheckScreen:   "Check Screen",
 		stateWelcomeScreen: "Welcome Screen",
 		stateMainScreen:    "Main Screen",
 	}[s]
@@ -37,7 +34,6 @@ type Model struct {
 	fatalErr    error
 
 	// Sub-models
-	check   checkscreen.Model
 	welcome welcomescreen.Model
 	main    mainscreen.Model
 }
@@ -58,17 +54,9 @@ func NewModel(ctx *common.UIContext) tea.Model {
 		Context: ctx,
 	}
 
-	var state screenState
-	if ctx.SkipCheck {
-		state = stateWelcomeScreen
-	} else {
-		state = stateCheckScreen
-	}
-
 	m := Model{
 		commonModel: &csm,
-		state:       state,
-		check:       checkscreen.NewModel(&csm),
+		state:       stateWelcomeScreen,
 		welcome:     welcomescreen.NewModel(&csm),
 		main:        mainscreen.NewModel(&csm),
 	}
@@ -80,8 +68,6 @@ func (m Model) Init() tea.Cmd {
 	var cmds []tea.Cmd
 
 	switch m.state {
-	case stateCheckScreen:
-		cmds = append(cmds, m.check.Init())
 	case stateWelcomeScreen:
 		cmds = append(cmds, m.welcome.Init())
 	case stateMainScreen:
@@ -127,16 +113,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.commonModel.Height = m.height - common.VPad*2
 
 		// Sync the size of the sub-models
-		m.check.SyncSize()
 		m.welcome.SyncSize()
 		m.main.SyncSize()
 
 	case common.SwitchScreenMsg:
 		switch m.state {
-		case stateCheckScreen:
-			m.state = stateWelcomeScreen
-			cmds = append(cmds, m.welcome.Init())
-
 		case stateWelcomeScreen:
 			m.state = stateMainScreen
 			cmds = append(cmds, m.main.Init())
@@ -145,11 +126,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	// Process children
 	switch m.state {
-	case stateCheckScreen:
-		newCheckScreenModel, cmd := m.check.Update(msg)
-		m.check = newCheckScreenModel
-		cmds = append(cmds, cmd)
-
 	case stateWelcomeScreen:
 		newWelcomeScreenModel, cmd := m.welcome.Update(msg)
 		m.welcome = newWelcomeScreenModel
@@ -175,12 +151,8 @@ func (m Model) View() string {
 
 	var screen string
 	switch m.state {
-	case stateCheckScreen:
-		screen = m.check.View()
-
 	case stateWelcomeScreen:
 		screen = m.welcome.View()
-
 	case stateMainScreen:
 		screen = m.main.View()
 	}

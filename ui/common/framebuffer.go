@@ -48,10 +48,10 @@ func (fb *FrameBuffer) Empty() bool {
 // DrawRune draws a single rune at the given coordinates
 // Note: this method does not support rendered content (ANSI escape codes)
 // Parameters:
-// - x, y: coordinates of the cell to draw the rune in
-// - r: rune to draw
-// - style: style to apply to the rune
-// - inheritStyle: if true, the new style will be `style.Inherit(originalStyle)`
+//   - x, y: coordinates of the cell to draw the rune in
+//   - r: rune to draw
+//   - style: style to apply to the rune
+//   - inheritStyle: if true, the new style will be `style.Inherit(originalStyle)`
 func (fb *FrameBuffer) DrawRune(x, y int, r rune, style lipgloss.Style, inheritStyle bool) {
 	if x >= 0 && x < fb.Width && y >= 0 && y < fb.Height {
 		fb.Cells[y][x].R = r
@@ -63,10 +63,10 @@ func (fb *FrameBuffer) DrawRune(x, y int, r rune, style lipgloss.Style, inheritS
 // If a new line is encountered, the string is drawn in the next line, starting from the same x coordinate
 // Note: this method does not support rendered content (ANSI escape codes)
 // Parameters:
-// - x, y: coordinates of the first cell to draw the string in
-// - s: string to draw (newlines are supported)
-// - style: style to apply to the whole string
-// - inheritStyle: if true, the new style will be `style.Inherit(originalStyle)`
+//   - x, y: coordinates of the first cell to draw the string in
+//   - s: string to draw (newlines are supported)
+//   - style: style to apply to the whole string
+//   - inheritStyle: if true, the new style will be `style.Inherit(originalStyle)`
 func (fb *FrameBuffer) DrawString(x, y int, s string, style lipgloss.Style, inheritStyle bool) {
 	rows := strings.Split(s, "\n")
 	for dy, row := range rows {
@@ -86,8 +86,8 @@ func (fb *FrameBuffer) DrawString(x, y int, s string, style lipgloss.Style, inhe
 
 // DrawRenderedString draws rendered content at the given coordinates
 // Parameters:
-// - x, y: coordinates of the first cell to draw the raw content in
-// - rendered: rendered content to draw (ANSI escape codes)
+//   - x, y: coordinates of the first cell to draw the raw content in
+//   - rendered: rendered content to draw (ANSI escape codes)
 func (fb *FrameBuffer) DrawRenderedString(x, y int, rendered string) {
 	rows := strings.Split(rendered, "\n")
 	for dy, row := range rows {
@@ -108,9 +108,9 @@ func (fb *FrameBuffer) DrawRenderedString(x, y int, rendered string) {
 
 // SetStyle sets the style of a cell
 // Parameters:
-// - x, y: coordinates of the cell to set the style of
-// - style: style to set
-// - inheritStyle: if true, the new style will be `style.Inherit(originalStyle)`
+//   - x, y: coordinates of the cell to set the style of
+//   - style: style to set
+//   - inheritStyle: if true, the new style will be `style.Inherit(originalStyle)`
 func (fb *FrameBuffer) SetStyle(x, y int, style lipgloss.Style, inheritStyle bool) {
 	if x >= 0 && x < fb.Width && y >= 0 && y < fb.Height {
 		if inheritStyle {

@@ -11,5 +11,5 @@ type UIContext struct {
 	Bass      *bass.BassModel
 	Config    *config.Config
 	Theme     *config.Theme
-	SkipCheck bool
+	Soundpack *config.SoundpackInfo
 }

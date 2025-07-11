@@ -1,0 +1,40 @@
+# Name your sound pack.
+# This must exactly match the folder name under `${BASSIT_BASE_DIR}/assets/soundpacks/`.
+# / \ : * ? " < > | are not allowed.
+name: "default"
+
+# Describe your sound pack.
+# You can briefly introduce the instrument used and its tone characteristics.
+description: "5-string Jazz Bass (Mahogany body, Roasted Maple neck), Vol 100%, Blend 50/50, EQ flat. Amp: Gallien-Krueger."
+
+# Author of this sound pack.
+author: "gol3vka@163.com"
+
+# Sample rate for all WAV files in this sound pack.
+# All samples must use this sample rate.
+sample_rate: 44100
+
+# Base pitch of the recorded samples.
+# All samples should be recorded at this pitch; they will be pitch-shifted from here to cover other notes.
+base_pitch: "D2"
+
+# These are the three sample categories: "normal", "slap", and "mute".
+# Each category represents a distinct playing technique and can be triggered by different key combinations.
+# / \ : * ? " < > | are not allowed in `name`.
+normal:
+  - name: "fingerstyle-pm"
+    file: "fingerstyle-pm.wav"
+  - name: "fingerstyle-fm"
+    file: "fingerstyle-fm.wav"
+
+slap:
+  - name: "slap"
+    file: "slap.wav"
+  - name: "pop"
+    file: "pop.wav"
+
+mute:
+  - name: "dead-note"
+    file: "dead-note.wav"
+  - name: "palm-mute"
+    file: "palm-mute.wav"

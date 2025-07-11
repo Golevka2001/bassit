@@ -71,6 +71,35 @@ Press one of the following keys to **pluck** the corresponding string (make the 
 
 > 💡 **Tip:** To play a note, first press a fret key, then pluck the corresponding string.
 
+**Modifier Keys:**
+
+- `\` : Slap mode
+- `Space` : Mute mode
+
+If you hold the modifier key while plucking, you can use different techniques to play, such as:
+
+|             Key             |       Default        | Slap Mode |    Mute Mode     |
+| :-------------------------: | :------------------: | :-------: | :--------------: |
+|     `=`, `[`, `;`, `.`      | moderately soft (𝓂𝓅) | slap (S)  |  dead note (X)   |
+| `Backspace`, `]` ,`'` , `/` | moderately loud (𝓂𝒻) |  pop (P)  | palm mute (P.M.) |
+
+The priority is: Mute Mode > Slap Mode > Default.
+(e.g. if no modifier key is held -> default mode; if both modifier keys are held -> mute mode.)
+
+### :art: Themes
+
+You can modify the style of the bass by simply modifying a theme file.
+
+Of course, bassit also provides some themes for you to choose from.
+
+|                    default                     |                   maple                    |                       vintage-maple                        |                     rosewood                     |                         fretless-pauferro                          |
+| :--------------------------------------------: | :----------------------------------------: | :--------------------------------------------------------: | :----------------------------------------------: | :----------------------------------------------------------------: |
+| ![default](./README.assets/themes/default.png) | ![maple](./README.assets/themes/maple.png) | ![vintage-maple](./README.assets/themes/vintage-maple.png) | ![rosewood](./README.assets/themes/rosewood.png) | ![fretless-pauferro](./README.assets/themes/fretless-pauferro.png) |
+
+Use `bassit --theme <theme-name>` to switch to a theme.
+
+The theme files are located at `~/.config/bassit/themes/`.
+
 ## :building_construction: Dependencies
 
 ### :penguin: Linux
@@ -118,6 +147,3 @@ If your Linux distribution is not listed on [pkgs.org](https://pkgs.org/download
 - [Rubber Band Library](https://breakfastquay.com/rubberband/)
   - License: [GPLv2](https://github.com/breakfastquay/rubberband/blob/default/COPYING)
   - It is used for generating pitch-shifted audio samples.
-- [A bass sound sample from Pixabay](https://pixabay.com/sound-effects/bass-guitar-c2-raw-101274/)
-  - License: [Pixabay Content License](https://pixabay.com/service/license-summary/)
-  - It is trimmed and pitch-shifted to create the bass sound.

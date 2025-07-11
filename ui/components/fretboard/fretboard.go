@@ -65,7 +65,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.restorePressedFret(msg.StringIdx, msg.FretIdx)
 
 	case PluckStringMsg:
-		m.drawVibratingString(msg.StringIdx, msg.FretIdx, msg.Position)
+		m.drawVibratingString(msg.StringIdx, msg.FretIdx, int(msg.Type)%2)
 
 	case RestorePluckedStringMsg:
 		m.restoreVibratingString(msg.StringIdx, msg.FretIdx)

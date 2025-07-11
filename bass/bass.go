@@ -1,22 +1,20 @@
 package bass
 
 import (
-	"time"
-
 	"github.com/Golevka2001/bassit/config"
 
 	"github.com/go-music-theory/music-theory/note"
 )
 
 type BassModel struct {
-	Strings []*bassStringModel // from highest to lowest
+	strings []*bassStringModel // from highest to lowest
 }
 
-func New(tuning [config.StringCnt]string) (*BassModel, error) {
+func NewBass(tuning [config.StringCnt]string) (*BassModel, error) {
 	strings := make([]*bassStringModel, config.StringCnt)
 	for i, noteName := range tuning {
 		baseNote := *note.Named(noteName)
-		bsm, err := newBassString(baseNote)
+		bsm, err := NewBassString(baseNote)
 		if err != nil {
 			return nil, err
 		}
@@ -24,49 +22,86 @@ func New(tuning [config.StringCnt]string) (*BassModel, error) {
 	}
 
 	return &BassModel{
-		Strings: strings,
+		strings: strings,
 	}, nil
 }
 
 func (bm *BassModel) GetBaseNotes() []note.Note {
 	notes := make([]note.Note, config.StringCnt)
-	for i := range bm.Strings {
-		notes[i] = bm.Strings[i].baseNote
+	for i := range bm.strings {
+		notes[i] = *bm.strings[i].GetNoteAt(0)
 	}
 	return notes
 }
 
-func (bm *BassModel) GetLowestAndHighestNotes() (lowest, highest note.Note) {
-	lowest = bm.Strings[config.StringCnt-1].baseNote
-	highest = bm.Strings[0].fretIdxToNote[config.DisplayedFretCount]
+// GetRange returns the lowest and highest notes according to the displayed fret count
+func (bm *BassModel) GetRange() (lowest, highest note.Note) {
+	lowest = *bm.strings[config.StringCnt-1].GetNoteAt(0)
+	highest = *bm.strings[0].GetNoteAt(config.DisplayedFretCount)
 	return
 }
 
-func (bm *BassModel) Press(stringIdx, fretIdx int) {
+// GetActualRange returns the lowest and highest notes according to total fret count
+func (bm *BassModel) GetActualRange() (lowest, highest note.Note) {
+	lowest = *bm.strings[config.StringCnt-1].GetNoteAt(0)
+	highest = *bm.strings[0].GetNoteAt(config.MaxFretCnt)
+	return
+}
+
+func (bm *BassModel) IsStringVibrating(stringIdx int) bool {
+	if stringIdx < 0 || stringIdx >= config.StringCnt {
+		return false
+	}
+	return bm.strings[stringIdx].isVibrating
+}
+
+func (bm *BassModel) GetValidFretIdxOfString(stringIdx int) int {
+	if stringIdx < 0 || stringIdx >= config.StringCnt {
+		return -1
+	}
+	return bm.strings[stringIdx].rightmostPressedFret
+}
+
+func (bm *BassModel) GetNoteAt(pos FretboardPosition) *note.Note {
+	if pos.StringIdx < 0 || pos.StringIdx >= config.StringCnt {
+		return nil
+	}
+	return bm.strings[pos.StringIdx].GetNoteAt(pos.FretIdx)
+}
+
+func (bm *BassModel) PressFret(pos FretboardPosition) {
+	if pos.StringIdx < 0 || pos.StringIdx >= config.StringCnt {
+		return
+	}
+	bm.strings[pos.StringIdx].PressFret(pos.FretIdx)
+}
+
+func (bm *BassModel) ReleaseFret(pos FretboardPosition) {
+	if pos.StringIdx < 0 || pos.StringIdx >= config.StringCnt {
+		return
+	}
+	bm.strings[pos.StringIdx].ReleaseFret(pos.FretIdx)
+}
+
+// PluckString plucks the string and returns the time of the last pluck
+func (bm *BassModel) PluckString(stringIdx int, t PluckType) int64 {
+	if stringIdx < 0 || stringIdx >= config.StringCnt {
+		return 0
+	}
+	return bm.strings[stringIdx].Pluck(t)
+}
+
+// StopVibratingString stops the string from vibrating if the time of the last pluck is the same as the parameter `t`
+func (bm *BassModel) StopVibratingString(stringIdx int, t int64) bool {
+	if stringIdx < 0 || stringIdx >= config.StringCnt {
+		return false
+	}
+	return bm.strings[stringIdx].StopVibrating(t)
+}
+
+func (bm *BassModel) StopVibratingStringWithoutCheck(stringIdx int) {
 	if stringIdx < 0 || stringIdx >= config.StringCnt {
 		return
 	}
-	bm.Strings[stringIdx].pressFret(fretIdx)
-}
-
-func (bm *BassModel) Release(stringIdx, fretIdx int) {
-	if stringIdx < 0 || stringIdx >= config.StringCnt {
-		return
-	}
-	bm.Strings[stringIdx].releaseFret(fretIdx)
-}
-
-func (bm *BassModel) PluckString(stringIdx, position int) {
-	if stringIdx < 0 || stringIdx >= config.StringCnt || position < 0 || position >= 2 {
-		return
-	}
-	bm.Strings[stringIdx].pluckString(position)
-	bm.Strings[stringIdx].LastPluckID = time.Now().UnixNano()
-}
-
-func (bm *BassModel) RestoreString(stringIdx int) {
-	if stringIdx < 0 || stringIdx >= config.StringCnt {
-		return
-	}
-	bm.Strings[stringIdx].restoreString()
+	bm.strings[stringIdx].StopVibratingWithoutCheck()
 }

@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/go-music-theory/music-theory/note"
@@ -10,30 +12,45 @@ import (
 )
 
 var (
-	// AccidentalStyle defines how to display accidental notes
-	AccidentalStyle note.AdjSymbol
-
-	// DisplayedFretCount defines the number of frets to be displayed
+	Tuning             [StringCnt]*note.Note
 	DisplayedFretCount int
+	AccidentalStyle    note.AdjSymbol
+	ThemeName          string
+	SoundpackName      string
+)
+
+var (
+	defaultCfg = Config{
+		Tuning:             [StringCnt]string{"G2", "D2", "A1", "E1"},
+		DisplayedFretCount: 12,
+		AccidentalStyle:    "sharp",
+		Theme:              "default",
+		Soundpack:          "default",
+	}
 )
 
 type Config struct {
-	// Tuning defines the tuning for the 4-string bass guitar
+	// Tuning defines the tuning for a 4-string bass guitar
 	// Octave number is required
-	// From the highest string to the lowest string
+	// Strings are ordered from string 1 (highest) to string 4 (lowest)
 	Tuning [StringCnt]string `yaml:"tuning"`
 
-	// Theme defines the name of the theme to be used
-	// The theme will be loaded from the `${BASSIT_BASE_DIR}/themes/` directory
-	// It should match the yaml file name in that directory, excluding the `.yaml` extension
-	Theme string `yaml:"theme"`
-
-	// DisplayedFretCount defines the number of frets to be displayed
+	// DisplayedFretCount defines how many frets to display on the fretboard
 	DisplayedFretCount int `yaml:"displayed_fret_count"`
 
-	// AccidentalStyle defines how to display accidental notes
-	// It can be "sharp" or "flat"
+	// AccidentalStyle determines how to display accidental notes
+	// Valid values are "sharp" or "flat"
 	AccidentalStyle string `yaml:"accidental_style"`
+
+	// Theme defines the name of the UI theme to use
+	// The theme file will be loaded from `${BASSIT_BASE_DIR}/themes/`
+	// This should match the filename (without `.yaml`) in that directory
+	Theme string `yaml:"theme"`
+
+	// Soundpack defines the name of the sound pack to use
+	// The sound pack will be loaded from `${BASSIT_BASE_DIR}/assets/soundpacks/`
+	// This should match the folder name in that directory
+	Soundpack string `yaml:"soundpack"`
 }
 
 func LoadConfig(path string) (*Config, error) {
@@ -43,7 +60,7 @@ func LoadConfig(path string) (*Config, error) {
 		v.SetConfigFile(path)
 	} else {
 		// Search default config in `${BASSIT_BASE_DIR}``
-		v.AddConfigPath(BaseDir())
+		v.AddConfigPath(BaseDir)
 		v.SetConfigName("config")
 		v.SetConfigType("yaml")
 	}
@@ -51,30 +68,101 @@ func LoadConfig(path string) (*Config, error) {
 	v.AutomaticEnv()
 
 	// Load config
-	var cfg Config
 	if err := v.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
-	if err := v.Unmarshal(&cfg, func(c *mapstructure.DecoderConfig) { c.TagName = "yaml" }); err != nil {
+	cfg := defaultCfg
+	if err := v.Unmarshal(&cfg, func(c *mapstructure.DecoderConfig) {
+		c.TagName = "yaml"
+	}); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
-	// Set `AccidentalStyle`
+	// Validate the config
+	if err := validateConfig(&cfg, true); err != nil {
+		return nil, fmt.Errorf("invalid config: %w", err)
+	}
+	return &cfg, nil
+}
+
+// validateConfig validates the config
+func validateConfig(cfg *Config, strict bool) error {
+	// `Tuning`
+	if len(cfg.Tuning) != StringCnt {
+		return fmt.Errorf("`tuning` must be an array of length %d", StringCnt)
+	}
+	invalid := false
+	for i, noteName := range cfg.Tuning {
+		n := note.Named(noteName)
+		if n.Class == note.Nil || n.Octave < 0 {
+			invalid = true
+		}
+		Tuning[i] = n
+	}
+	if invalid {
+		if strict {
+			return fmt.Errorf("invalid tuning: %s", cfg.Tuning)
+		}
+		cfg.Tuning = defaultCfg.Tuning
+		for i := range cfg.Tuning {
+			Tuning[i] = note.Named(cfg.Tuning[i])
+		}
+	}
+
+	// `DisplayedFretCount`
+	if cfg.DisplayedFretCount <= 0 || cfg.DisplayedFretCount > MaxFretCnt {
+		if strict {
+			return fmt.Errorf("`displayed_fret_count` must be between 1 and %d", MaxFretCnt)
+		}
+		DisplayedFretCount = defaultCfg.DisplayedFretCount
+	} else {
+		DisplayedFretCount = cfg.DisplayedFretCount
+	}
+
+	// `AccidentalStyle`
 	switch strings.ToLower(cfg.AccidentalStyle) {
 	case "sharp":
 		AccidentalStyle = note.Sharp
 	case "flat":
 		AccidentalStyle = note.Flat
 	default:
+		if strict {
+			return fmt.Errorf("`accidental_style` must be either `sharp` or `flat`")
+		}
 		AccidentalStyle = note.Sharp
 	}
 
-	// Set `DisplayedFretCount`
-	if cfg.DisplayedFretCount <= 0 || cfg.DisplayedFretCount > MaxFretCnt {
-		DisplayedFretCount = DefaultDisplayedFretCount
+	// `Theme`
+	if cfg.Theme == "" {
+		if strict {
+			return fmt.Errorf("`theme` is required")
+		}
+		ThemeName = defaultCfg.Theme
 	} else {
-		DisplayedFretCount = cfg.DisplayedFretCount
+		ThemeName = cfg.Theme
+	}
+	// Check if the theme file exists
+	themePath := filepath.Join(ThemeDir(), ThemeName+".yaml")
+	if _, err := os.Stat(themePath); err != nil {
+		themePath = filepath.Join(ThemeDir(), ThemeName+".yml")
+	}
+	if _, err := os.Stat(themePath); err != nil {
+		return fmt.Errorf("theme file not found: %s", ThemeName)
 	}
 
-	return &cfg, nil
+	// `Soundpack`
+	if cfg.Soundpack == "" {
+		if strict {
+			return fmt.Errorf("`soundpack` is required")
+		}
+		SoundpackName = defaultCfg.Soundpack
+	} else {
+		SoundpackName = cfg.Soundpack
+	}
+	// Check if the soundpack folder exists
+	if _, err := os.Stat(filepath.Join(SoundpackDir(), SoundpackName)); err != nil {
+		return fmt.Errorf("soundpack folder not found: %s", SoundpackName)
+	}
+
+	return nil
 }

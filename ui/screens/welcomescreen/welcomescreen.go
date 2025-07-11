@@ -58,7 +58,7 @@ func (m Model) Init() tea.Cmd {
 		tea.EnterAltScreen,
 		tea.ClearScreen,
 		m.spinner.Tick,
-		loadResourcesCmd(m.bass, m.audio),
+		loadSoundpackCmd(m.bass, m.audio),
 		func() tea.Msg {
 			time.Sleep(timeout)
 			return timeoutMsg{}

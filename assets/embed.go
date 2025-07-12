@@ -13,20 +13,22 @@ import (
 //go:embed *
 var Assets embed.FS
 
-// NOTE: The paths of embedded resources must use `/`, even on Windows
 const (
 	cfgFile = "config.yaml"
 
 	thirdPartyDir = "3rdparty"
 	soundpackDir  = "soundpacks"
 	themeDir      = "themes"
+)
 
-	rbBinForWindows  = thirdPartyDir + "/rubberband-4.0.0-gpl-executable-windows/rubberband.exe"
-	rb3BinForWindows = thirdPartyDir + "/rubberband-4.0.0-gpl-executable-windows/rubberband-r3.exe"
-	rbDllForWindows  = thirdPartyDir + "/rubberband-4.0.0-gpl-executable-windows/sndfile.dll"
+// NOTE: The paths of embedded resources must use `/`, even on Windows
+var (
+	rbBinForWindows  = filepath.ToSlash(filepath.Join(thirdPartyDir, "rubberband-4.0.0-gpl-executable-windows", "rubberband.exe"))
+	rb3BinForWindows = filepath.ToSlash(filepath.Join(thirdPartyDir, "rubberband-4.0.0-gpl-executable-windows", "rubberband-r3.exe"))
+	rbDllForWindows  = filepath.ToSlash(filepath.Join(thirdPartyDir, "rubberband-4.0.0-gpl-executable-windows", "sndfile.dll"))
 
-	rbBinForDarwin  = thirdPartyDir + "/rubberband-4.0.0-gpl-executable-macos/rubberband"
-	rb3BinForDarwin = thirdPartyDir + "/rubberband-4.0.0-gpl-executable-macos/rubberband-r3"
+	rbBinForDarwin  = filepath.ToSlash(filepath.Join(thirdPartyDir, "rubberband-4.0.0-gpl-executable-macos", "rubberband"))
+	rb3BinForDarwin = filepath.ToSlash(filepath.Join(thirdPartyDir, "rubberband-4.0.0-gpl-executable-macos", "rubberband-r3"))
 )
 
 type FileToExtract struct {
@@ -54,7 +56,7 @@ func ExtractTo(path string) error {
 	}
 	for _, file := range themeFiles {
 		files = append(files, FileToExtract{
-			Src:  filepath.Join(themeDir, file.Name()),
+			Src:  filepath.ToSlash(filepath.Join(themeDir, file.Name())),
 			Dst:  filepath.Join(themeDstDir, file.Name()),
 			Perm: 0644,
 		})
@@ -102,14 +104,14 @@ func ExtractTo(path string) error {
 	}
 	for _, entry := range soundpackEntries {
 		if entry.IsDir() {
-			subDir := filepath.Join(soundpackDir, entry.Name())
+			subDir := filepath.ToSlash(filepath.Join(soundpackDir, entry.Name()))
 			subFiles, err := Assets.ReadDir(subDir)
 			if err != nil {
 				return fmt.Errorf("failed to read soundpack subdir %s: %w", subDir, err)
 			}
 			for _, f := range subFiles {
 				files = append(files, FileToExtract{
-					Src:  filepath.Join(subDir, f.Name()),
+					Src:  filepath.ToSlash(filepath.Join(subDir, f.Name())),
 					Dst:  filepath.Join(soundpackDstDir, entry.Name(), f.Name()),
 					Perm: 0644,
 				})

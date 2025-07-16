@@ -29,7 +29,7 @@ Supported on **Linux**, **macOS**, and **Windows**.
 go version
 
 # Install bassit
-go install github.com/Golevka2001/bassit@latest
+go install github.com/Golevka2001/bassit@latestdocsd
 
 # Run
 $GOPATH/bin/bassit
@@ -39,13 +39,15 @@ bassit
 
 ### :keyboard: Keybindings
 
-![Keybindings](./README.assets/keybindings.png)
+![Keybindings](./README.assets/keybindings/keybindings.drawio.png)
 
 #### Basic Controls
 
-- `Ctrl+C`: Exit the application
+- `Esc`: Move focus to the tab selector
 - `→` / `Tab`: Switch to the next tab
 - `←` / `Shift+Tab`: Switch to the previous tab
+- `Enter`: Enter the selected tab
+- `Ctrl+C`: Exit the application
 
 #### Fret Controls
 
@@ -69,8 +71,6 @@ Press one of the following keys to **pluck** the corresponding string (make the 
 |     `;`, `'`     |   A    |
 |     `.`, `/`     |   E    |
 
-> 💡 **Tip:** To play a note, first press a fret key, then pluck the corresponding string.
-
 **Modifier Keys:**
 
 - `\` : Slap mode
@@ -84,7 +84,9 @@ If you hold the modifier key while plucking, you can use different techniques to
 | `Backspace`, `]` ,`'` , `/` | moderately loud (𝓂𝒻) |  pop (P)  | palm mute (P.M.) |
 
 The priority is: Mute Mode > Slap Mode > Default.
-(e.g. if no modifier key is held -> default mode; if both modifier keys are held -> mute mode.)
+(e.g. if no modifier key is held -> default mode; if both modifier keys are held -> mute mode)
+
+> 💡 **Tip:** To play a note, first press a fret key, then pluck the corresponding string.
 
 ### :art: Themes
 

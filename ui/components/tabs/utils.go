@@ -34,7 +34,6 @@ func WithInactiveStyle(s lipgloss.Style) Option {
 	}
 }
 
-
 func (m *Model) SetWidth(width int) {
 	width = max(0, width)
 	m.Width = width

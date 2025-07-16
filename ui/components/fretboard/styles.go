@@ -3,7 +3,7 @@ package fretboard
 import (
 	"github.com/Golevka2001/bassit/config"
 	"github.com/Golevka2001/bassit/ui/common"
-	
+
 	"github.com/charmbracelet/lipgloss/v2"
 )
 

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/Golevka2001/bassit/audio"
+	"github.com/Golevka2001/bassit/config"
 )
 
 //go:embed *
@@ -80,7 +80,7 @@ func ExtractTo(path string) error {
 			Perm: 0644,
 		})
 		// Set the Rubberband command for Windows
-		audio.RubberbandCommand = filepath.Join(rbDstDir, "rubberband-r3.exe")
+		config.RubberbandCommand = filepath.Join(rbDstDir, "rubberband-r3.exe")
 
 	case "darwin":
 		files = append(files, FileToExtract{
@@ -93,7 +93,7 @@ func ExtractTo(path string) error {
 			Perm: 0755,
 		})
 		// Set the Rubberband command for Darwin
-		audio.RubberbandCommand = filepath.Join(rbDstDir, "rubberband-r3")
+		config.RubberbandCommand = filepath.Join(rbDstDir, "rubberband-r3")
 	}
 
 	// Soundpacks

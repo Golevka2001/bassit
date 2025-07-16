@@ -12,6 +12,10 @@ import (
 )
 
 var (
+	RubberbandCommand = "rubberband-r3"
+)
+
+var (
 	SampleRate int
 	BasePitch  string
 	Normal     [2]SampleItem

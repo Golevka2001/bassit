@@ -154,9 +154,9 @@ func shiftPitch(src, dst string, semitoneToShift int) error {
 	semitoneToShiftStr := fmt.Sprintf("%d", semitoneToShift)
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
-		cmd = exec.Command("powershell", audio.RubberbandCommand, "-p", semitoneToShiftStr, src, dst)
+		cmd = exec.Command("powershell", config.RubberbandCommand, "-p", semitoneToShiftStr, src, dst)
 	} else {
-		cmd = exec.Command(audio.RubberbandCommand, "-p", semitoneToShiftStr, src, dst)
+		cmd = exec.Command(config.RubberbandCommand, "-p", semitoneToShiftStr, src, dst)
 	}
 
 	err := cmd.Run()

@@ -1,6 +1,7 @@
 package mainscreen
 
 import (
+	"reflect"
 	"strings"
 
 	"github.com/Golevka2001/bassit/ui/common"
@@ -51,6 +52,8 @@ type Model struct {
 	tabs  tabs.Model
 	state tabState
 
+	focusOnTab bool
+
 	// Sub-models
 	freePlayTab tabcontents.FreePlayTabModel
 	settingsTab tabcontents.SettingsTabModel
@@ -71,6 +74,7 @@ func NewModel(csm *common.CommonScreenModel) Model {
 			tabs.WithBorder(lipgloss.RoundedBorder()),
 		),
 		state:       tabStateFreePlay,
+		focusOnTab:  false,
 		freePlayTab: tabcontents.NewFreePlayTabModel(&ctm),
 		settingsTab: tabcontents.NewSettingsTabModel(&ctm),
 		exitTab:     tabcontents.NewExitTabModel(&ctm),
@@ -100,39 +104,59 @@ func (m Model) Init() tea.Cmd {
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmds []tea.Cmd
+	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
 	case tea.KeyPressMsg:
 		switch msg.String() {
-		case "right", "tab":
-			m.state = tabState(min(int(m.state)+1, len(tabLabels)-1))
-			cmds = append(cmds, func() tea.Msg {
-				return tabs.SwitchToNextTabMsg{}
-			})
+		case "esc":
+			m.focusOnTab = !m.focusOnTab
+			cmds = append(cmds, nil)
+			if m.focusOnTab {
+				cmds = append(cmds, func() tea.Msg {
+					return tabs.FocusMsg{TabIdx: int(m.state)}
+				})
+			} else {
+				cmds = append(cmds, func() tea.Msg {
+					return tabs.UnfocusMsg{}
+				})
+			}
 
-		case "left", "shift+tab":
-			m.state = tabState(max(0, int(m.state)-1))
-			cmds = append(cmds, func() tea.Msg {
-				return tabs.SwitchToPreviousTabMsg{}
-			})
+		case "enter":
+			if m.focusOnTab {
+				focusedIdx := m.tabs.GetFocusedIdx()
+				if int(m.state) != focusedIdx {
+					// Switch to the focused tab
+					m.focusOnTab = false
+					m.state = tabState(focusedIdx)
+					cmds = append(cmds, func() tea.Msg {
+						return tabs.SwitchToTabMsg{TabIdx: focusedIdx}
+					})
+				}
+			}
 		}
 	}
 
-	// Update the tabs and sub-models
-	var cmd tea.Cmd
-	m.tabs, cmd = m.tabs.Update(msg)
-	cmds = append(cmds, cmd)
+	if m.focusOnTab ||
+		reflect.TypeOf(msg) == reflect.TypeOf(tabs.FocusMsg{}) ||
+		reflect.TypeOf(msg) == reflect.TypeOf(tabs.UnfocusMsg{}) ||
+		reflect.TypeOf(msg) == reflect.TypeOf(tabs.SwitchToTabMsg{}) {
+		m.tabs, cmd = m.tabs.Update(msg)
+		cmds = append(cmds, cmd)
+	}
 
-	switch m.state {
-	case tabStateFreePlay:
-		m.freePlayTab, cmd = m.freePlayTab.Update(msg)
-		cmds = append(cmds, cmd)
-	case tabStateSettings:
-		m.settingsTab, cmd = m.settingsTab.Update(msg)
-		cmds = append(cmds, cmd)
-	case tabStateExit:
-		m.exitTab, cmd = m.exitTab.Update(msg)
-		cmds = append(cmds, cmd)
+	if !m.focusOnTab {
+		switch m.state {
+		case tabStateFreePlay:
+			m.freePlayTab, cmd = m.freePlayTab.Update(msg)
+			cmds = append(cmds, cmd)
+		case tabStateSettings:
+			m.settingsTab, cmd = m.settingsTab.Update(msg)
+			cmds = append(cmds, cmd)
+		case tabStateExit:
+			m.exitTab, cmd = m.exitTab.Update(msg)
+			cmds = append(cmds, cmd)
+		}
 	}
 
 	return m, tea.Batch(cmds...)

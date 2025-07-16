@@ -1,8 +1,10 @@
 package tabs
 
-type SwitchToNextTabMsg struct{}
+type FocusMsg struct {
+	TabIdx int
+}
 
-type SwitchToPreviousTabMsg struct{}
+type UnfocusMsg struct{}
 
 type SwitchToTabMsg struct {
 	TabIdx int

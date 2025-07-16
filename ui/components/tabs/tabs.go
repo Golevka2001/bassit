@@ -19,8 +19,9 @@ type Model struct {
 	activeStyle   lipgloss.Style
 	inactiveStyle lipgloss.Style
 
-	activeIdx int
-	labels    []string
+	activeIdx  int
+	labels     []string
+	focusedIdx int
 }
 
 func New(labels []string, activeIdx int, opts ...Option) Model {
@@ -31,9 +32,10 @@ func New(labels []string, activeIdx int, opts ...Option) Model {
 	}
 
 	m := Model{
-		activeIdx: activeIdx,
-		labels:    labels,
-		border:    lipgloss.RoundedBorder(),
+		activeIdx:  activeIdx,
+		labels:     labels,
+		border:     lipgloss.RoundedBorder(),
+		focusedIdx: -1,
 	}
 
 	// Set default styles
@@ -59,22 +61,31 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
-	case SwitchToNextTabMsg:
-		m.activeIdx = min(len(m.labels)-1, m.activeIdx+1)
+	case FocusMsg:
+		m.focusedIdx = msg.TabIdx
+		if msg.TabIdx >= 0 && msg.TabIdx < len(m.labels) {
+			m.activeIdx = msg.TabIdx
+		}
 		cmds = append(cmds, nil)
 
-	case SwitchToPreviousTabMsg:
-		m.activeIdx = max(0, m.activeIdx-1)
+	case UnfocusMsg:
+		m.focusedIdx = -1
 		cmds = append(cmds, nil)
 
 	case SwitchToTabMsg:
-		if msg.TabIdx < 0 {
-			msg.TabIdx = 0
-		} else if msg.TabIdx >= len(m.labels) {
-			msg.TabIdx = len(m.labels) - 1
-		}
 		m.activeIdx = msg.TabIdx
+		m.focusedIdx = -1
 		cmds = append(cmds, nil)
+
+	case tea.KeyPressMsg:
+		switch msg.String() {
+		case "left", "shift+tab":
+			m.focusedIdx = max(0, m.focusedIdx-1)
+			cmds = append(cmds, nil)
+		case "right", "tab":
+			m.focusedIdx = min(len(m.labels)-1, m.focusedIdx+1)
+			cmds = append(cmds, nil)
+		}
 	}
 
 	return m, tea.Batch(cmds...)
@@ -94,10 +105,14 @@ func (m Model) View() string {
 		isFirst := i == 0
 		isLast := i == tabCnt-1
 		isActive := i == m.activeIdx
+		isFocused := i == m.focusedIdx
 
 		style := m.inactiveStyle
 		if isActive {
 			style = m.activeStyle
+		}
+		if isFocused {
+			style = style.Inherit(common.UITextStyle)
 		}
 
 		border, _, _, _, _ := style.GetBorder()
@@ -173,43 +188,4 @@ func (m Model) View() string {
 	}
 
 	return lipgloss.JoinHorizontal(lipgloss.Top, renderedTabs...)
-}
-
-func (m *Model) SetWidth(width int) {
-	width = max(0, width)
-	m.Width = width
-}
-
-func (m *Model) SetBorder(border lipgloss.Border) {
-	m.border = border
-	m.SetActiveStyle(common.NormalStyle)
-	m.SetInactiveStyle(common.NormalStyle)
-}
-
-func (m *Model) SetActiveStyle(style lipgloss.Style) {
-	border := tabBorderWithCustomBottom(
-		m.border.BottomRight,
-		" ",
-		m.border.BottomLeft,
-		m.border,
-	)
-
-	m.activeStyle = common.NormalStyle.
-		Inherit(style).
-		Padding(0, 1).
-		Border(border, true)
-}
-
-func (m *Model) SetInactiveStyle(style lipgloss.Style) {
-	border := tabBorderWithCustomBottom(
-		m.border.MiddleBottom,
-		m.border.Bottom,
-		m.border.MiddleBottom,
-		m.border,
-	)
-
-	m.inactiveStyle = common.NormalStyle.
-		Inherit(style).
-		Padding(0, 1).
-		Border(border, true)
 }

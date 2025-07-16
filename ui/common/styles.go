@@ -29,13 +29,15 @@ var (
 
 	BTextStyle  = NormalStyle.Bold(true)
 	ITextStyle  = NormalStyle.Italic(true)
+	UTextStyle  = NormalStyle.Underline(true)
 	BITextStyle = BTextStyle.Italic(true)
+	UITextStyle = UTextStyle.Bold(true)
 
 	TitleStyle = BTextStyle.
-		Inline(true).
-		AlignHorizontal(lipgloss.Center).
-		Foreground(TitleFgColor).
-		Background(TitleBgColor)
+			Inline(true).
+			AlignHorizontal(lipgloss.Center).
+			Foreground(TitleFgColor).
+			Background(TitleBgColor)
 
 	// HelpStyle is copied from `bubbles/help` component
 	HelpStyle = NormalStyle.Foreground(compat.AdaptiveColor{

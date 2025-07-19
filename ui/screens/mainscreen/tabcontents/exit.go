@@ -24,7 +24,11 @@ func (m ExitTabModel) Init() tea.Cmd {
 }
 
 func (m ExitTabModel) Update(msg tea.Msg) (ExitTabModel, tea.Cmd) {
-	return m, nil
+	return m, tea.Batch(
+		tea.ClearScreen,
+		// TODO: add a confirm dialog
+		tea.Quit,
+	)
 }
 
 func (m ExitTabModel) View() string {

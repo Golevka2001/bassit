@@ -1,4 +1,4 @@
-package tabs
+package tabselector
 
 type FocusMsg struct {
 	TabIdx int

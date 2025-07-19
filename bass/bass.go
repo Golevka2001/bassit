@@ -26,6 +26,7 @@ func NewBass(tuning [config.StringCnt]string) (*BassModel, error) {
 	}, nil
 }
 
+// GetBaseNotes returns the open string notes of each string
 func (bm *BassModel) GetBaseNotes() []note.Note {
 	notes := make([]note.Note, config.StringCnt)
 	for i := range bm.strings {
@@ -53,6 +54,20 @@ func (bm *BassModel) IsStringVibrating(stringIdx int) bool {
 		return false
 	}
 	return bm.strings[stringIdx].isVibrating
+}
+
+func (bm *BassModel) GetNoteToPlay(stringIdx int) *note.Note {
+	if stringIdx < 0 || stringIdx >= config.StringCnt {
+		return nil
+	}
+	return bm.strings[stringIdx].GetNoteToPlay()
+}
+
+func (bm *BassModel) IsFretPressed(pos FretboardPosition) bool {
+	if pos.StringIdx < 0 || pos.StringIdx >= config.StringCnt {
+		return false
+	}
+	return bm.strings[pos.StringIdx].IsFretPressed(pos.FretIdx)
 }
 
 func (bm *BassModel) GetValidFretIdxOfString(stringIdx int) int {

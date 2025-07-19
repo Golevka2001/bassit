@@ -1,4 +1,4 @@
-package tabs
+package tabselector
 
 import (
 	"github.com/Golevka2001/bassit/ui/common"

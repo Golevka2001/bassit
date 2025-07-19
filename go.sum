@@ -1,3 +1,5 @@
+github.com/Golevka2001/go-chord-detector v0.0.1 h1:CiIQALofqn7Uvm9I0IPW9cMLXOSDeRntU9q+h9qCSl8=
+github.com/Golevka2001/go-chord-detector v0.0.1/go.mod h1:Q4uAjGhqwZrjuN4w3g9tLi7ye1nHB64qoac3Nm6godU=
 github.com/aymanbagabas/go-udiff v0.2.0 h1:TK0fH4MteXUDspT88n8CKzvK0X9O2xu9yQjWpi6yML8=
 github.com/aymanbagabas/go-udiff v0.2.0/go.mod h1:RE4Ex0qsGkTAJoQdQQCA0uG+nAzJO/pI/QwceO5fgrA=
 github.com/charmbracelet/bubbles/v2 v2.0.0-beta.1 h1:swACzss0FjnyPz1enfX56GKkLiuKg5FlyVmOLIlU2kE=
@@ -26,16 +28,16 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/ebitengine/oto/v3 v3.3.3 h1:m6RV69OqoXYSWCDsHXN9rc07aDuDstGHtait7HXSM7g=
 github.com/ebitengine/oto/v3 v3.3.3/go.mod h1:MZeb/lwoC4DCOdiTIxYezrURTw7EvK/yF863+tmBI+U=
-github.com/ebitengine/purego v0.8.0 h1:JbqvnEzRvPpxhCJzJJ2y0RbiZ8nyjccVUrSM3q+GvvE=
-github.com/ebitengine/purego v0.8.0/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
+github.com/ebitengine/purego v0.8.4 h1:CF7LEKg5FFOsASUj0+QwaXf8Ht6TlFxg09+S9wz0omw=
+github.com/ebitengine/purego v0.8.4/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
 github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
 github.com/fsnotify/fsnotify v1.8.0 h1:dAwr6QBTBZIkG8roQaJjGof0pp0EeF+tNV7YBP3F/8M=
 github.com/fsnotify/fsnotify v1.8.0/go.mod h1:8jBTzvmWwFyi3Pb8djgCCO5IBqzKJ/Jwo8TRcHyHii0=
 github.com/go-music-theory/music-theory v0.0.5-0.20191125184038-bd9271db4dae h1:BNGN1vmgEyrGX9+0DtNdSOqg5SI9bc475eZleS0rGn0=
 github.com/go-music-theory/music-theory v0.0.5-0.20191125184038-bd9271db4dae/go.mod h1:DFdPk5o3Qgl6ZhWYa2oO2RPZaDt17axj8q78IC8uYJM=
-github.com/go-viper/mapstructure/v2 v2.3.0 h1:27XbWsHIqhbdR5TIC911OfYvgSaW93HM+dX7970Q7jk=
-github.com/go-viper/mapstructure/v2 v2.3.0/go.mod h1:oJDH3BJKyqBA2TXFhDsKDGDTlndYOZ6rGS0BRZIxGhM=
+github.com/go-viper/mapstructure/v2 v2.4.0 h1:EBsztssimR/CONLSZZ04E8qAkxNYq4Qp9LvH92wZUgs=
+github.com/go-viper/mapstructure/v2 v2.4.0/go.mod h1:oJDH3BJKyqBA2TXFhDsKDGDTlndYOZ6rGS0BRZIxGhM=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/hajimehoshi/ebiten/v2 v2.8.8 h1:xyMxOAn52T1tQ+j3vdieZ7auDBOXmvjUprSrxaIbsi8=

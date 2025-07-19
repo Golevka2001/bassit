@@ -68,6 +68,13 @@ func (bsm *bassStringModel) PressFret(fretIdx int) {
 	bsm.rightmostPressedFret = max(bsm.rightmostPressedFret, fretIdx)
 }
 
+func (bsm *bassStringModel) IsFretPressed(fretIdx int) bool {
+	if fretIdx < 0 || fretIdx > config.MaxFretCnt {
+		return false
+	}
+	return bsm.fretPressed[fretIdx]
+}
+
 func (bsm *bassStringModel) ReleaseFret(fretIdx int) {
 	if fretIdx < 0 || fretIdx > config.MaxFretCnt {
 		return

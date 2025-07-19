@@ -1,4 +1,4 @@
-package tabs
+package tabselector
 
 import (
 	"github.com/Golevka2001/bassit/ui/common"
@@ -112,7 +112,7 @@ func (m Model) View() string {
 			style = m.activeStyle
 		}
 		if isFocused {
-			style = style.Inherit(common.UITextStyle)
+			style = style.Inherit(common.IUTextStyle)
 		}
 
 		border, _, _, _, _ := style.GetBorder()

@@ -27,11 +27,13 @@ var (
 
 	ScreenStyle = NormalStyle.Padding(VPad, HPad)
 
-	BTextStyle  = NormalStyle.Bold(true)
-	ITextStyle  = NormalStyle.Italic(true)
-	UTextStyle  = NormalStyle.Underline(true)
-	BITextStyle = BTextStyle.Italic(true)
-	UITextStyle = UTextStyle.Bold(true)
+	BTextStyle   = NormalStyle.Bold(true)
+	ITextStyle   = NormalStyle.Italic(true)
+	UTextStyle   = NormalStyle.Underline(true)
+	BITextStyle  = BTextStyle.Italic(true)
+	BUTextStyle  = BTextStyle.Underline(true)
+	IUTextStyle  = ITextStyle.Underline(true)
+	BIUTextStyle = BITextStyle.Underline(true)
 
 	TitleStyle = BTextStyle.
 			Inline(true).

@@ -18,6 +18,8 @@ type Model struct {
 	style     Style
 	theme     *config.Theme
 
+	forChordTab bool
+
 	layoutMappingsUpdated bool
 	fretboardLen          int
 	fretboardHeight       int
@@ -32,14 +34,15 @@ type Model struct {
 	yToString             map[int]int
 }
 
-func New(width, height int, theme *config.Theme, baseNotes []note.Note) Model {
+func New(width, height int, theme *config.Theme, baseNotes []note.Note, forChordTab bool) Model {
 	m := Model{
-		Width:     width,
-		Height:    height,
-		frameBuf:  common.NewFrameBuffer(width, height),
-		baseNotes: baseNotes,
-		style:     NewStyle(theme),
-		theme:     theme,
+		Width:       width,
+		Height:      height,
+		frameBuf:    common.NewFrameBuffer(width, height),
+		baseNotes:   baseNotes,
+		style:       NewStyle(theme),
+		theme:       theme,
+		forChordTab: forChordTab,
 	}
 
 	m.updateLayoutMappings()
@@ -64,11 +67,31 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case ReleaseFretMsg:
 		m.restorePressedFret(msg.StringIdx, msg.FretIdx)
 
+	// The following two are only valid when `forChordTab` is false
 	case PluckStringMsg:
+		if m.forChordTab {
+			return m, nil
+		}
 		m.drawVibratingString(msg.StringIdx, msg.FretIdx, int(msg.Type)%2)
 
 	case RestorePluckedStringMsg:
+		if m.forChordTab {
+			return m, nil
+		}
 		m.restoreVibratingString(msg.StringIdx, msg.FretIdx)
+
+	// The following two are only valid when `forChordTab` is true
+	case IgnoreStringMsg:
+		if !m.forChordTab {
+			return m, nil
+		}
+		m.drawXOnString(int(msg))
+
+	case RestoreIgnoredStringMsg:
+		if !m.forChordTab {
+			return m, nil
+		}
+		m.removeXFromString(int(msg))
 	}
 
 	return m, nil

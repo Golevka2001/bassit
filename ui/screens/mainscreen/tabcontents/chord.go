@@ -16,17 +16,14 @@ import (
 	"github.com/go-music-theory/music-theory/note"
 )
 
-var (
-	notesStyle  = common.NormalStyle.MarginTop(1)
-	chordsStyle = common.BUTextStyle.Foreground(lipgloss.Blue).MarginBottom(1)
-)
-
 type ChordTabModel struct {
 	commonModel *common.CommonTabModel
 
 	bass      *bass.BassModel
 	audio     *audio.AudioManager
 	fretboard fretboard.Model
+
+	ignoredStrings [config.StringCnt]bool
 }
 
 func NewChordTabModel(ctm *common.CommonTabModel) ChordTabModel {
@@ -35,6 +32,7 @@ func NewChordTabModel(ctm *common.CommonTabModel) ChordTabModel {
 		ctm.Height,
 		ctm.Context.Theme,
 		ctm.Context.Bass.GetBaseNotes(),
+		true,
 	)
 
 	return ChordTabModel{
@@ -73,14 +71,22 @@ func (m ChordTabModel) Update(msg tea.Msg) (ChordTabModel, tea.Cmd) {
 				})
 			}
 		}
+		// Key event for ignoring a string
 		if pluckInfo, ok := config.KeyToPluckInfo[msg.String()]; ok {
 			stringIdx := pluckInfo.StringIdx
-			cmds = append(cmds, func() tea.Msg {
-				return fretboard.PressFretMsg(bass.FretboardPosition{
-					StringIdx: stringIdx,
-					FretIdx:   0,
+			if m.ignoredStrings[stringIdx] {
+				// If the string is already ignored, restore it
+				m.ignoredStrings[stringIdx] = false
+				cmds = append(cmds, func() tea.Msg {
+					return fretboard.RestoreIgnoredStringMsg(stringIdx)
 				})
-			})
+			} else {
+				// If the string is not ignored, ignore it
+				m.ignoredStrings[stringIdx] = true
+				cmds = append(cmds, func() tea.Msg {
+					return fretboard.IgnoreStringMsg(stringIdx)
+				})
+			}
 		}
 	}
 
@@ -98,15 +104,19 @@ func (m ChordTabModel) View() string {
 	notes := []*note.Note{}
 	var notesStr strings.Builder
 	for stringIdx := range config.StringCnt {
-		n := m.bass.GetNoteToPlay(config.StringCnt - stringIdx - 1) // lowest -> highest
-		if n == nil {
+		// lowest -> highest
+		stringIdx = config.StringCnt - stringIdx - 1
+		n := m.bass.GetNoteToPlay(stringIdx)
+		// If the string is ignored, skip it
+		if m.ignoredStrings[stringIdx] || n == nil {
 			notesStr.WriteString("  X  ")
-		} else {
-			notesStr.WriteString("  " + utils.GetNoteNameWithOctave(*n) + "  ")
-			notes = append(notes, n)
+			continue
 		}
+		notesStr.WriteString("  " + utils.GetNoteNameWithOctave(*n) + "  ")
+		notes = append(notes, n)
 	}
-	rNotes := notesStyle.
+	rNotes := common.NormalStyle.
+		MarginTop(1).
 		Width(m.commonModel.Width).
 		Align(lipgloss.Center).
 		Render(notesStr.String())
@@ -125,9 +135,11 @@ func (m ChordTabModel) View() string {
 	} else {
 		chordsStr.WriteString("Unknown")
 	}
-	rChords := chordsStyle.
+	rChords := common.BUTextStyle.
+		MarginBottom(1).
 		Width(m.commonModel.Width).
 		Align(lipgloss.Center).
+		Foreground(lipgloss.Blue).
 		Render(chordsStr.String())
 
 	// Render the fretboard

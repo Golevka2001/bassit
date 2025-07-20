@@ -36,6 +36,7 @@ func NewFreePlayTabModel(ctm *common.CommonTabModel) FreePlayTabModel {
 		ctm.Height,
 		ctm.Context.Theme,
 		ctm.Context.Bass.GetBaseNotes(),
+		false,
 	)
 
 	return FreePlayTabModel{

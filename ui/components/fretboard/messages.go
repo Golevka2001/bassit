@@ -12,3 +12,7 @@ type PluckStringMsg struct {
 }
 
 type RestorePluckedStringMsg bass.FretboardPosition
+
+type IgnoreStringMsg int
+
+type RestoreIgnoredStringMsg int

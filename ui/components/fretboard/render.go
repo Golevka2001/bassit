@@ -13,7 +13,7 @@ const (
 	stringSpacing     = 1
 	nutWidth          = 3
 	baseNoteNameWidth = 4
-	pluckSignWidth    = 4
+	pluckSignWidth    = 2
 	blockInlayMarginX = 1
 	blockInlayMarginY = 2
 )
@@ -152,7 +152,9 @@ func (m *Model) drawStrings() {
 
 		// Draw the pluck signs
 		m.frameBuf.DrawRune(m.fretboardEndX+2, y, m.theme.NotPluckedStringChar, m.style.stringStyle, false)
-		m.frameBuf.DrawRune(m.fretboardEndX+4, y, m.theme.NotPluckedStringChar, m.style.stringStyle, false)
+		if !m.forChordTab {
+			m.frameBuf.DrawRune(m.fretboardEndX+4, y, m.theme.NotPluckedStringChar, m.style.stringStyle, false)
+		}
 
 		// Draw the strings
 		for x := m.fretboardStartX; x <= m.fretboardEndX; x++ {
@@ -173,6 +175,10 @@ func (m *Model) drawStrings() {
 }
 
 func (m *Model) drawPressedFret(stringIdx, fretIdx int) {
+	if stringIdx < 0 || stringIdx >= config.StringCnt ||
+		fretIdx < 0 || fretIdx > config.DisplayedFretCount {
+		return
+	}
 	x := m.fretCenterX[fretIdx]
 	y := m.stringY[stringIdx]
 
@@ -180,6 +186,10 @@ func (m *Model) drawPressedFret(stringIdx, fretIdx int) {
 }
 
 func (m *Model) restorePressedFret(stringIdx, fretIdx int) {
+	if stringIdx < 0 || stringIdx >= config.StringCnt ||
+		fretIdx < 0 || fretIdx > config.DisplayedFretCount {
+		return
+	}
 	x := m.fretCenterX[fretIdx]
 	y := m.stringY[stringIdx]
 
@@ -194,6 +204,10 @@ func (m *Model) restorePressedFret(stringIdx, fretIdx int) {
 }
 
 func (m *Model) drawVibratingString(stringIdx int, fretIdx int, position int) {
+	if stringIdx < 0 || stringIdx >= config.StringCnt ||
+		fretIdx < 0 || fretIdx > config.DisplayedFretCount {
+		return
+	}
 	// Draw the sign
 	y := m.stringY[stringIdx]
 	if position == 0 {
@@ -229,6 +243,10 @@ func (m *Model) drawVibratingString(stringIdx int, fretIdx int, position int) {
 }
 
 func (m *Model) restoreVibratingString(stringIdx int, fretIdx int) {
+	if stringIdx < 0 || stringIdx >= config.StringCnt ||
+		fretIdx < 0 || fretIdx > config.DisplayedFretCount {
+		return
+	}
 	// Restore the sign
 	y := m.stringY[stringIdx]
 	m.frameBuf.DrawRune(m.fretboardEndX+2, y, m.theme.NotPluckedStringChar, m.style.stringStyle, false)
@@ -256,4 +274,20 @@ func (m *Model) restoreVibratingString(stringIdx int, fretIdx int) {
 		}
 		m.frameBuf.DrawRune(x, y, r, m.style.stringStyle, true)
 	}
+}
+
+func (m *Model) drawXOnString(stringIdx int) {
+	if stringIdx < 0 || stringIdx >= config.StringCnt {
+		return
+	}
+	y := m.stringY[stringIdx]
+	m.frameBuf.DrawRune(m.fretboardEndX+2, y, 'X', m.style.stringStyle, false)
+}
+
+func (m *Model) removeXFromString(stringIdx int) {
+	if stringIdx < 0 || stringIdx >= config.StringCnt {
+		return
+	}
+	y := m.stringY[stringIdx]
+	m.frameBuf.DrawRune(m.fretboardEndX+2, y, m.theme.NotPluckedStringChar, m.style.stringStyle, false)
 }

@@ -12,7 +12,10 @@ func (m *Model) updateLayoutMappings() {
 	}
 
 	m.fretboardStartX = baseNoteNameWidth
-	m.fretboardEndX = max(0, m.Width-1-pluckSignWidth)
+	m.fretboardEndX = max(0, m.Width-1-pluckSignWidth*2) // 2 signs in free playing mode
+	if m.forChordTab {
+		m.fretboardEndX = max(0, m.Width-1-pluckSignWidth) // 1 sign in chord detection mode
+	}
 	m.nutStartX = m.fretboardStartX
 	m.nutEndX = m.nutStartX + nutWidth - 1
 	m.fretboardLen = m.fretboardEndX - m.fretboardStartX

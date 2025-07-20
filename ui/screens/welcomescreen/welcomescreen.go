@@ -18,7 +18,6 @@ const (
 	timeout = 2 * time.Second
 
 	// staticElementsHeight represents the height of the title and loading hint
-	// TODO: make it dynamic
 	staticElementsHeight = 2
 )
 

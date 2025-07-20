@@ -16,6 +16,9 @@ import (
 	"github.com/go-music-theory/music-theory/note"
 )
 
+// staticElementsHeight represents the height of the notes and chord detection result
+const staticElementsHeight = 5
+
 type ChordTabModel struct {
 	commonModel *common.CommonTabModel
 
@@ -145,7 +148,7 @@ func (m ChordTabModel) View() string {
 	// Render the fretboard
 	rFretboard := common.NormalStyle.
 		Width(m.commonModel.Width).
-		Height(m.commonModel.Height - 5).
+		Height(m.commonModel.Height - staticElementsHeight).
 		AlignVertical(lipgloss.Center).
 		Render(m.fretboard.View())
 
@@ -162,6 +165,6 @@ func (m ChordTabModel) View() string {
 func (m *ChordTabModel) SyncSize() {
 	m.fretboard.SetSize(
 		m.commonModel.Width,
-		m.commonModel.Height-5,
+		m.commonModel.Height-staticElementsHeight,
 	)
 }

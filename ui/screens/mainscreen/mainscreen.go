@@ -13,14 +13,7 @@ import (
 )
 
 // staticElementsHeight represents the height of the title, tabs and borders
-// TODO: make it dynamic
 const staticElementsHeight = 6
-
-var (
-	tabContentStyle = common.NormalStyle.Padding(0, 1).
-		Border(lipgloss.RoundedBorder()).
-		UnsetBorderTop()
-)
 
 // tabState is an enum for the different tabs in the program
 type tabState int
@@ -196,7 +189,11 @@ func (m Model) View() string {
 	case tabStateExit:
 		tabContent = m.exitTab.View()
 	}
-	rTabContent := tabContentStyle.Render(tabContent)
+	rTabContent := common.NormalStyle.
+		Padding(0, 1).
+		Border(lipgloss.RoundedBorder()).
+		UnsetBorderTop().
+		Render(tabContent)
 
 	b.WriteString(lipgloss.JoinVertical(lipgloss.Left,
 		rTitle,

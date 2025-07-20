@@ -23,7 +23,7 @@ func loadSoundpackCmd(b *bass.BassModel, a *audio.AudioManager) tea.Cmd {
 		lowestNote, highestNote := b.GetRange()
 
 		if err := genPitchShiftedSamples(lowestNote, highestNote); err != nil {
-			return err // FIXME: return error to the screen
+			return err
 		}
 
 		a.LoadSoundpackSamples(b)

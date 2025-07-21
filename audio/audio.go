@@ -9,8 +9,8 @@ import (
 	"github.com/Golevka2001/bassit/bass"
 	"github.com/Golevka2001/bassit/config"
 	"github.com/Golevka2001/bassit/utils"
-	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 
+	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 	"github.com/ebitengine/oto/v3"
 )
 

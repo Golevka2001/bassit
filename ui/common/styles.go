@@ -36,10 +36,10 @@ var (
 	BIUTextStyle = BITextStyle.Underline(true)
 
 	TitleStyle = BTextStyle.
-		Inline(true).
-		AlignHorizontal(lipgloss.Center).
-		Foreground(TitleFgColor).
-		Background(TitleBgColor)
+			Inline(true).
+			AlignHorizontal(lipgloss.Center).
+			Foreground(TitleFgColor).
+			Background(TitleBgColor)
 
 	// HelpStyle is copied from `bubbles/help` component
 	HelpStyle = NormalStyle.Foreground(compat.AdaptiveColor{

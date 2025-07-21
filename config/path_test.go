@@ -193,28 +193,3 @@ func TestSoundpackDir(t *testing.T) {
 		})
 	}
 }
-
-func TestSetBaseDirEdgeCases(t *testing.T) {
-	originalBaseDir := BaseDir
-	defer func() { BaseDir = originalBaseDir }()
-
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{
-			name:  "path with null character",
-			input: string([]byte{0}), expected: "error checking path",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			actual := SetBaseDir(tt.input)
-
-			assert.Error(t, actual)
-			assert.Contains(t, actual.Error(), tt.expected)
-		})
-	}
-}

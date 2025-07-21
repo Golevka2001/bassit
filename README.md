@@ -10,13 +10,28 @@ Tired of typing commands? Time to play some bass 🎸
 
 Supported on **Linux**, **macOS**, and **Windows**.
 
+## :camera: Snapshots
+
+![MacOS Snapshots](./README.assets/snapshots/macos.gif)
+
+<details>
+<summary><strong>Windows and Linux Snapshots</strong></summary>
+<div style="display: flex; gap: 10px;">
+  <img src="./README.assets/snapshots/windows.gif" alt="Windows Snapshot" width="49%" />
+  <img src="./README.assets/snapshots/linux.gif" alt="Linux Snapshot" width="49%" />
+</div>
+</details>
+
+
 ## :rocket: Quick Start
 
 ### :vertical_traffic_light: Before You Begin
 
 1. See the [Dependencies](#building_construction-dependencies) section below for installation instructions.
 
-2. To avoid character encoding or alignment issues, please make sure:
+2. Please use a modern terminal that supports [progressive keyboard enhancements](https://sw.kovidgoyal.net/kitty/keyboard-protocol/). See [this page](https://github.com/charmbracelet/bubbletea/discussions/1374#:~:text=Keyboard-,Enhancements,-Progressive%20keyboard%20enhancements) for a list of supported terminals.
+
+3. To avoid character encoding or alignment issues, please make sure:
    - You are using the **UTF-8 character set**
      - On Linux or macOS, you can check your current character set settings by running the `locale` command.
      - On Windows, you can check your current character set settings in PowerShell by running `$OutputEncoding`.

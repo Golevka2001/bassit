@@ -158,9 +158,19 @@ apk add rubberband
 
 If your Linux distribution is not listed on [pkgs.org](https://pkgs.org/download/rubberband), you may need to build from source, see [their repository](https://github.com/breakfastquay/rubberband).
 
-
 ## :toolbox: Third-Party Libraries & Assets
 
 - [Rubber Band Library](https://breakfastquay.com/rubberband/)
   - License: [GPLv2](https://github.com/breakfastquay/rubberband/blob/default/COPYING)
   - It is used for generating pitch-shifted audio samples.
+
+## Planned Features
+
+- More than 4 strings.
+- The settings tab for adjusting preferences and themes.
+- Chord -> fingering.
+- Metronome.
+- Resample and create a full-quality sound pack.
+- A website for users to upload and share sound packs, themes, etc.
+- Recording and exporting.
+- ...

@@ -63,12 +63,15 @@ func (m ChordTabModel) Update(msg tea.Msg) (ChordTabModel, tea.Cmd) {
 			if m.bass.IsFretPressed(pos) {
 				// If the fret is already pressed, release it
 				m.bass.ReleaseFret(pos)
+				go m.audio.StopBassNote(pos)
 				cmds = append(cmds, func() tea.Msg {
 					return fretboard.ReleaseFretMsg(pos)
 				})
 			} else {
 				// If the fret is not pressed, press it
 				m.bass.PressFret(pos)
+				// Play the note
+				go m.audio.PlayBassNote(pos, bass.PluckTypeNormal1)
 				cmds = append(cmds, func() tea.Msg {
 					return fretboard.PressFretMsg(pos)
 				})
@@ -80,12 +83,24 @@ func (m ChordTabModel) Update(msg tea.Msg) (ChordTabModel, tea.Cmd) {
 			if m.ignoredStrings[stringIdx] {
 				// If the string is already ignored, restore it
 				m.ignoredStrings[stringIdx] = false
+				// Play the note
+				pos := bass.FretboardPosition{
+					StringIdx: pluckInfo.StringIdx,
+					FretIdx:   m.bass.GetValidFretIdxOfString(pluckInfo.StringIdx),
+				}
+				go m.audio.PlayBassNote(pos, bass.PluckTypeNormal1)
 				cmds = append(cmds, func() tea.Msg {
 					return fretboard.RestoreIgnoredStringMsg(stringIdx)
 				})
 			} else {
 				// If the string is not ignored, ignore it
 				m.ignoredStrings[stringIdx] = true
+				// Stop all players on the string
+				for fretIdx := range config.DisplayedFretCount {
+					pos := bass.FretboardPosition{StringIdx: stringIdx, FretIdx: fretIdx}
+					go m.audio.StopBassNote(pos)
+				}
+
 				cmds = append(cmds, func() tea.Msg {
 					return fretboard.IgnoreStringMsg(stringIdx)
 				})

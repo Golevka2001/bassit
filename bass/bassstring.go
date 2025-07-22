@@ -60,6 +60,10 @@ func (bsm *bassStringModel) GetNoteToPlay() *note.Note {
 	return bsm.GetNoteAt(bsm.rightmostPressedFret)
 }
 
+func (bsm *bassStringModel) GetRightmostPressedFret() int {
+	return bsm.rightmostPressedFret
+}
+
 func (bsm *bassStringModel) PressFret(fretIdx int) {
 	if fretIdx < 0 || fretIdx > config.MaxFretCnt {
 		return

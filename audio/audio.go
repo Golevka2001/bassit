@@ -63,7 +63,7 @@ func (am *AudioManager) PlayBassNote(pos bass.FretboardPosition, t bass.PluckTyp
 }
 
 func (am *AudioManager) StopBassNote(pos bass.FretboardPosition) {
-	for t := bass.PluckTypeNormal1; t < config.PluckTypeCount; t++ {
+	for t := range bass.PluckType(config.PluckTypeCount) {
 		player := am.getPlayer(pos, t)
 		if player == nil {
 			return
@@ -77,7 +77,7 @@ func (am *AudioManager) StopBassNote(pos bass.FretboardPosition) {
 }
 
 func (am *AudioManager) LoadSoundpackSamples(b *bass.BassModel) {
-	for t := bass.PluckTypeNormal1; t < config.PluckTypeCount; t++ {
+	for t := range bass.PluckType(config.PluckTypeCount) {
 		dirPath := filepath.Join(config.SoundpackDir(), config.SoundpackName, t.String())
 		for stringIdx := range config.StringCnt {
 			for fretIdx := 0; fretIdx < config.DisplayedFretCount; fretIdx++ {

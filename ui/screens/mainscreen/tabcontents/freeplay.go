@@ -79,7 +79,7 @@ func (m FreePlayTabModel) Update(msg tea.Msg) (FreePlayTabModel, tea.Cmd) {
 		if pluckInfo, ok := config.KeyToPluckInfo[msg.String()]; ok {
 			pos := bass.FretboardPosition{
 				StringIdx: pluckInfo.StringIdx,
-				FretIdx:   m.bass.GetValidFretIdxOfString(pluckInfo.StringIdx),
+				FretIdx:   m.bass.GetRightmostPressedFretIdxOfString(pluckInfo.StringIdx),
 			}
 			var pluckType bass.PluckType
 			if m.muteEnabled {
@@ -113,12 +113,13 @@ func (m FreePlayTabModel) Update(msg tea.Msg) (FreePlayTabModel, tea.Cmd) {
 		// Key event for pressing a fret
 		if pos, ok := config.KeyToFretboardPos[msg.String()]; ok {
 			seqCmds := []tea.Cmd{}
-			// If the fret is higher than the valid fret, stop the vibrating string
 			lastValidPos := bass.FretboardPosition{
 				StringIdx: pos.StringIdx,
-				FretIdx:   m.bass.GetValidFretIdxOfString(pos.StringIdx),
+				FretIdx:   m.bass.GetRightmostPressedFretIdxOfString(pos.StringIdx),
 			}
-			if m.bass.IsStringVibrating(pos.StringIdx) && pos.FretIdx > lastValidPos.FretIdx {
+			isVibrating := m.bass.IsStringVibrating(pos.StringIdx) // Get the state before pressing the fret
+			// If currently pressed fret is higher than the last fret, stop the vibrating string first
+			if isVibrating && pos.FretIdx > lastValidPos.FretIdx {
 				go m.audio.StopBassNote(lastValidPos)
 				m.bass.StopVibratingStringWithoutCheck(pos.StringIdx)
 				seqCmds = append(seqCmds, func() tea.Msg {
@@ -130,6 +131,27 @@ func (m FreePlayTabModel) Update(msg tea.Msg) (FreePlayTabModel, tea.Cmd) {
 			seqCmds = append(seqCmds, func() tea.Msg {
 				return fretboard.PressFretMsg(pos)
 			})
+			// Detect and trigger hammer-on effect
+			diff := pos.FretIdx - lastValidPos.FretIdx
+			if isVibrating && diff > 0 && diff <= config.MaxFretGapForHP && lastValidPos.FretIdx > 0 {
+				go m.audio.PlayBassNote(pos, bass.PluckTypeNormal1)
+				pluckTime := m.bass.PluckString(pos.StringIdx, bass.PluckTypeNormal1)
+				seqCmds = append(seqCmds, func() tea.Msg {
+					return fretboard.PluckStringMsg{
+						FretboardPosition: pos,
+						Type:              bass.PluckTypeNormal1,
+					}
+				})
+				// Restore the string after duration
+				seqCmds = append(seqCmds, tea.Tick(utils.GetVibDuration(), func(t time.Time) tea.Msg {
+					// Only restore if no new pluck has been made
+					if m.bass.StopVibratingString(pos.StringIdx, pluckTime) {
+						go m.audio.StopBassNote(pos)
+						return fretboard.RestorePluckedStringMsg(pos)
+					}
+					return nil
+				}))
+			}
 			cmds = append(cmds, tea.Sequence(seqCmds...))
 		}
 
@@ -153,9 +175,9 @@ func (m FreePlayTabModel) Update(msg tea.Msg) (FreePlayTabModel, tea.Cmd) {
 		// Key event for releasing a fret
 		if pos, ok := config.KeyToFretboardPos[msg.String()]; ok {
 			seqCmds := []tea.Cmd{}
-			// If the fret is higher than the valid fret, stop the vibrating string
-
-			if m.bass.IsStringVibrating(pos.StringIdx) && pos.FretIdx >= m.bass.GetValidFretIdxOfString(pos.StringIdx) {
+			isVibrating := m.bass.IsStringVibrating(pos.StringIdx) // Get the state before releasing the fret
+			// If the fret to release is the highest fret, stop the vibrating string first
+			if isVibrating && pos.FretIdx >= m.bass.GetRightmostPressedFretIdxOfString(pos.StringIdx) {
 				go m.audio.StopBassNote(pos)
 				m.bass.StopVibratingStringWithoutCheck(pos.StringIdx)
 				seqCmds = append(seqCmds, func() tea.Msg {
@@ -167,6 +189,31 @@ func (m FreePlayTabModel) Update(msg tea.Msg) (FreePlayTabModel, tea.Cmd) {
 			seqCmds = append(seqCmds, func() tea.Msg {
 				return fretboard.ReleaseFretMsg(pos)
 			})
+			// Detect and trigger pull-off effect
+			diff := pos.FretIdx - m.bass.GetRightmostPressedFretIdxOfString(pos.StringIdx)
+			if isVibrating && diff > 0 && diff <= config.MaxFretGapForHP && m.bass.GetRightmostPressedFretIdxOfString(pos.StringIdx) > 0 {
+				newPos := bass.FretboardPosition{
+					StringIdx: pos.StringIdx,
+					FretIdx:   m.bass.GetRightmostPressedFretIdxOfString(pos.StringIdx),
+				}
+				go m.audio.PlayBassNote(newPos, bass.PluckTypeNormal1)
+				pluckTime := m.bass.PluckString(newPos.StringIdx, bass.PluckTypeNormal1)
+				seqCmds = append(seqCmds, func() tea.Msg {
+					return fretboard.PluckStringMsg{
+						FretboardPosition: newPos,
+						Type:              bass.PluckTypeNormal1,
+					}
+				})
+				// Restore the string after duration
+				seqCmds = append(seqCmds, tea.Tick(utils.GetVibDuration(), func(t time.Time) tea.Msg {
+					// Only restore if no new pluck has been made
+					if m.bass.StopVibratingString(newPos.StringIdx, pluckTime) {
+						go m.audio.StopBassNote(newPos)
+						return fretboard.RestorePluckedStringMsg(newPos)
+					}
+					return nil
+				}))
+			}
 			cmds = append(cmds, tea.Sequence(seqCmds...))
 		}
 	}

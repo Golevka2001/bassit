@@ -20,6 +20,7 @@ func TestConfig(t *testing.T) {
 			config: Config{
 				Tuning:             [StringCnt]string{"G2", "D2", "A1", "E1"},
 				DisplayedFretCount: 12,
+				MaxFretGapForHP:    4,
 				AccidentalStyle:    "sharp",
 				Theme:              "default",
 				Soundpack:          "default",
@@ -27,6 +28,7 @@ func TestConfig(t *testing.T) {
 			validate: func(t *testing.T, cfg Config) {
 				assert.Equal(t, [StringCnt]string{"G2", "D2", "A1", "E1"}, cfg.Tuning)
 				assert.Equal(t, 12, cfg.DisplayedFretCount)
+				assert.Equal(t, 4, cfg.MaxFretGapForHP)
 				assert.Equal(t, "sharp", cfg.AccidentalStyle)
 				assert.Equal(t, "default", cfg.Theme)
 				assert.Equal(t, "default", cfg.Soundpack)
@@ -37,6 +39,7 @@ func TestConfig(t *testing.T) {
 			config: Config{
 				Tuning:             [StringCnt]string{"A2", "E2", "B1", "F#1"},
 				DisplayedFretCount: 15,
+				MaxFretGapForHP:    6,
 				AccidentalStyle:    "flat",
 				Theme:              "dark",
 				Soundpack:          "custom",
@@ -44,6 +47,7 @@ func TestConfig(t *testing.T) {
 			validate: func(t *testing.T, cfg Config) {
 				assert.Equal(t, [StringCnt]string{"A2", "E2", "B1", "F#1"}, cfg.Tuning)
 				assert.Equal(t, 15, cfg.DisplayedFretCount)
+				assert.Equal(t, 6, cfg.MaxFretGapForHP)
 				assert.Equal(t, "flat", cfg.AccidentalStyle)
 				assert.Equal(t, "dark", cfg.Theme)
 				assert.Equal(t, "custom", cfg.Soundpack)
@@ -68,6 +72,7 @@ func TestDefaultConfig(t *testing.T) {
 			validate: func(t *testing.T) {
 				assert.Equal(t, [StringCnt]string{"G2", "D2", "A1", "E1"}, defaultCfg.Tuning)
 				assert.Equal(t, 12, defaultCfg.DisplayedFretCount)
+				assert.Equal(t, 4, defaultCfg.MaxFretGapForHP)
 				assert.Equal(t, "sharp", defaultCfg.AccidentalStyle)
 				assert.Equal(t, "default", defaultCfg.Theme)
 				assert.Equal(t, "default", defaultCfg.Soundpack)
@@ -128,6 +133,7 @@ func TestValidateConfig(t *testing.T) {
 			config: Config{
 				Tuning:             [StringCnt]string{"G2", "D2", "A1", "E1"},
 				DisplayedFretCount: 12,
+				MaxFretGapForHP:    4,
 				AccidentalStyle:    "sharp",
 				Theme:              "test_theme",
 				Soundpack:          "test_soundpack",
@@ -155,6 +161,7 @@ func TestValidateConfig(t *testing.T) {
 				assert.Equal(t, note.A, Tuning[2].Class)
 				assert.Equal(t, note.E, Tuning[3].Class)
 				assert.Equal(t, 12, DisplayedFretCount)
+				assert.Equal(t, 4, MaxFretGapForHP)
 				assert.Equal(t, note.Sharp, AccidentalStyle)
 				assert.Equal(t, "test_theme", ThemeName)
 				assert.Equal(t, "test_soundpack", SoundpackName)
@@ -163,7 +170,9 @@ func TestValidateConfig(t *testing.T) {
 		{
 			name: "invalid tuning - strict mode",
 			config: Config{
-				Tuning: [StringCnt]string{"G2", "D2", "A1", "X1"}, DisplayedFretCount: 12,
+				Tuning: [StringCnt]string{"G2", "D2", "A1", "X1"},
+				DisplayedFretCount: 12,
+				MaxFretGapForHP: 4,
 				AccidentalStyle: "sharp",
 				Theme:           "test_theme",
 				Soundpack:       "test_soundpack",
@@ -181,7 +190,9 @@ func TestValidateConfig(t *testing.T) {
 		{
 			name: "invalid tuning - non-strict mode",
 			config: Config{
-				Tuning: [StringCnt]string{"G2", "D2", "A1", "X1"}, DisplayedFretCount: 12,
+				Tuning: [StringCnt]string{"G2", "D2", "A1", "X1"},
+				DisplayedFretCount: 12,
+				MaxFretGapForHP: 4,
 				AccidentalStyle: "sharp",
 				Theme:           "test_theme",
 				Soundpack:       "test_soundpack",
@@ -214,7 +225,9 @@ func TestValidateConfig(t *testing.T) {
 			name: "invalid displayed fret count - strict mode",
 			config: Config{
 				Tuning:             [StringCnt]string{"G2", "D2", "A1", "E1"},
-				DisplayedFretCount: 0, AccidentalStyle: "sharp",
+				DisplayedFretCount: 0,
+				MaxFretGapForHP: 4,
+				AccidentalStyle: "sharp",
 				Theme:     "test_theme",
 				Soundpack: "test_soundpack",
 			},
@@ -232,7 +245,9 @@ func TestValidateConfig(t *testing.T) {
 			name: "invalid displayed fret count - non-strict mode",
 			config: Config{
 				Tuning:             [StringCnt]string{"G2", "D2", "A1", "E1"},
-				DisplayedFretCount: -5, AccidentalStyle: "sharp",
+				DisplayedFretCount: -5,
+				MaxFretGapForHP: 4,
+				AccidentalStyle: "sharp",
 				Theme:     "test_theme",
 				Soundpack: "test_soundpack",
 			},
@@ -254,6 +269,36 @@ func TestValidateConfig(t *testing.T) {
 			expected: nil,
 			validate: func(t *testing.T, cfg *Config, tempDir string) {
 				assert.Equal(t, defaultCfg.DisplayedFretCount, DisplayedFretCount)
+			},
+		},
+		{
+			name: "max fret gap for hp validation",
+			config: Config{
+				Tuning:             [StringCnt]string{"G2", "D2", "A1", "E1"},
+				DisplayedFretCount: 12,
+				MaxFretGapForHP:    8,
+				AccidentalStyle:    "sharp",
+				Theme:              "test_theme",
+				Soundpack:          "test_soundpack",
+			},
+			strict: false,
+			setup: func() string {
+				tempDir, _ := os.MkdirTemp("", "bassit_config_test_*")
+
+				themeDir := filepath.Join(tempDir, "themes")
+				soundpackDir := filepath.Join(tempDir, "soundpacks", "test_soundpack")
+				os.MkdirAll(themeDir, 0755)
+				os.MkdirAll(soundpackDir, 0755)
+
+				themeFile := filepath.Join(themeDir, "test_theme.yaml")
+				os.WriteFile(themeFile, []byte("test: theme"), 0644)
+
+				BaseDir = tempDir
+				return tempDir
+			},
+			expected: nil,
+			validate: func(t *testing.T, cfg *Config, tempDir string) {
+				assert.Equal(t, 8, MaxFretGapForHP)
 			},
 		},
 	}
@@ -304,6 +349,7 @@ func TestLoadConfig(t *testing.T) {
 				configContent := `
 tuning: ["A2", "E2", "B1", "F#1"]
 displayed_fret_count: 15
+max_fret_gap_for_hp: 6
 accidental_style: "flat"
 theme: "custom"
 soundpack: "custom"
@@ -320,6 +366,7 @@ soundpack: "custom"
 				assert.NotNil(t, cfg)
 				assert.Equal(t, [StringCnt]string{"A2", "E2", "B1", "F#1"}, cfg.Tuning)
 				assert.Equal(t, 15, cfg.DisplayedFretCount)
+				assert.Equal(t, 6, cfg.MaxFretGapForHP)
 				assert.Equal(t, "flat", cfg.AccidentalStyle)
 				assert.Equal(t, "custom", cfg.Theme)
 				assert.Equal(t, "custom", cfg.Soundpack)
@@ -341,6 +388,7 @@ soundpack: "custom"
 				configContent := `
 tuning: ["G2", "D2", "A1", "E1"]
 displayed_fret_count: 12
+max_fret_gap_for_hp: 4
 accidental_style: "sharp"
 theme: "default"
 soundpack: "default"
@@ -357,6 +405,7 @@ soundpack: "default"
 				assert.NotNil(t, cfg)
 				assert.Equal(t, defaultCfg.Tuning, cfg.Tuning)
 				assert.Equal(t, 12, cfg.DisplayedFretCount)
+				assert.Equal(t, 4, cfg.MaxFretGapForHP)
 				assert.Equal(t, "sharp", cfg.AccidentalStyle)
 				assert.Equal(t, "default", cfg.Theme)
 				assert.Equal(t, "default", cfg.Soundpack)
@@ -410,6 +459,7 @@ invalid yaml syntax here
 				configContent := `
 tuning: ["G2", "D2", "A1", "E1"]
 displayed_fret_count: 12
+max_fret_gap_for_hp: 4
 accidental_style: "sharp"
 theme: "nonexistent"
 soundpack: "default"
@@ -441,6 +491,7 @@ soundpack: "default"
 				configContent := `
 tuning: ["G2", "D2", "A1", "E1"]
 displayed_fret_count: 12
+max_fret_gap_for_hp: 4
 accidental_style: "sharp"
 theme: "default"
 soundpack: "nonexistent"

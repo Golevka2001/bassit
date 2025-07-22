@@ -151,7 +151,7 @@ func TestBassModelFretOperations(t *testing.T) {
 			validate: func(t *testing.T, bass *BassModel) {
 				pos := FretboardPosition{StringIdx: 0, FretIdx: 5}
 				assert.True(t, bass.IsFretPressed(pos))
-				assert.Equal(t, 5, bass.GetValidFretIdxOfString(0))
+				assert.Equal(t, 5, bass.GetRightmostPressedFretIdxOfString(0))
 			},
 		},
 		{
@@ -165,7 +165,7 @@ func TestBassModelFretOperations(t *testing.T) {
 				assert.True(t, bass.IsFretPressed(FretboardPosition{StringIdx: 1, FretIdx: 3}))
 				assert.True(t, bass.IsFretPressed(FretboardPosition{StringIdx: 1, FretIdx: 5}))
 				assert.True(t, bass.IsFretPressed(FretboardPosition{StringIdx: 1, FretIdx: 7}))
-				assert.Equal(t, 7, bass.GetValidFretIdxOfString(1))
+				assert.Equal(t, 7, bass.GetRightmostPressedFretIdxOfString(1))
 			},
 		},
 		{
@@ -178,7 +178,7 @@ func TestBassModelFretOperations(t *testing.T) {
 			validate: func(t *testing.T, bass *BassModel) {
 				assert.True(t, bass.IsFretPressed(FretboardPosition{StringIdx: 2, FretIdx: 3}))
 				assert.False(t, bass.IsFretPressed(FretboardPosition{StringIdx: 2, FretIdx: 7}))
-				assert.Equal(t, 3, bass.GetValidFretIdxOfString(2))
+				assert.Equal(t, 3, bass.GetRightmostPressedFretIdxOfString(2))
 			},
 		},
 		{
@@ -190,8 +190,8 @@ func TestBassModelFretOperations(t *testing.T) {
 			validate: func(t *testing.T, bass *BassModel) {
 				assert.False(t, bass.IsFretPressed(FretboardPosition{StringIdx: -1, FretIdx: 5}))
 				assert.False(t, bass.IsFretPressed(FretboardPosition{StringIdx: config.StringCnt, FretIdx: 5}))
-				assert.Equal(t, -1, bass.GetValidFretIdxOfString(-1))
-				assert.Equal(t, -1, bass.GetValidFretIdxOfString(config.StringCnt))
+				assert.Equal(t, -1, bass.GetRightmostPressedFretIdxOfString(-1))
+				assert.Equal(t, -1, bass.GetRightmostPressedFretIdxOfString(config.StringCnt))
 			},
 		},
 	}

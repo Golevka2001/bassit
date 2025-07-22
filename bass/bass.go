@@ -70,11 +70,11 @@ func (bm *BassModel) IsFretPressed(pos FretboardPosition) bool {
 	return bm.strings[pos.StringIdx].IsFretPressed(pos.FretIdx)
 }
 
-func (bm *BassModel) GetValidFretIdxOfString(stringIdx int) int {
+func (bm *BassModel) GetRightmostPressedFretIdxOfString(stringIdx int) int {
 	if stringIdx < 0 || stringIdx >= config.StringCnt {
 		return -1
 	}
-	return bm.strings[stringIdx].rightmostPressedFret
+	return bm.strings[stringIdx].GetRightmostPressedFret()
 }
 
 func (bm *BassModel) GetNoteAt(pos FretboardPosition) *note.Note {

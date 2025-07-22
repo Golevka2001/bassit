@@ -55,7 +55,7 @@ func TestAudioManager(t *testing.T) {
 			name: "AudioManager struct fields",
 			validate: func(t *testing.T) {
 				am := &AudioManager{
-					otoCtx:  nil,
+					otoCtx:       nil,
 					playerGroups: make(map[bass.FretboardPosition]BassNotePlayerGroup),
 				}
 
@@ -294,7 +294,7 @@ func TestAudioManagerLoadSoundpackSamples(t *testing.T) {
 				soundpackDir := filepath.Join(tempDir, "test_soundpack")
 				os.MkdirAll(soundpackDir, 0755)
 
-				for t := bass.PluckTypeNormal1; t < config.PluckTypeCount; t++ {
+				for t := range bass.PluckType(config.PluckTypeCount) {
 					os.MkdirAll(filepath.Join(soundpackDir, t.String()), 0755)
 				}
 

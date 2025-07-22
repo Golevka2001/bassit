@@ -68,6 +68,15 @@ func (m ChordTabModel) Update(msg tea.Msg) (ChordTabModel, tea.Cmd) {
 					return fretboard.ReleaseFretMsg(pos)
 				})
 			} else {
+				// If the fret to press is higher than the highest fret, stop the vibrating string first
+				if pos.FretIdx > m.bass.GetRightmostPressedFretIdxOfString(pos.StringIdx) {
+					lastPos := bass.FretboardPosition{
+						StringIdx: pos.StringIdx,
+						FretIdx:   m.bass.GetRightmostPressedFretIdxOfString(pos.StringIdx),
+					}
+					go m.audio.StopBassNote(lastPos)
+					m.bass.StopVibratingStringWithoutCheck(lastPos.StringIdx)
+				}
 				// If the fret is not pressed, press it
 				m.bass.PressFret(pos)
 				// Play the note
@@ -86,7 +95,7 @@ func (m ChordTabModel) Update(msg tea.Msg) (ChordTabModel, tea.Cmd) {
 				// Play the note
 				pos := bass.FretboardPosition{
 					StringIdx: pluckInfo.StringIdx,
-					FretIdx:   m.bass.GetValidFretIdxOfString(pluckInfo.StringIdx),
+					FretIdx:   m.bass.GetRightmostPressedFretIdxOfString(pluckInfo.StringIdx),
 				}
 				go m.audio.PlayBassNote(pos, bass.PluckTypeNormal1)
 				cmds = append(cmds, func() tea.Msg {

@@ -10,6 +10,10 @@ tuning:
 # `displayed_fret_count` defines how many frets to display on the fretboard.
 displayed_fret_count: 12
 
+# `max_fret_gap_for_hp` sets the maximum fret distance for hammer-on/pull-off detection.
+# For example, if set to `2`, playing fret 7 followed by fret 9 (without plucking) will trigger a hammer-on effect, while fret 10 will not.
+max_fret_gap_for_hp: 2
+
 # `accidental_style` determines how to display accidental notes.
 # Valid values are "sharp" or "flat".
 accidental_style: "sharp"

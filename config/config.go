@@ -14,6 +14,7 @@ import (
 var (
 	Tuning             [StringCnt]*note.Note
 	DisplayedFretCount int
+	MaxFretGapForHP    int
 	AccidentalStyle    note.AdjSymbol
 	ThemeName          string
 	SoundpackName      string
@@ -23,6 +24,7 @@ var (
 	defaultCfg = Config{
 		Tuning:             [StringCnt]string{"G2", "D2", "A1", "E1"},
 		DisplayedFretCount: 12,
+		MaxFretGapForHP:    4,
 		AccidentalStyle:    "sharp",
 		Theme:              "default",
 		Soundpack:          "default",
@@ -37,6 +39,9 @@ type Config struct {
 
 	// DisplayedFretCount defines how many frets to display on the fretboard
 	DisplayedFretCount int `yaml:"displayed_fret_count"`
+
+	// MaxFretGapForHP sets the maximum fret distance for hammer-on/pull-off detection
+	MaxFretGapForHP int `yaml:"max_fret_gap_for_hp"`
 
 	// AccidentalStyle determines how to display accidental notes
 	// Valid values are "sharp" or "flat"
@@ -118,6 +123,9 @@ func validateConfig(cfg *Config, strict bool) error {
 	} else {
 		DisplayedFretCount = cfg.DisplayedFretCount
 	}
+
+	// `MaxFretGapForHP`
+	MaxFretGapForHP = cfg.MaxFretGapForHP
 
 	// `AccidentalStyle`
 	switch strings.ToLower(cfg.AccidentalStyle) {

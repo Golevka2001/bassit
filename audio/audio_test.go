@@ -20,7 +20,7 @@ func TestBassNotePlayer(t *testing.T) {
 		{
 			name: "BassNotePlayer struct creation",
 			validate: func(t *testing.T) {
-				player := BassNotePlayer{}
+				player := BassNotePlayerGroup{}
 
 				assert.Equal(t, config.PluckTypeCount, len(player.players))
 
@@ -32,7 +32,7 @@ func TestBassNotePlayer(t *testing.T) {
 		{
 			name: "BassNotePlayer players array type",
 			validate: func(t *testing.T) {
-				player := BassNotePlayer{}
+				player := BassNotePlayerGroup{}
 
 				assert.IsType(t, [config.PluckTypeCount]*oto.Player{}, player.players)
 			},
@@ -56,21 +56,21 @@ func TestAudioManager(t *testing.T) {
 			validate: func(t *testing.T) {
 				am := &AudioManager{
 					otoCtx:  nil,
-					players: make(map[bass.FretboardPosition]BassNotePlayer),
+					playerGroups: make(map[bass.FretboardPosition]BassNotePlayerGroup),
 				}
 
-				assert.NotNil(t, am.players)
-				assert.IsType(t, map[bass.FretboardPosition]BassNotePlayer{}, am.players)
+				assert.NotNil(t, am.playerGroups)
+				assert.IsType(t, map[bass.FretboardPosition]BassNotePlayerGroup{}, am.playerGroups)
 			},
 		},
 		{
 			name: "AudioManager players map initialization",
 			validate: func(t *testing.T) {
 				am := &AudioManager{
-					players: make(map[bass.FretboardPosition]BassNotePlayer),
+					playerGroups: make(map[bass.FretboardPosition]BassNotePlayerGroup),
 				}
 
-				assert.Equal(t, 0, len(am.players))
+				assert.Equal(t, 0, len(am.playerGroups))
 			},
 		},
 	}
@@ -106,8 +106,8 @@ func TestNewAudioManager(t *testing.T) {
 
 				assert.NotNil(t, am)
 				assert.NotNil(t, am.otoCtx)
-				assert.NotNil(t, am.players)
-				assert.Equal(t, 0, len(am.players))
+				assert.NotNil(t, am.playerGroups)
+				assert.Equal(t, 0, len(am.playerGroups))
 			},
 		},
 		{
@@ -163,7 +163,7 @@ func TestAudioManagerGetPlayer(t *testing.T) {
 			name: "get player for non-existent position",
 			setup: func() *AudioManager {
 				return &AudioManager{
-					players: make(map[bass.FretboardPosition]BassNotePlayer),
+					playerGroups: make(map[bass.FretboardPosition]BassNotePlayerGroup),
 				}
 			},
 			pos:       bass.FretboardPosition{StringIdx: 0, FretIdx: 0},
@@ -174,10 +174,10 @@ func TestAudioManagerGetPlayer(t *testing.T) {
 			name: "get player for existing position with nil player",
 			setup: func() *AudioManager {
 				am := &AudioManager{
-					players: make(map[bass.FretboardPosition]BassNotePlayer),
+					playerGroups: make(map[bass.FretboardPosition]BassNotePlayerGroup),
 				}
 				pos := bass.FretboardPosition{StringIdx: 0, FretIdx: 0}
-				am.players[pos] = BassNotePlayer{}
+				am.playerGroups[pos] = BassNotePlayerGroup{}
 				return am
 			},
 			pos:       bass.FretboardPosition{StringIdx: 0, FretIdx: 0},
@@ -211,7 +211,7 @@ func TestAudioManagerStopBassNote(t *testing.T) {
 			name: "stop bass note for non-existent position",
 			setup: func() *AudioManager {
 				return &AudioManager{
-					players: make(map[bass.FretboardPosition]BassNotePlayer),
+					playerGroups: make(map[bass.FretboardPosition]BassNotePlayerGroup),
 				}
 			},
 			pos: bass.FretboardPosition{StringIdx: 0, FretIdx: 0},
@@ -223,10 +223,10 @@ func TestAudioManagerStopBassNote(t *testing.T) {
 			name: "stop bass note for existing position with nil players",
 			setup: func() *AudioManager {
 				am := &AudioManager{
-					players: make(map[bass.FretboardPosition]BassNotePlayer),
+					playerGroups: make(map[bass.FretboardPosition]BassNotePlayerGroup),
 				}
 				pos := bass.FretboardPosition{StringIdx: 0, FretIdx: 0}
-				am.players[pos] = BassNotePlayer{}
+				am.playerGroups[pos] = BassNotePlayerGroup{}
 				return am
 			},
 			pos: bass.FretboardPosition{StringIdx: 0, FretIdx: 0},
@@ -275,7 +275,7 @@ func TestAudioManagerLoadSoundpackSamples(t *testing.T) {
 				config.SoundpackName = "nonexistent"
 				config.DisplayedFretCount = 2
 				am := &AudioManager{
-					players: make(map[bass.FretboardPosition]BassNotePlayer),
+					playerGroups: make(map[bass.FretboardPosition]BassNotePlayerGroup),
 				}
 
 				tuning := [config.StringCnt]string{"G2", "D2", "A1", "E1"}
@@ -284,7 +284,7 @@ func TestAudioManagerLoadSoundpackSamples(t *testing.T) {
 				return am, bassModel, tempDir
 			},
 			validate: func(t *testing.T, am *AudioManager, tempDir string) {
-				assert.Equal(t, 0, len(am.players))
+				assert.Equal(t, 0, len(am.playerGroups))
 			},
 		},
 		{
@@ -302,7 +302,7 @@ func TestAudioManagerLoadSoundpackSamples(t *testing.T) {
 				config.SoundpackName = "test_soundpack"
 				config.DisplayedFretCount = 1
 				am := &AudioManager{
-					players: make(map[bass.FretboardPosition]BassNotePlayer),
+					playerGroups: make(map[bass.FretboardPosition]BassNotePlayerGroup),
 				}
 
 				tuning := [config.StringCnt]string{"G2", "D2", "A1", "E1"}
@@ -311,7 +311,7 @@ func TestAudioManagerLoadSoundpackSamples(t *testing.T) {
 				return am, bassModel, tempDir
 			},
 			validate: func(t *testing.T, am *AudioManager, tempDir string) {
-				assert.Equal(t, 0, len(am.players))
+				assert.Equal(t, 0, len(am.playerGroups))
 			},
 		},
 	}
@@ -344,7 +344,7 @@ func TestAudioManagerPlayBassNote(t *testing.T) {
 			name: "play bass note for non-existent position",
 			setup: func() *AudioManager {
 				return &AudioManager{
-					players: make(map[bass.FretboardPosition]BassNotePlayer),
+					playerGroups: make(map[bass.FretboardPosition]BassNotePlayerGroup),
 				}
 			},
 			pos:       bass.FretboardPosition{StringIdx: 0, FretIdx: 0},
@@ -357,10 +357,10 @@ func TestAudioManagerPlayBassNote(t *testing.T) {
 			name: "play bass note for existing position with nil player",
 			setup: func() *AudioManager {
 				am := &AudioManager{
-					players: make(map[bass.FretboardPosition]BassNotePlayer),
+					playerGroups: make(map[bass.FretboardPosition]BassNotePlayerGroup),
 				}
 				pos := bass.FretboardPosition{StringIdx: 0, FretIdx: 0}
-				am.players[pos] = BassNotePlayer{}
+				am.playerGroups[pos] = BassNotePlayerGroup{}
 				return am
 			},
 			pos:       bass.FretboardPosition{StringIdx: 0, FretIdx: 0},

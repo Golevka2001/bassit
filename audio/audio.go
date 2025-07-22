@@ -10,17 +10,17 @@ import (
 	"github.com/Golevka2001/bassit/config"
 	"github.com/Golevka2001/bassit/utils"
 
-	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 	"github.com/ebitengine/oto/v3"
+	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 )
 
-type BassNotePlayer struct {
+type BassNotePlayerGroup struct {
 	players [config.PluckTypeCount]*oto.Player
 }
 
 type AudioManager struct {
-	otoCtx  *oto.Context
-	players map[bass.FretboardPosition]BassNotePlayer
+	otoCtx       *oto.Context
+	playerGroups map[bass.FretboardPosition]BassNotePlayerGroup
 }
 
 func NewAudioManager() (*AudioManager, error) {
@@ -39,8 +39,8 @@ func NewAudioManager() (*AudioManager, error) {
 
 	// Initialize the AudioManager
 	am := &AudioManager{
-		otoCtx:  otoCtx,
-		players: make(map[bass.FretboardPosition]BassNotePlayer),
+		otoCtx:       otoCtx,
+		playerGroups: make(map[bass.FretboardPosition]BassNotePlayerGroup),
 	}
 
 	return am, nil
@@ -52,8 +52,8 @@ func (am *AudioManager) PlayBassNote(pos bass.FretboardPosition, t bass.PluckTyp
 		return
 	}
 	// Reset the player to the beginning
-	player.Pause()
 	player.Seek(0, 0)
+	player.SetVolume(1)
 
 	player.Play()
 
@@ -68,8 +68,11 @@ func (am *AudioManager) StopBassNote(pos bass.FretboardPosition) {
 		if player == nil {
 			return
 		}
-		player.Pause()
-		player.Seek(0, 0)
+		// FIXME: Using Pause() causes an annoying small pop noise.
+		// Temporarily setting volume to 0 as a workaround, which may increase resource usage.
+		player.SetVolume(0)
+		// player.Pause()
+		// player.Seek(0, 0)
 	}
 }
 
@@ -97,19 +100,19 @@ func (am *AudioManager) LoadSoundpackSamples(b *bass.BassModel) {
 					continue
 				}
 				// Store to the map
-				player, ok := am.players[pos]
+				playerGroup, ok := am.playerGroups[pos]
 				if !ok {
-					player = BassNotePlayer{}
+					playerGroup = BassNotePlayerGroup{}
 				}
-				player.players[t] = am.otoCtx.NewPlayer(decodedWav)
-				am.players[pos] = player
+				playerGroup.players[t] = am.otoCtx.NewPlayer(decodedWav)
+				am.playerGroups[pos] = playerGroup
 			}
 		}
 	}
 }
 
 func (am *AudioManager) getPlayer(pos bass.FretboardPosition, t bass.PluckType) *oto.Player {
-	players, ok := am.players[pos]
+	players, ok := am.playerGroups[pos]
 	if !ok {
 		return nil
 	}

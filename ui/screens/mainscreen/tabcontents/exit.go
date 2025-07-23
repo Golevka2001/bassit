@@ -38,7 +38,7 @@ func (m ExitTabModel) View() string {
 		Width(m.commonModel.Width).
 		Height(m.commonModel.Height).
 		Align(lipgloss.Center).
-		Render("Comming Soon..."))
+		Render("Coming Soon..."))
 
 	return b.String()
 }

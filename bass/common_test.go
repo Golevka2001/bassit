@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/Golevka2001/bassit/config"
-	
+
 	"github.com/stretchr/testify/assert"
 )
 

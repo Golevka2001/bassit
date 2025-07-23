@@ -16,24 +16,54 @@ jobs:
 
     strategy:
       matrix:
-        # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/amd64, windows/arm64, darwin/amd64, darwin/arm64
-        goos: [linux, windows, darwin]
+        # build and publish in parallel: windows/386 windows/amd64, windows/arm64, darwin/amd64, darwin/arm64
+        goos: [windows, darwin]
         goarch: ["386", amd64, arm64]
         exclude:
           - goarch: "386"
             goos: darwin
-          - goarch: "386"
-            goos: windows
 
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libasound2-dev rubberband-cli
-        go get -v -d ./...
+    # FIXME: I give up. Cgo is always a tough nut to crack.
+    # - name: Install dependencies and set env
+    #   run: |
+    #     CGO_ENABLED=0
+    #     CC=""
+        
+    #     if [ "${{ matrix.goos }}" = "linux" ]; then
+    #       CGO_ENABLED=1
+    #       if [ "${{ matrix.goarch }}" = "arm64" ]; then
+    #         CC=aarch64-linux-gnu-gcc
+    #         sudo dpkg --add-architecture arm64
+    #         sudo touch /etc/apt/sources.list.d/arm64.list
+    #         sudo sed -i 's/^deb /deb [arch=amd64,i386] /g' /etc/apt/sources.list
+    #         sudo sed -i 's/^Types: deb$/&\nArchitectures: amd64 i386/' /etc/apt/sources.list.d/ubuntu.sources
+    #         echo "deb [arch=arm64] http://ports.ubuntu.com/ noble main restricted" | sudo tee -a /etc/apt/sources.list.d/arm64.list
+    #         echo "deb [arch=arm64] http://ports.ubuntu.com/ noble-updates main restricted" | sudo tee -a /etc/apt/sources.list.d/arm64.list
+    #         echo "deb [arch=arm64] http://ports.ubuntu.com/ noble universe" | sudo tee -a /etc/apt/sources.list.d/arm64.list
+    #         echo "deb [arch=arm64] http://ports.ubuntu.com/ noble-updates universe" | sudo tee -a /etc/apt/sources.list.d/arm64.list
+    #         echo "deb [arch=arm64] http://ports.ubuntu.com/ noble multiverse" | sudo tee -a /etc/apt/sources.list.d/arm64.list
+    #         echo "deb [arch=arm64] http://ports.ubuntu.com/ noble-updates multiverse" | sudo tee -a /etc/apt/sources.list.d/arm64.list
+    #         echo "deb [arch=arm64] http://ports.ubuntu.com/ noble-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/arm64.list
+    #         sudo apt-get update
+    #         sudo apt-get install -y gcc-aarch64-linux-gnu libasound2-dev:arm64
 
+    #       elif [ "${{ matrix.goarch }}" = "386" ]; then
+    #         sudo dpkg --add-architecture i386
+    #         sudo apt-get update
+    #         sudo apt-get install -y gcc-multilib libasound2-dev:i386
+
+    #       else
+    #         CC=gcc
+    #         sudo apt-get install -y libasound2-dev
+    #       fi
+    #     fi
+
+    #     echo "CGO_ENABLED=$CGO_ENABLED" >> "$GITHUB_ENV"
+    #     echo "CC=$CC" >> "$GITHUB_ENV"
+    
     - uses: wangyoucao577/go-release-action@v1.53
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
